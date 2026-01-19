@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: ga-auth-service
+  
+  # 가상 스레드 활성화
+  threads:
+    virtual:
+      enabled: true
+  
+  # 데이터베이스 설정
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ga_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  
+  # JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+  
+  # Redis 설정
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+server:
+  port: 8081
+
+# JWT 설정
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-change-in-production-min-256-bits}
+  access-token-expiration: 3600000 # 1 hour
+  refresh-token-expiration: 604800000 # 7 days
+
+# gRPC 설정
+grpc:
+  user-service:
+    host: ${GRPC_USER_SERVICE_HOST:localhost}
+    port: ${GRPC_USER_SERVICE_PORT:9090}
+  audit-service:
+    host: ${GRPC_AUDIT_SERVICE_HOST:localhost}
+    port: ${GRPC_AUDIT_SERVICE_PORT:9091}
+
+logging:
+  level:
+    root: INFO
+    com.goalmond: DEBUG
+    org.springframework.security: DEBUG

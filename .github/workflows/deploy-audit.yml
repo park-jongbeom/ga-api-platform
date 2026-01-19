@@ -1,0 +1,48 @@
+name: Deploy Audit Service
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ga-audit-service/**'
+      - 'ga-common/**'
+      - 'ga-grpc-interface/**'
+      - '.github/workflows/deploy-audit.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build Audit Service
+        run: ./gradlew :ga-audit-service:build -x test
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Image
+        run: |
+          docker build -f ga-audit-service/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/ga-audit-service:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/ga-audit-service:latest
+
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /opt/ga-api-platform
+            docker-compose pull ga-audit-service
+            docker-compose up -d ga-audit-service

@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ga-postgres
+    environment:
+      POSTGRES_DB: ga_db
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ga-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: ga-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ga-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: ga-auth-service/Dockerfile
+    container_name: ga-auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ga_db
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-production}
+      GRPC_USER_SERVICE_HOST: user-service
+      GRPC_USER_SERVICE_PORT: 9090
+      GRPC_AUDIT_SERVICE_HOST: audit-service
+      GRPC_AUDIT_SERVICE_PORT: 9091
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ga-network
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: .
+      dockerfile: ga-user-service/Dockerfile
+    container_name: ga-user-service
+    ports:
+      - "8082:8082"
+      - "9090:9090"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ga_db
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      GRPC_AUDIT_SERVICE_HOST: audit-service
+      GRPC_AUDIT_SERVICE_PORT: 9091
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ga-network
+    restart: unless-stopped
+
+  audit-service:
+    build:
+      context: .
+      dockerfile: ga-audit-service/Dockerfile
+    container_name: ga-audit-service
+    ports:
+      - "8083:8083"
+      - "9091:9091"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ga_db
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ga-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  ga-network:
+    driver: bridge

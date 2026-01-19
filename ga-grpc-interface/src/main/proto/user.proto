@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package com.goalmond.grpc.user;
+
+import "common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.goalmond.grpc.user";
+option java_outer_classname = "UserProto";
+
+// 사용자 프로필 조회 요청
+message GetUserProfileRequest {
+  string user_id = 1;
+}
+
+// 사용자 프로필 응답
+message UserProfileResponse {
+  string user_id = 1;
+  string email = 2;
+  string name = 3;
+  repeated AcademicProfile academic_profiles = 4;
+  repeated FinancialProfile financial_profiles = 5;
+  repeated UserPreference preferences = 6;
+}
+
+// 학업 프로필
+message AcademicProfile {
+  string id = 1;
+  string degree = 2;
+  string major = 3;
+  double gpa = 4;
+  string institution = 5;
+}
+
+// 재정 프로필
+message FinancialProfile {
+  string id = 1;
+  string budget_range = 2;
+  string funding_source = 3;
+}
+
+// 사용자 선호도
+message UserPreference {
+  string id = 1;
+  string preferred_major = 2;
+  string career_track = 3;
+}
+
+// 사용자 서비스
+service UserService {
+  rpc GetUserProfile(GetUserProfileRequest) returns (UserProfileResponse);
+}

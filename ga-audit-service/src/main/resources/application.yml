@@ -37,3 +37,15 @@ logging:
   level:
     root: INFO
     com.goalmond: DEBUG
+
+# SpringDoc OpenAPI (Swagger) 설정
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  info:
+    title: GA Audit Service API
+    description: 감사 로그 서비스 API 문서
+    version: 1.0.0

@@ -61,3 +61,15 @@ logging:
     root: INFO
     com.goalmond: DEBUG
     org.springframework.security: DEBUG
+
+# SpringDoc OpenAPI (Swagger) 설정
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  info:
+    title: GA Auth Service API
+    description: 인증/인가 서비스 API 문서
+    version: 1.0.0

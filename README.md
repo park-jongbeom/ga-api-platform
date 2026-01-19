@@ -172,6 +172,46 @@ docker compose --env-file .env up -d
 - **User Service**: http://localhost:8082
 - **Audit Service**: http://localhost:8083
 
+## Swagger API 문서
+
+각 서비스의 Swagger UI를 통해 REST API 문서를 확인하고 테스트할 수 있습니다.
+
+### 접근 방법
+
+#### 로컬 개발 환경
+- **Auth Service (인증/인가)**: http://localhost:8081/swagger-ui.html
+- **User Service (사용자 프로필)**: http://localhost:8082/swagger-ui.html
+- **Audit Service (감사 로그)**: http://localhost:8083/swagger-ui.html
+
+#### 프로덕션 환경
+배포된 서버의 경우, 각 서비스의 포트에 접근:
+- **Auth Service Swagger**: `http://{서버주소}:8081/swagger-ui.html`
+- **User Service Swagger**: `http://{서버주소}:8082/swagger-ui.html`
+- **Audit Service Swagger**: `http://{서버주소}:8083/swagger-ui.html`
+
+### OpenAPI JSON 스펙
+각 서비스의 OpenAPI JSON 스펙을 다운로드하여 Postman, Insomnia 등에서 사용할 수 있습니다:
+- **Auth Service**: `http://{서버주소}:8081/v3/api-docs`
+- **User Service**: `http://{서버주소}:8082/v3/api-docs`
+- **Audit Service**: `http://{서버주소}:8083/v3/api-docs`
+
+### Swagger UI 주요 기능
+1. **API 문서 확인**: 각 엔드포인트의 상세 설명, 파라미터, 응답 형식 확인
+2. **API 테스트**: 브라우저에서 직접 API 호출 및 응답 확인
+3. **인증 토큰 설정**: "Authorize" 버튼을 통해 JWT 토큰 설정 가능
+4. **요청/응답 예시**: 각 API의 요청 및 응답 예시 확인
+
+### API 사용 가이드
+각 서비스의 Swagger UI에서 다음 정보를 확인할 수 있습니다:
+- **인증/인가 API**: 로그인, 토큰 갱신, 로그아웃 방법
+- **사용자 프로필 API**: 사용자 정보 및 프로필 조회 방법
+- **감사 로그 API**: 감사 로그 조회 및 필터링 방법
+
+### 참고사항
+- 모든 REST API는 JWT Access Token 인증이 필요합니다 (인증 API 제외)
+- Swagger UI에서 "Authorize" 버튼을 클릭하여 토큰을 설정할 수 있습니다
+- 토큰 형식: `Bearer {accessToken}`
+
 ## gRPC 포트
 
 - **User Service**: 9090

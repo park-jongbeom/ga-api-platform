@@ -174,9 +174,31 @@ docker compose --env-file .env up -d
 
 ## Swagger API 문서
 
-각 서비스의 Swagger UI를 통해 REST API 문서를 확인하고 테스트할 수 있습니다.
+모든 마이크로서비스의 API 문서를 하나의 통합 Swagger UI에서 확인할 수 있습니다.
 
-### 접근 방법
+### 통합 Swagger UI (권장)
+
+**ga-auth-service**를 메인 문서 페이지로 사용하여 모든 서비스의 API를 한 곳에서 확인할 수 있습니다.
+
+#### 접근 방법
+
+- **로컬 개발 환경**: http://localhost:8081/swagger-ui.html
+- **프로덕션 환경**: `http://{서버주소}:8081/swagger-ui.html`
+
+#### 사용 방법
+
+1. **서비스 선택**: Swagger UI 상단의 드롭다운에서 원하는 서비스를 선택합니다.
+   - 인증/인가 서비스 (Auth Service) - 기본 선택
+   - 사용자 프로필 서비스 (User Service)
+   - 감사 로그 서비스 (Audit Service)
+
+2. **API 탐색**: 선택한 서비스의 모든 API 엔드포인트를 확인할 수 있습니다.
+
+3. **API 테스트**: "Try it out" 버튼을 클릭하여 브라우저에서 직접 API를 호출하고 응답을 확인할 수 있습니다.
+
+### 개별 서비스 Swagger UI
+
+각 서비스의 개별 Swagger UI에도 접근할 수 있습니다:
 
 #### 로컬 개발 환경
 - **Auth Service (인증/인가)**: http://localhost:8081/swagger-ui.html
@@ -184,12 +206,12 @@ docker compose --env-file .env up -d
 - **Audit Service (감사 로그)**: http://localhost:8083/swagger-ui.html
 
 #### 프로덕션 환경
-배포된 서버의 경우, 각 서비스의 포트에 접근:
 - **Auth Service Swagger**: `http://{서버주소}:8081/swagger-ui.html`
 - **User Service Swagger**: `http://{서버주소}:8082/swagger-ui.html`
 - **Audit Service Swagger**: `http://{서버주소}:8083/swagger-ui.html`
 
 ### OpenAPI JSON 스펙
+
 각 서비스의 OpenAPI JSON 스펙을 다운로드하여 Postman, Insomnia 등에서 사용할 수 있습니다:
 - **Auth Service**: `http://{서버주소}:8081/v3/api-docs`
 - **User Service**: `http://{서버주소}:8082/v3/api-docs`

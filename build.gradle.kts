@@ -21,9 +21,11 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "io.spring.dependency-management")
 
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
+    afterEvaluate {
+        extensions.configure<org.gradle.api.plugins.JavaPluginExtension> {
+            toolchain {
+                languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(21))
+            }
         }
     }
 

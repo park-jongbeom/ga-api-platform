@@ -1,0 +1,141 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  SERVER_HOST: ${{ secrets.SERVER_HOST }}
+  SERVER_USER: ${{ secrets.SERVER_USER }}
+  SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_PORT: ${{ secrets.DB_PORT }}
+  DB_NAME: ${{ secrets.DB_NAME }}
+  DB_USERNAME: ${{ secrets.DB_USERNAME }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ env.SERVER_SSH_KEY }}
+      
+      - name: Add server to known hosts
+        run: |
+          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SERVER_HOST }}
+          username: ${{ env.SERVER_USER }}
+          key: ${{ env.SERVER_SSH_KEY }}
+          command_timeout: 300s
+          envs: DB_HOST,DB_PORT,DB_NAME,DB_USERNAME,DB_PASSWORD
+          script: |
+            #!/bin/bash
+            set -e
+            
+            # 디렉토리 생성 (없는 경우)
+            mkdir -p /home/${{ env.SERVER_USER }}/ga-api-platform
+            cd /home/${{ env.SERVER_USER }}/ga-api-platform
+            
+            # .env 파일 생성 또는 업데이트 (환경 변수 저장)
+            cat > .env << EOF
+            DB_HOST=${DB_HOST}
+            DB_PORT=${DB_PORT}
+            DB_NAME=${DB_NAME}
+            DB_USERNAME=${DB_USERNAME}
+            DB_PASSWORD=${DB_PASSWORD}
+            EOF
+            
+            # 함수: 재시도 로직을 포함한 이미지 pull
+            pull_with_retry() {
+              local service=$1
+              local max_attempts=3
+              local attempt=1
+              
+              while [ $attempt -le $max_attempts ]; do
+                echo "Attempt $attempt of $max_attempts: Pulling $service..."
+                
+                # timeout 명령어로 각 pull에 개별 타임아웃 설정 (120초)
+                if timeout 120 docker compose pull "$service" 2>&1; then
+                  echo "Successfully pulled $service"
+                  return 0
+                fi
+                
+                if [ $attempt -lt $max_attempts ]; then
+                  wait_time=$((attempt * 10))
+                  echo "Pull failed. Waiting ${wait_time}s before retry..."
+                  sleep $wait_time
+                fi
+                
+                attempt=$((attempt + 1))
+              done
+              
+              echo "Warning: Failed to pull $service after $max_attempts attempts"
+              return 1
+            }
+            
+            # 함수: 이미지 존재 확인
+            image_exists() {
+              local image=$1
+              docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^${image}$" 2>/dev/null
+            }
+            
+            # Docker Compose V2 사용 시도, 없으면 docker-compose 사용
+            DOCKER_COMPOSE_CMD=""
+            if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
+              DOCKER_COMPOSE_CMD="docker compose"
+            elif command -v docker-compose &> /dev/null; then
+              DOCKER_COMPOSE_CMD="docker-compose"
+            else
+              echo "Docker Compose를 찾을 수 없습니다. 설치가 필요합니다."
+              exit 1
+            fi
+            
+            echo "Using: $DOCKER_COMPOSE_CMD"
+            
+            # ga-user-service 배포
+            SERVICE_NAME="ga-user-service"
+            IMAGE_NAME="patrick5471/${SERVICE_NAME}:latest"
+            
+            echo "Checking if image ${IMAGE_NAME} exists..."
+            
+            # 이미지가 이미 존재하는지 확인
+            if image_exists "$IMAGE_NAME"; then
+              echo "이미지 ${IMAGE_NAME}가 이미 존재합니다."
+              echo "최신 버전을 위해 pull을 시도하지만, 실패해도 기존 이미지로 진행합니다."
+              
+              # Pull 시도 (실패해도 계속 진행)
+              pull_with_retry "$SERVICE_NAME" || {
+                echo "Pull 실패, 기존 이미지로 서비스를 시작합니다."
+              }
+            else
+              echo "이미지가 존재하지 않습니다. Pull이 필수입니다."
+              if ! pull_with_retry "$SERVICE_NAME"; then
+                echo "Error: 이미지 pull에 실패했습니다. 서비스를 시작할 수 없습니다."
+                exit 1
+              fi
+            fi
+            
+            # 서비스 시작
+            echo "Starting service ${SERVICE_NAME}..."
+            $DOCKER_COMPOSE_CMD --env-file .env up -d "$SERVICE_NAME"
+            
+            # 서비스 상태 확인
+            echo "Checking service status..."
+            sleep 5
+            $DOCKER_COMPOSE_CMD ps "$SERVICE_NAME"
+            
+            echo "Deployment completed successfully!"

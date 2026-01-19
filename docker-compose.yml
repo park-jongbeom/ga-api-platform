@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -35,10 +33,8 @@ services:
     networks:
       - ga-network
 
-  auth-service:
-    build:
-      context: .
-      dockerfile: ga-auth-service/Dockerfile
+  ga-auth-service:
+    image: ${DOCKER_USERNAME:-yourusername}/ga-auth-service:latest
     container_name: ga-auth-service
     ports:
       - "8081:8081"
@@ -51,9 +47,9 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-production}
-      GRPC_USER_SERVICE_HOST: user-service
+      GRPC_USER_SERVICE_HOST: ga-user-service
       GRPC_USER_SERVICE_PORT: 9090
-      GRPC_AUDIT_SERVICE_HOST: audit-service
+      GRPC_AUDIT_SERVICE_HOST: ga-audit-service
       GRPC_AUDIT_SERVICE_PORT: 9091
     depends_on:
       postgres:
@@ -64,10 +60,8 @@ services:
       - ga-network
     restart: unless-stopped
 
-  user-service:
-    build:
-      context: .
-      dockerfile: ga-user-service/Dockerfile
+  ga-user-service:
+    image: ${DOCKER_USERNAME:-yourusername}/ga-user-service:latest
     container_name: ga-user-service
     ports:
       - "8082:8082"
@@ -78,7 +72,7 @@ services:
       DB_NAME: ga_db
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      GRPC_AUDIT_SERVICE_HOST: audit-service
+      GRPC_AUDIT_SERVICE_HOST: ga-audit-service
       GRPC_AUDIT_SERVICE_PORT: 9091
     depends_on:
       postgres:
@@ -87,10 +81,8 @@ services:
       - ga-network
     restart: unless-stopped
 
-  audit-service:
-    build:
-      context: .
-      dockerfile: ga-audit-service/Dockerfile
+  ga-audit-service:
+    image: ${DOCKER_USERNAME:-yourusername}/ga-audit-service:latest
     container_name: ga-audit-service
     ports:
       - "8083:8083"

@@ -35,6 +35,9 @@ dependencies {
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     
+    // SpringDoc OpenAPI (Swagger 어노테이션)
+    implementation("io.swagger.core.v3:swagger-annotations-jakarta:2.2.19")
+    
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

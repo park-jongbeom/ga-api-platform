@@ -95,14 +95,75 @@ docker-compose up -d
 
 ## 환경 변수
 
+### 로컬 개발
+
 `.env` 파일을 생성하여 다음 변수를 설정하세요:
 
 ```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=ga_db
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
 REDIS_HOST=localhost
 REDIS_PORT=6379
 JWT_SECRET=your-secret-key-change-in-production-min-256-bits
+```
+
+### 프로덕션 배포 (외부 DB 사용)
+
+이 프로젝트는 외부 PostgreSQL 데이터베이스(예: AWS Lightsail Managed DB)를 사용합니다.
+
+#### 서버에 .env 파일 생성
+
+배포 서버의 `/home/{USER}/ga-api-platform/` 디렉토리에 `.env` 파일을 생성하세요:
+
+```bash
+cd /home/ubuntu/ga-api-platform
+cat > .env << EOF
+DB_HOST=your-external-db-host.example.com
+DB_PORT=5432
+DB_NAME=ga_db
+DB_USERNAME=your-db-username
+DB_PASSWORD=your-db-password
+EOF
+chmod 600 .env  # 보안을 위해 권한 제한
+```
+
+#### GitHub Secrets 설정
+
+GitHub Actions에서 자동 배포를 사용하려면 다음 Secrets를 설정하세요:
+
+**Repository Settings > Secrets and variables > Actions**에서 다음을 추가:
+
+1. **Docker Hub 관련:**
+   - `DOCKER_USERNAME`: Docker Hub 사용자명
+   - `DOCKER_PASSWORD`: Docker Hub 액세스 토큰
+
+2. **서버 접속 관련:**
+   - `SERVER_HOST`: 배포 서버 호스트 주소
+   - `SERVER_USER`: SSH 사용자명
+   - `SERVER_SSH_KEY`: SSH 개인 키
+
+3. **데이터베이스 관련 (필수):**
+   - `DB_HOST`: 외부 PostgreSQL 호스트 주소
+   - `DB_PORT`: PostgreSQL 포트 (기본값: 5432)
+   - `DB_NAME`: 데이터베이스 이름
+   - `DB_USERNAME`: 데이터베이스 사용자명
+   - `DB_PASSWORD`: 데이터베이스 비밀번호
+
+#### 수동 배포 시 환경 변수 설정
+
+서버에서 직접 Docker Compose를 실행하는 경우:
+
+```bash
+export DB_HOST=your-external-db-host.example.com
+export DB_PORT=5432
+export DB_NAME=ga_db
+export DB_USERNAME=your-db-username
+export DB_PASSWORD=your-db-password
+
+docker compose --env-file .env up -d
 ```
 
 ## API 엔드포인트
@@ -123,12 +184,8 @@ GitHub Actions를 통해 자동 빌드 및 배포가 설정되어 있습니다.
 1. `main` 브랜치에 푸시하면 자동으로 빌드 및 Docker Hub에 푸시됩니다.
 2. 배포는 AWS Lightsail 서버로 자동 진행됩니다.
 
-필요한 GitHub Secrets:
-- `DOCKER_HUB_USERNAME`
-- `DOCKER_HUB_TOKEN`
-- `AWS_LIGHTSAIL_HOST`
-- `AWS_LIGHTSAIL_USERNAME`
-- `AWS_LIGHTSAIL_SSH_KEY`
+**참고:** GitHub Actions 워크플로우는 자동으로 서버에 `.env` 파일을 생성하고 환경 변수를 주입합니다. 
+서버에 직접 접속하여 수동으로 `.env` 파일을 생성할 수도 있습니다.
 
 ## 라이선스
 

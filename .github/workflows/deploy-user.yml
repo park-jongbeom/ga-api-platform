@@ -41,6 +41,15 @@ jobs:
           docker build -f ga-user-service/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/ga-user-service:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/ga-user-service:latest
 
+      - name: Copy docker-compose.yml to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "/opt/ga-api-platform/"
+          
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -48,6 +57,18 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            # 디렉토리 생성 (없는 경우)
+            mkdir -p /opt/ga-api-platform
             cd /opt/ga-api-platform
-            docker-compose pull ga-user-service
-            docker-compose up -d ga-user-service
+            
+            # Docker Compose V2 사용 시도, 없으면 docker-compose 사용
+            if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+              docker compose pull ga-user-service
+              docker compose up -d ga-user-service
+            elif command -v docker-compose &> /dev/null; then
+              docker-compose pull ga-user-service
+              docker-compose up -d ga-user-service
+            else
+              echo "Docker Compose를 찾을 수 없습니다. 설치가 필요합니다."
+              exit 1
+            fi

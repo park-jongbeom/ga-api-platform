@@ -1,0 +1,12 @@
+{
+  "git.commitMessageLanguage": "ko",
+  "git.useCommitInputAsStashMessage": true,
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "[kotlin]": {
+    "files.encoding": "utf8"
+  },
+  "[yaml]": {
+    "files.encoding": "utf8"
+  }
+}

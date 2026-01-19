@@ -20,8 +20,8 @@ class AuthController {
     }
     
     @PostMapping("/logout")
-    fun logout(): ApiResponse<Nothing> {
+    fun logout(): ApiResponse<Unit> {
         // TODO: 구현 필요
-        return ApiResponse.success(null, "Logout successful")
+        return ApiResponse.success(Unit, "Logout successful")
     }
 }

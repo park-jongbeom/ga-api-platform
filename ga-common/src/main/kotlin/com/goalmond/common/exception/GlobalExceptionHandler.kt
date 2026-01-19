@@ -43,7 +43,7 @@ class GlobalExceptionHandler {
         logger.warn("Not found: {}", e.message)
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
-            .body(ApiResponse.error(e.message))
+            .body(ApiResponse.error(e.message ?: "요청한 리소스를 찾을 수 없습니다."))
     }
 
     @ExceptionHandler(UnauthorizedException::class)
@@ -51,7 +51,7 @@ class GlobalExceptionHandler {
         logger.warn("Unauthorized: {}", e.message)
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
-            .body(ApiResponse.error(e.message))
+            .body(ApiResponse.error(e.message ?: "인증이 필요합니다."))
     }
 
     @ExceptionHandler(ForbiddenException::class)
@@ -59,7 +59,7 @@ class GlobalExceptionHandler {
         logger.warn("Forbidden: {}", e.message)
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
-            .body(ApiResponse.error(e.message))
+            .body(ApiResponse.error(e.message ?: "접근 권한이 없습니다."))
     }
 
     @ExceptionHandler(BusinessException::class)
@@ -67,7 +67,7 @@ class GlobalExceptionHandler {
         logger.warn("Business exception: {}", e.message)
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(ApiResponse.error(e.message))
+            .body(ApiResponse.error(e.message ?: "비즈니스 로직 오류가 발생했습니다."))
     }
 
     @ExceptionHandler(Exception::class)

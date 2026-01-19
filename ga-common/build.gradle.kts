@@ -6,9 +6,21 @@ plugins {
     id("io.spring.dependency-management")
 }
 
+// ga-common은 라이브러리 모듈이므로 bootJar 비활성화
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    enabled = false
+}
+
+// 일반 jar 빌드 활성화
+tasks.named<Jar>("jar") {
+    enabled = true
+    archiveClassifier.set("")
+}
+
 dependencies {
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     

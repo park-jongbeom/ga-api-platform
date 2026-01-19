@@ -1,7 +1,7 @@
 package com.goalmond.common.entity
 
 import jakarta.persistence.*
-import org.hibernate.annotations.GenericGenerator
+import org.hibernate.annotations.UuidGenerator
 import java.time.LocalDateTime
 import java.util.*
 
@@ -12,8 +12,8 @@ import java.util.*
 @MappedSuperclass
 abstract class AuditEntity {
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @GeneratedValue
+    @UuidGenerator
     @Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
     var id: UUID? = null
 

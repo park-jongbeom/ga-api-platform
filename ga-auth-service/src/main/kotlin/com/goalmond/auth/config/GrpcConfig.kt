@@ -1,4 +1,4 @@
-package com.goalmond.grpc.config
+package com.goalmond.auth.config
 
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder

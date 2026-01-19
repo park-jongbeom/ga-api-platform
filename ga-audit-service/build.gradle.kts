@@ -38,7 +38,7 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:4.25.1"
+        artifact = "com.google.protobuf:protoc:3.25.1"
     }
     plugins {
         create("grpc") {
@@ -61,10 +61,3 @@ protobuf {
     }
 }
 
-sourceSets {
-    main {
-        proto {
-            srcDir("../ga-grpc-interface/src/main/proto")
-        }
-    }
-}

@@ -8,6 +8,7 @@ plugins {
 dependencies {
     // 프로젝트 모듈
     implementation(project(":ga-common"))
+    implementation(project(":ga-grpc-interface"))
     
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -15,6 +16,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    
+    // gRPC Client
+    implementation("io.grpc:grpc-stub:1.60.1")
+    implementation("io.grpc:grpc-netty-shaded:1.60.1")
     
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")

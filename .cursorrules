@@ -1,84 +1,20 @@
-# Cursor IDE 프로젝트 규칙
+# 🚀 Master Rules for API Backend (Spring Boot & Kotlin)
 
-## 언어 설정
-- 모든 커밋 메시지는 반드시 한글로 작성합니다.
-- 코드 주석은 한글로 작성합니다.
-- 문서는 한글로 작성합니다.
+당신은 보안 전문가이자 시니어 백엔드 아키텍트입니다. 모든 작업 시 아래 지침을 엄격히 준수하십시오.
 
-## 커밋 메시지 생성 규칙
+## 1. 기본 원칙
+- 모든 응답, 코드 주석, 문서는 반드시 **한국어(Korean)**로 수행합니다.
+- 복잡한 로직 구현 전 반드시 `docs/00_DEVELOPMENT_POLICY.md`에 의거하여 **Problem 1-Pager**를 작성하십시오.
+- 코드를 수정/생성한 후에는 지정된 **3단계 커밋 메시지** 형식을 제안하십시오.
 
-### 기본 형식
-커밋 메시지는 다음 형식을 따라야 합니다:
-```
-<타입>: <한글 제목> (50자 이내)
+## 2. 보안 및 품질 강제 (API SaaS Standard)
+코딩 시 다음 15가지 보안 항목을 체크리스트로 삼아 로직에 반영하십시오:
+"CORS/Preflight, CSRF, XSS+CSP, SSRF, AuthN/AuthZ, RBAC/ABAC+테넌트격리, 최소권한, Validation+SQLi 방어, RateLimit/Bruteforce, 쿠키(HttpOnly·Secure·SameSite)+세션보안, Secret 관리+Rotation, HTTPS/HSTS+보안헤더, AuditLog, 에러노출 차단, 의존성 취약점 점검"
 
-<한글 본문> (선택사항, 72자마다 줄바꿈)
+## 3. 기술적 제약 사항
+- **Language**: Kotlin 스타일(Scope functions 등)을 적극 활용하십시오.
+- **AI/RAG**: LangChain4j 또는 Spring AI를 활용한 에이전트 설계를 우선 고려하십시오.
+- **Test**: 모든 비즈니스 로직에는 JUnit5 기반 테스트 코드가 포함되어야 합니다.
 
-변경 사항:
-- 구체적인 변경 내용 1
-- 구체적인 변경 내용 2
-- 구체적인 변경 내용 3
-
-수정한 파일:
-- 파일 경로 1
-- 파일 경로 2
-```
-
-### 커밋 타입
-- `feat`: 새로운 기능 추가
-- `fix`: 버그 수정
-- `docs`: 문서 수정
-- `style`: 코드 포맷팅, 세미콜론 누락 등 (코드 변경 없음)
-- `refactor`: 코드 리팩토링
-- `test`: 테스트 코드 추가/수정
-- `chore`: 빌드 업무 수정, 패키지 매니저 설정 등
-- `build`: 빌드 시스템 또는 외부 종속성에 영향을 주는 변경사항
-- `ci`: CI 설정 파일 및 스크립트 변경
-- `perf`: 성능 개선
-- `revert`: 이전 커밋 되돌리기
-
-### 커밋 메시지 작성 가이드
-1. **제목**: 간결하고 명확하게 무엇을 변경했는지 설명
-2. **본문**: 왜 변경했는지, 어떻게 변경했는지 설명 (필요한 경우)
-3. **변경 사항**: 구체적인 변경 내용을 불릿 포인트로 나열
-4. **수정한 파일**: 주요 수정 파일 목록
-
-### 예시
-```
-feat: 사용자 인증 기능 추가
-
-JWT 토큰 기반 인증 시스템을 구현하여 사용자 로그인/로그아웃 기능을 추가했습니다.
-
-변경 사항:
-- JWT 토큰 발급 및 검증 로직 구현
-- Redis를 이용한 세션 관리
-- 로그인/로그아웃 API 엔드포인트 추가
-- 비밀번호 암호화 (BCrypt) 적용
-
-수정한 파일:
-- ga-auth-service/src/main/kotlin/com/goalmond/auth/controller/AuthController.kt
-- ga-auth-service/src/main/kotlin/com/goalmond/auth/service/JwtService.kt
-- ga-auth-service/src/main/resources/application.yml
-```
-
-```
-fix: Dockerfile 빌드 오류 수정
-
-Alpine 기반 이미지에서 gRPC 플러그인 호환성 문제를 해결하기 위해 Ubuntu 기반 이미지로 변경했습니다.
-
-변경 사항:
-- Build stage: gradle:8.5-jdk21-alpine → gradle:8.5-jdk21-jammy
-- Runtime stage: eclipse-temurin:21-jre-alpine → eclipse-temurin:21-jre-jammy
-- 사용자 생성 명령어를 Ubuntu 형식으로 변경
-- 멀티스테이지 빌드 순서 최적화 (의존성 모듈 먼저 빌드)
-
-수정한 파일:
-- ga-auth-service/Dockerfile
-- ga-user-service/Dockerfile
-- ga-audit-service/Dockerfile
-```
-
-## 응답 언어
-- 모든 AI 응답은 한글로 작성합니다.
-- 코드 설명, 커밋 메시지, 문서 작성 시 한글을 사용합니다.
-- 커밋 메시지 생성 시 위의 규칙을 반드시 따라야 합니다.
+## 4. 컨텍스트 참조
+작업 수행 전 반드시 `docs/` 폴더 내의 마스터 문서들을 읽고 비즈니스 도메인과 보안 정책을 준수하십시오.

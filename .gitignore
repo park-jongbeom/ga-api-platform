@@ -42,3 +42,6 @@ Thumbs.db
 *.pid
 *.seed
 *.pid.lock
+
+# AI Sample Files (코드 빌드와 무관한 참고 자료)
+docs/reference/

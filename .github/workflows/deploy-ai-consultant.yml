@@ -1,0 +1,99 @@
+﻿name: Deploy AI Consultant Service
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ga-ai-consultant-service/**'
+      - 'ga-common/**'
+      - 'ga-grpc-interface/**'
+      - '.github/workflows/deploy-ai-consultant.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build AI Consultant Service
+        run: ./gradlew :ga-ai-consultant-service:build -x test
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Image
+        run: |
+          docker build -f ga-ai-consultant-service/Dockerfile -t patrick5471/ga-ai-consultant-service:latest .
+          docker push patrick5471/ga-ai-consultant-service:latest
+
+      - name: Copy docker-compose.yml to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "/home/${{ secrets.SERVER_USER }}/ga-api-platform"
+          
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+          RATE_LIMIT_PER_MINUTE: ${{ secrets.RATE_LIMIT_PER_MINUTE }}
+          RATE_LIMIT_PER_HOUR: ${{ secrets.RATE_LIMIT_PER_HOUR }}
+          RATE_LIMIT_PER_DAY: ${{ secrets.RATE_LIMIT_PER_DAY }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: DB_HOST,DB_PORT,DB_NAME,DB_USERNAME,DB_PASSWORD,OPENAI_API_KEY,JWT_SECRET,REDIS_PASSWORD,ALLOWED_ORIGINS,RATE_LIMIT_PER_MINUTE,RATE_LIMIT_PER_HOUR,RATE_LIMIT_PER_DAY
+          script: |
+            mkdir -p /home/${{ secrets.SERVER_USER }}/ga-api-platform
+            cd /home/${{ secrets.SERVER_USER }}/ga-api-platform
+            
+            cat > .env << EOF
+            DB_HOST=${DB_HOST}
+            DB_PORT=${DB_PORT}
+            DB_NAME=${DB_NAME}
+            DB_USERNAME=${DB_USERNAME}
+            DB_PASSWORD=${DB_PASSWORD}
+            OPENAI_API_KEY=${OPENAI_API_KEY}
+            JWT_SECRET=${JWT_SECRET}
+            REDIS_PASSWORD=${REDIS_PASSWORD}
+            ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+            RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE:-10}
+            RATE_LIMIT_PER_HOUR=${RATE_LIMIT_PER_HOUR:-100}
+            RATE_LIMIT_PER_DAY=${RATE_LIMIT_PER_DAY:-500}
+            EOF
+            
+            if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+              docker compose --env-file .env pull ga-ai-consultant-service
+              docker compose --env-file .env up -d ga-ai-consultant-service
+            elif command -v docker-compose &> /dev/null; then
+              docker-compose --env-file .env pull ga-ai-consultant-service
+              docker-compose --env-file .env up -d ga-ai-consultant-service
+            else
+              echo "Docker Compose瑜?李얠쓣 ???놁뒿?덈떎. ?ㅼ튂媛 ?꾩슂?⑸땲??"
+              exit 1
+            fi

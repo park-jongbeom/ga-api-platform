@@ -1,0 +1,142 @@
+spring:
+  application:
+    name: ga-ai-consultant-service
+  
+  # 데이터베이스 설정
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/goalmond_ai}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  # JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: false
+        use_sql_comments: true
+    open-in-view: false
+  
+  # Flyway 마이그레이션
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    schemas: public
+  
+  # Redis 설정 (Chat Memory & Rate Limiting)
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+  
+  # Security 설정
+  security:
+    jwt:
+      secret: ${JWT_SECRET:your-256-bit-secret-key-change-this-in-production}
+      expiration: 86400000 # 24시간
+
+# 서버 설정
+server:
+  port: ${SERVER_PORT:8083}
+  shutdown: graceful
+  compression:
+    enabled: true
+  error:
+    include-message: always
+    include-stacktrace: never
+    include-binding-errors: never
+
+# LangChain4j 설정
+langchain4j:
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    model-name: ${OPENAI_MODEL:gpt-4-turbo}
+    temperature: 0.7
+    max-tokens: 2000
+    timeout: 30s
+  
+  embeddings:
+    model-name: text-embedding-ada-002
+    dimension: 1536
+
+# Rate Limiting 설정
+rate-limit:
+  per-minute: 10
+  per-hour: 100
+  per-day: 500
+
+# CORS 설정
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173}
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+# Actuator 설정 (내부 네트워크만 접근)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    enable:
+      jvm: true
+      system: true
+      process: true
+      hikaricp: true
+    export:
+      prometheus:
+        enabled: true
+        step: 10s
+    tags:
+      application: ${spring.application.name}
+      environment: ${ENVIRONMENT:local}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        consultant.chat.processing: true
+        rag.search.duration: true
+
+# 로깅 설정
+logging:
+  level:
+    com.goalmond: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    dev.langchain4j: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Swagger 설정
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha

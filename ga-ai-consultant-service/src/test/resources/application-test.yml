@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: ga-ai-consultant-service-test
+  
+  # 테스트용 H2 데이터베이스 (경량)
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        show_sql: false
+  
+  # Flyway 비활성화 (테스트에서는 ddl-auto: create-drop 사용)
+  flyway:
+    enabled: false
+  
+  # 테스트용 임베디드 Redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  
+  # Security 테스트 설정
+  security:
+    jwt:
+      secret: test-secret-key-for-junit-tests-only-256-bits
+      expiration: 3600000
+
+# LangChain4j 테스트 설정 (Mock)
+langchain4j:
+  openai:
+    api-key: sk-test-mock-key
+    model-name: gpt-4-turbo
+    temperature: 0.7
+
+# Rate Limiting 테스트 설정
+rate-limit:
+  per-minute: 1000
+  per-hour: 10000
+  per-day: 100000
+
+# 로깅 테스트 설정
+logging:
+  level:
+    com.goalmond: INFO
+    org.springframework: WARN

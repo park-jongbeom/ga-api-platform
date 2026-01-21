@@ -5,5 +5,6 @@ include(
     "ga-grpc-interface",
     "ga-auth-service",
     "ga-user-service",
-    "ga-audit-service"
+    "ga-audit-service",
+    "ga-ai-consultant-service"
 )

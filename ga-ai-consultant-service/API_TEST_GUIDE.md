@@ -56,7 +56,7 @@ export SERVER_HOST="123.456.789.0"
 **인증 불필요**, 서비스 기본 상태 확인:
 
 ```bash
-curl http://${SERVER_HOST}:8084/actuator/health
+curl http://go-almond.ddnsfree.com:8084/actuator/health
 ```
 
 **예상 응답:**

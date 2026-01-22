@@ -55,7 +55,7 @@ spring:
 
 # 서버 설정
 server:
-  port: ${SERVER_PORT:8083}
+  port: ${SERVER_PORT:8084}
   shutdown: graceful
   compression:
     enabled: true

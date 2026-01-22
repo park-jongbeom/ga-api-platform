@@ -26,6 +26,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build AI Consultant Service
+        working-directory: .
         run: ./gradlew :ga-ai-consultant-service:build -x test
 
       - name: Login to Docker Hub
@@ -35,6 +36,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and Push Image
+        working-directory: .
         run: |
           docker build -f ga-ai-consultant-service/Dockerfile -t patrick5471/ga-ai-consultant-service:latest .
           docker push patrick5471/ga-ai-consultant-service:latest
@@ -69,9 +71,11 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           envs: DB_HOST,DB_PORT,DB_NAME,DB_USERNAME,DB_PASSWORD,OPENAI_API_KEY,JWT_SECRET,REDIS_PASSWORD,ALLOWED_ORIGINS,RATE_LIMIT_PER_MINUTE,RATE_LIMIT_PER_HOUR,RATE_LIMIT_PER_DAY
           script: |
+            # 디렉토리 생성 (없는 경우)
             mkdir -p /home/${{ secrets.SERVER_USER }}/ga-api-platform
             cd /home/${{ secrets.SERVER_USER }}/ga-api-platform
             
+            # .env 파일 생성 또는 업데이트 (환경 변수 저장)
             cat > .env << EOF
             DB_HOST=${DB_HOST}
             DB_PORT=${DB_PORT}
@@ -80,13 +84,14 @@ jobs:
             DB_PASSWORD=${DB_PASSWORD}
             OPENAI_API_KEY=${OPENAI_API_KEY}
             JWT_SECRET=${JWT_SECRET}
-            REDIS_PASSWORD=${REDIS_PASSWORD}
+            REDIS_PASSWORD=${REDIS_PASSWORD:-}
             ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
             RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE:-10}
             RATE_LIMIT_PER_HOUR=${RATE_LIMIT_PER_HOUR:-100}
             RATE_LIMIT_PER_DAY=${RATE_LIMIT_PER_DAY:-500}
             EOF
             
+            # Docker Compose V2 사용 시도, 없으면 docker-compose 사용
             if command -v docker &> /dev/null && docker compose version &> /dev/null; then
               docker compose --env-file .env pull ga-ai-consultant-service
               docker compose --env-file .env up -d ga-ai-consultant-service
@@ -94,6 +99,6 @@ jobs:
               docker-compose --env-file .env pull ga-ai-consultant-service
               docker-compose --env-file .env up -d ga-ai-consultant-service
             else
-              echo "Docker Compose瑜?李얠쓣 ???놁뒿?덈떎. ?ㅼ튂媛 ?꾩슂?⑸땲??"
+              echo "Docker Compose를 찾을 수 없습니다. 설치가 필요합니다."
               exit 1
             fi

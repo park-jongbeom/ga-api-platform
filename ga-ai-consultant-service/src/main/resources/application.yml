@@ -79,9 +79,9 @@ langchain4j:
 
 # Rate Limiting 설정
 rate-limit:
-  per-minute: 10
-  per-hour: 100
-  per-day: 500
+  per-minute: ${RATE_LIMIT_PER_MINUTE:10}
+  per-hour: ${RATE_LIMIT_PER_HOUR:100}
+  per-day: ${RATE_LIMIT_PER_DAY:500}
 
 # CORS 설정
 cors:

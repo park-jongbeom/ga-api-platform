@@ -249,6 +249,29 @@ GitHub Actions를 통해 자동 빌드 및 배포가 설정되어 있습니다.
 **참고:** GitHub Actions 워크플로우는 자동으로 서버에 `.env` 파일을 생성하고 환경 변수를 주입합니다. 
 서버에 직접 접속하여 수동으로 `.env` 파일을 생성할 수도 있습니다.
 
+### docker-compose.yml 자동 반영 확인 방법
+
+`docker-compose.yml` 변경 사항이 서버에 반영되지 않는 경우, 아래 순서로 확인하세요.
+
+1. **GitHub Actions 로그 확인**
+   - 워크플로우 `Deploy to Server`에서 `docker-compose.yml`을 서버로 전송(SCP)하는 단계가 성공했는지 확인합니다.
+
+2. **서버에서 실제 파일 확인**
+   - 서버에서 아래 경로의 파일이 최신인지 확인합니다.
+
+```bash
+ls -al /home/$USER/ga-api-platform/docker-compose.yml
+sed -n '70,120p' /home/$USER/ga-api-platform/docker-compose.yml
+```
+
+3. **컨테이너 재생성(환경변수/포트 반영)**
+   - `docker-compose.yml`의 `environment`, `ports`, `healthcheck` 변경은 기존 컨테이너에 자동 반영되지 않으므로 재생성이 필요합니다.
+
+```bash
+cd /home/$USER/ga-api-platform
+docker-compose --env-file .env up -d --force-recreate
+```
+
 ## 라이선스
 
 Copyright (c) 2024 Go Almond

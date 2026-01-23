@@ -86,7 +86,7 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       # (추가) Spring datasource 설정에서 사용하는 키
-      DATABASE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      DATABASE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=require
       DATABASE_USERNAME: ${DB_USERNAME}
       DATABASE_PASSWORD: ${DB_PASSWORD}
       # OpenAI

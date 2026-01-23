@@ -43,7 +43,7 @@ EXPOSE 8084
 
 # 헬스 체크
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8084/actuator/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8084/actuator/health || exit 1
 
 # JVM 옵션 설정
 ENV JAVA_OPTS="-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"

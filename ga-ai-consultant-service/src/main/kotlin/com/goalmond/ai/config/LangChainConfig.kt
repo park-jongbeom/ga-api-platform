@@ -2,8 +2,8 @@ package com.goalmond.ai.config
 
 import dev.langchain4j.model.chat.ChatLanguageModel
 import dev.langchain4j.model.embedding.EmbeddingModel
+import dev.langchain4j.model.googleai.GoogleAiEmbeddingModel
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel
-import dev.langchain4j.model.googleai.GoogleAiGeminiEmbeddingModel
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,17 +31,16 @@ class LangChainConfig {
         @Value("\${langchain4j.google-ai-gemini.api-key}") apiKey: String,
         @Value("\${langchain4j.google-ai-gemini.model-name}") modelName: String,
         @Value("\${langchain4j.google-ai-gemini.temperature}") temperature: Double,
-        @Value("\${langchain4j.google-ai-gemini.max-tokens}") maxTokens: Int,
+        @Value("\${langchain4j.google-ai-gemini.max-tokens}") maxOutputTokens: Int,
         @Value("\${langchain4j.google-ai-gemini.timeout}") timeout: Duration
     ): ChatLanguageModel {
         return GoogleAiGeminiChatModel.builder()
             .apiKey(apiKey)
             .modelName(modelName)
             .temperature(temperature)
-            .maxTokens(maxTokens)
+            .maxOutputTokens(maxOutputTokens)
             .timeout(timeout)
-            .logRequests(true)
-            .logResponses(true)
+            .logRequestsAndResponses(true)
             .build()
     }
     
@@ -55,12 +54,11 @@ class LangChainConfig {
         @Value("\${langchain4j.google-ai-gemini.api-key}") apiKey: String,
         @Value("\${langchain4j.google-ai-gemini.embedding-model}") modelName: String
     ): EmbeddingModel {
-        return GoogleAiGeminiEmbeddingModel.builder()
+        return GoogleAiEmbeddingModel.builder()
             .apiKey(apiKey)
             .modelName(modelName)
             .timeout(Duration.ofSeconds(30))
-            .logRequests(true)
-            .logResponses(true)
+            .logRequestsAndResponses(true)
             .build()
     }
 }

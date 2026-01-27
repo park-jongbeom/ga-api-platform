@@ -39,7 +39,18 @@ jobs:
         working-directory: .
         run: |
           docker build -f ga-auth-service/Dockerfile -t patrick5471/ga-auth-service:latest .
-          docker push patrick5471/ga-auth-service:latest
+          for i in 1 2 3; do
+            echo "Docker push attempt $i..."
+            if docker push patrick5471/ga-auth-service:latest; then
+              echo "Docker push succeeded"
+              break
+            fi
+            if [ "$i" -eq 3 ]; then
+              echo "Docker push failed after 3 attempts"
+              exit 1
+            fi
+            sleep $((i * 10))
+          done
 
       - name: Copy docker-compose.yml to server
         uses: appleboy/scp-action@v0.1.7

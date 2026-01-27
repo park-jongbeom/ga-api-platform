@@ -22,37 +22,39 @@ class SwaggerDebugFilter : OncePerRequestFilter() {
             path.startsWith("/swagger-ui") ||
             path == "/swagger-ui.html"
 
-        if (isSwaggerRequest) {
-            // #region agent log
-            appendDebugLog(
-                hypothesisId = "H1",
-                location = "SwaggerDebugFilter.kt:doFilterInternal.entry",
-                message = "swagger request received",
-                data = mapOf(
-                    "method" to request.method,
-                    "uri" to request.requestURI,
-                    "origin" to request.getHeader("Origin"),
-                    "host" to request.getHeader("Host")
-                )
+        // #region agent log
+        appendDebugLog(
+            hypothesisId = "H1",
+            location = "SwaggerDebugFilter.kt:doFilterInternal.entry",
+            message = "http request received",
+            data = mapOf(
+                "method" to request.method,
+                "uri" to request.requestURI,
+                "isSwaggerRequest" to isSwaggerRequest,
+                "origin" to request.getHeader("Origin"),
+                "host" to request.getHeader("Host"),
+                "remoteAddr" to request.remoteAddr,
+                "remotePort" to request.remotePort.toString()
             )
-            // #endregion
-        }
+        )
+        // #endregion
 
         filterChain.doFilter(request, response)
 
-        if (isSwaggerRequest) {
-            // #region agent log
-            appendDebugLog(
-                hypothesisId = "H2",
-                location = "SwaggerDebugFilter.kt:doFilterInternal.exit",
-                message = "swagger response prepared",
-                data = mapOf(
-                    "status" to response.status,
-                    "allowOrigin" to response.getHeader("Access-Control-Allow-Origin")
-                )
+        // #region agent log
+        appendDebugLog(
+            hypothesisId = "H2",
+            location = "SwaggerDebugFilter.kt:doFilterInternal.exit",
+            message = "http response prepared",
+            data = mapOf(
+                "method" to request.method,
+                "uri" to request.requestURI,
+                "status" to response.status,
+                "isSwaggerRequest" to isSwaggerRequest,
+                "allowOrigin" to response.getHeader("Access-Control-Allow-Origin")
             )
-            // #endregion
-        }
+        )
+        // #endregion
     }
 
     private fun appendDebugLog(

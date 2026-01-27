@@ -63,7 +63,8 @@ class SwaggerDebugFilter : OncePerRequestFilter() {
         message: String,
         data: Map<String, Any?>
     ) {
-        val logPath = "c:\\Users\\qk54r\\ga-api-platform\\.cursor\\debug.log"
+        // 컨테이너 내부 경로 사용 (호스트의 ./logs 디렉토리와 마운트됨)
+        val logPath = "/app/logs/debug.log"
         val payload = mapOf(
             "sessionId" to "debug-session",
             "runId" to "run1",

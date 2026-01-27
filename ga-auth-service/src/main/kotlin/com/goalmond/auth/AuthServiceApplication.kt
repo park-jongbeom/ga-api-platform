@@ -17,7 +17,7 @@ class AuthServiceApplication {
     fun applicationReadyListener(env: Environment): ApplicationListener<ApplicationReadyEvent> {
         return ApplicationListener { event ->
             // #region agent log
-            val logPath = "c:\\Users\\qk54r\\ga-api-platform\\.cursor\\debug.log"
+            val logPath = "/app/logs/debug.log"
             val port = env.getProperty("server.port", "8081")
             val payload = mapOf(
                 "sessionId" to "debug-session",
@@ -60,7 +60,7 @@ class AuthServiceApplication {
 
 fun main(args: Array<String>) {
     // #region agent log
-    val logPath = "c:\\Users\\qk54r\\ga-api-platform\\.cursor\\debug.log"
+    val logPath = "/app/logs/debug.log"
     val payload = mapOf(
         "sessionId" to "debug-session",
         "runId" to "run1",

@@ -18,7 +18,11 @@ class WebConfig : WebMvcConfigurer {
     
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
-            .allowedOrigins("http://localhost:5173")
+            .allowedOrigins(
+                "http://localhost:5173",
+                "https://go-almond.ddnsfree.com",
+                "http://go-almond.ddnsfree.com"
+            )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(true)
@@ -31,7 +35,11 @@ class WebConfig : WebMvcConfigurer {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:5173")
+        configuration.allowedOrigins = listOf(
+            "http://localhost:5173",
+            "https://go-almond.ddnsfree.com",
+            "http://go-almond.ddnsfree.com"
+        )
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = true

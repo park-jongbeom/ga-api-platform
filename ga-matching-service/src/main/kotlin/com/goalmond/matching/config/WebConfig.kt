@@ -12,7 +12,9 @@ class WebConfig : WebMvcConfigurer {
                 "http://localhost:5173",
                 "http://localhost:3000",
                 "https://goalmond.com",
-                "https://www.goalmond.com"
+                "https://www.goalmond.com",
+                "https://go-almond.ddnsfree.com",
+                "http://go-almond.ddnsfree.com"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")

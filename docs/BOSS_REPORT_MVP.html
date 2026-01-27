@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Almond AI 매칭 MVP 개발 계획 보고서</title>
+    <style>
+        /* 기본 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', '맑은 고딕', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* 제목 스타일 */
+        h1 {
+            font-size: 24px;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        h3 {
+            font-size: 16px;
+            color: #34495e;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* 메타 정보 */
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 3px;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        /* 박스 스타일 */
+        .summary-box {
+            background-color: #e8f4f8;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .warning-box {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .info-box {
+            background-color: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        /* 리스트 스타일 */
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* 표 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        thead {
+            background-color: #3498db;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr:hover {
+            background-color: #e9ecef;
+        }
+
+        /* 타임라인 스타일 */
+        .timeline {
+            background-color: #f8f9fa;
+            border-left: 3px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-line;
+        }
+
+        /* 강조 텍스트 */
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .success {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .warning {
+            color: #ffc107;
+            font-weight: 600;
+        }
+
+        .danger {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .primary {
+            color: #3498db;
+            font-weight: 600;
+        }
+
+        /* 체크리스트 */
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .checklist li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .excluded-list {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .excluded-list li:before {
+            content: "✗ ";
+            color: #dc3545;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* 페이지 구분선 */
+        .page-break {
+            page-break-after: always;
+        }
+
+        /* 인쇄 스타일 */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 20mm;
+                box-shadow: none;
+            }
+
+            h2 {
+                page-break-after: avoid;
+            }
+
+            table {
+                page-break-inside: avoid;
+            }
+
+            .summary-box, .warning-box, .info-box {
+                page-break-inside: avoid;
+            }
+
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
+
+        /* 섹션 스타일 */
+        .section {
+            margin-bottom: 30px;
+        }
+
+        /* 코드 블록 스타일 */
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <h1>Go Almond AI 매칭 MVP 개발 계획 보고서</h1>
+        
+        <div class="meta">
+            <div class="meta-item">
+                <span class="meta-label">보고 일자</span>
+                <span class="meta-value">2026년 1월 26일</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">보고자</span>
+                <span class="meta-value">박종범</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">수신</span>
+                <span class="meta-value">보스</span>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="section">
+            <h2>📋 Executive Summary (핵심 요약)</h2>
+            
+            <div class="summary-box">
+                <h3>현황</h3>
+                <ul class="checklist">
+                    <li>핵심 기능 우선순위 결정: AI 매칭 기능 MVP 집중</li>
+                    <li>JIRA 기반 프로젝트 관리 체계 구축 완료</li>
+                    <li>백엔드 + 프론트엔드 병렬 개발 전략 수립</li>
+                </ul>
+
+                <h3>목표 완료일</h3>
+                <ul>
+                    <li>프론트엔드: <strong class="primary">2026년 2월 25일</strong> (2.5주)</li>
+                    <li>백엔드: <strong class="primary">2026년 3월 4일</strong> (6주)</li>
+                    <li>MVP 통합 완료: <strong class="primary">2026년 3월 초순</strong></li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h3>중요 사항</h3>
+                <ul>
+                    <li><strong class="warning">1~2주 실제 작업 후 일정 정확도 재평가 필요</strong></li>
+                    <li>AI 기반 개발 도구(Cursor) 활용한 예측이므로 보정 필요</li>
+                    <li>2월 10일경 1차 일정 검증 완료 예정</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- MVP 핵심 기능 범위 -->
+        <div class="section">
+            <h2>🎯 MVP 핵심 기능 범위</h2>
+            
+            <h3>포함된 핵심 기능 (7개)</h3>
+            <ul class="checklist">
+                <li><strong>회원가입/로그인</strong> - 사용자 인증</li>
+                <li><strong>필수 정보 입력</strong> - 학력, 개인정보, 유학 목표 (3단계 입력)</li>
+                <li><strong>AI 매칭 실행</strong> - 6대 지표 기반 매칭 알고리즘</li>
+                <li><strong>추천 학교 Top 5 표시</strong> - 매칭률 순위별 학교 리스트</li>
+                <li><strong>학교 상세 보기</strong> - 학교 정보 + 설명 가능한 추천 이유</li>
+                <li><strong>지원 관리</strong> - 보관하기/지원하기 기능</li>
+                <li><strong>대시보드</strong> - 매칭 현황 및 지원 현황 요약</li>
+            </ul>
+
+            <h3>제외된 기능 (Phase 2 이후로 연기)</h3>
+            <ul class="excluded-list">
+                <li>4개 프로그램 별 상세 페이지</li>
+                <li>문서 표준화 (지원/비자 서류)</li>
+                <li>미국 생활 정보 허브</li>
+                <li>고급 검색 기능</li>
+                <li>PDF 생성/공유 기능</li>
+                <li>챗봇 문의</li>
+            </ul>
+
+            <div class="info-box">
+                <strong>제외 이유:</strong> 사용자가 AI 매칭을 체험하고 추천 결과를 확인할 수 있는 최소 기능에 집중하여, 빠른 시장 검증과 피드백 수집을 우선합니다.
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- 개발 일정 -->
+        <div class="section">
+            <h2>📅 개발 일정</h2>
+            
+            <h3>전체 타임라인</h3>
+            <div class="timeline">현재 (2026년 1월 27일)
+    │
+    ├─ 프론트엔드 (2.5주) ──────→ 2월 25일 완료 ✅
+    │  하루 6시간 × 주 4일 (월~목)
+    │
+    ├─ 백엔드 (6주) ────────────→ 3월 4일 완료 ✅
+    │  하루 2.5시간 × 주 4일 (월~목, 19:00~21:30)
+    │
+    └─ 통합 테스트 & 디버깅 ─────→ 3월 중순 배포</div>
+
+            <h3>백엔드 개발 일정 (6주, 57시간)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>주차</th>
+                        <th>주요 작업</th>
+                        <th>시간</th>
+                        <th>프론트엔드 블로킹 해소</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Week 1</td>
+                        <td>Mock API + Swagger 문서</td>
+                        <td>10시간</td>
+                        <td class="success">✓ 프론트 작업 즉시 시작 가능</td>
+                    </tr>
+                    <tr>
+                        <td>Week 2</td>
+                        <td>사용자 프로필 API + DB 마이그레이션</td>
+                        <td>10시간</td>
+                        <td class="success">✓ 실제 프로필 저장 가능</td>
+                    </tr>
+                    <tr>
+                        <td>Week 3</td>
+                        <td>AI 매칭 엔진 핵심 로직 (6대 지표)</td>
+                        <td>9시간</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Week 4</td>
+                        <td>매칭 실행 API + 설명 생성</td>
+                        <td>10시간</td>
+                        <td class="success">✓ 실제 매칭 결과 연동</td>
+                    </tr>
+                    <tr>
+                        <td>Week 5</td>
+                        <td>지원 관리 + 대시보드 API</td>
+                        <td>10시간</td>
+                        <td class="success">✓ 지원 기능 연동</td>
+                    </tr>
+                    <tr>
+                        <td>Week 6</td>
+                        <td>보안 강화 + 모니터링</td>
+                        <td>8시간</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>프론트엔드 개발 일정 (2.5주, 60시간)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>주차</th>
+                        <th>주요 작업</th>
+                        <th>시간</th>
+                        <th>백엔드 의존성</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Week 1</td>
+                        <td>회원가입 + 프로필 입력 UI</td>
+                        <td>24시간</td>
+                        <td>Mock API (Week 1)</td>
+                    </tr>
+                    <tr>
+                        <td>Week 2</td>
+                        <td>6대 지표 차트 + 학교 리스트</td>
+                        <td>24시간</td>
+                        <td>실제 API (Week 4)</td>
+                    </tr>
+                    <tr>
+                        <td>Week 3</td>
+                        <td>지원 관리 + 대시보드 + 테스트</td>
+                        <td>12시간</td>
+                        <td>Application API (Week 5)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>병렬 개발 전략</h3>
+            <div class="timeline">백엔드 Week 1 → Mock API 제공
+         ↓
+프론트 Week 1 → Mock 데이터로 UI 개발 시작 (블로킹 해소!)
+         ↓
+백엔드 Week 2~4 → 실제 API 개발 진행
+         ↓
+프론트 Week 2~3 → 실제 API 연동 및 완성</div>
+
+            <div class="info-box">
+                <h3>핵심 포인트</h3>
+                <ul>
+                    <li>백엔드가 Week 1에 Mock API를 제공하여 프론트엔드가 즉시 작업 시작</li>
+                    <li>프론트엔드는 2.5주 만에 완료 (백엔드 Week 4 시점)</li>
+                    <li>백엔드 Week 4~6에 실제 API를 완성하면서 프론트엔드 통합</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- 일정 산출 근거 -->
+        <div class="section">
+            <h2>🔍 일정 산출 근거</h2>
+            
+            <h3>AI 기반 개발 도구 활용</h3>
+            <p><strong>Cursor AI 활용 효과:</strong></p>
+            <ul>
+                <li>코드 생성/리팩토링 자동화</li>
+                <li>실시간 에러 수정</li>
+                <li>테스트 코드 자동 생성</li>
+                <li>문서 작성 지원</li>
+            </ul>
+
+            <p><strong>실적 기반 예측:</strong></p>
+            <ul>
+                <li>최근 AI 컨설턴트 서비스: 31시간에 완성</li>
+                <li>유사 복잡도의 매칭 서비스: 57시간 예상</li>
+                <li>프론트엔드: 기구축 컴포넌트 60% 재사용 → 60시간 예상</li>
+            </ul>
+
+            <div class="warning-box">
+                <h3>⚠️ 일정 검증 필요성</h3>
+                
+                <p><strong>현재 일정의 불확실성:</strong></p>
+                <ul>
+                    <li>AI 도구 기반 예측이므로 실제 개발 속도와 차이 발생 가능</li>
+                    <li>새로운 기술 스택 학습 시간 미포함 가능성</li>
+                    <li>예상치 못한 기술적 이슈 발생 가능</li>
+                </ul>
+
+                <p><strong>검증 계획:</strong></p>
+                <ol>
+                    <li>Week 1~2 실제 작업 진행</li>
+                    <li>예상 시간 vs 실제 소요 시간 비교</li>
+                    <li>차이 발생 시 전체 일정 재조정</li>
+                    <li>보정된 일정으로 재보고</li>
+                </ol>
+
+                <p><strong>검증 시점:</strong> <span class="highlight">2026년 2월 10일 (약 2주 후)</span></p>
+            </div>
+        </div>
+
+        <!-- JIRA 프로젝트 관리 -->
+        <div class="section">
+            <h2>📊 JIRA 프로젝트 관리</h2>
+            
+            <h3>백로그 구성</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>Epic 수</th>
+                        <th>Story 수</th>
+                        <th>총 Story Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>백엔드</strong></td>
+                        <td>6개</td>
+                        <td>18개</td>
+                        <td>57 SP (57시간)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>프론트엔드</strong></td>
+                        <td>3개</td>
+                        <td>18개</td>
+                        <td>60 SP (60시간)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>진행 상황 가시성</h3>
+            <p>JIRA Board를 통해 실시간 확인 가능:</p>
+            <ul>
+                <li><strong>To Do</strong> - 계획됨</li>
+                <li><strong>In Progress</strong> - 진행 중</li>
+                <li><strong>Testing</strong> - 테스트 중</li>
+                <li><strong>Done</strong> - 완료</li>
+            </ul>
+
+            <p><strong>주간 리포트:</strong> 매주 금요일 Sprint 리뷰 진행, 완료 Story Points 집계 및 다음 주 계획 공유</p>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- 리스크 및 완화 계획 -->
+        <div class="section">
+            <h2>⚠️ 리스크 및 완화 계획</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>리스크</th>
+                        <th>영향도</th>
+                        <th>완화 계획</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AI 예측 일정 오차</td>
+                        <td class="danger">높음</td>
+                        <td>Week 1~2 검증 후 재조정</td>
+                    </tr>
+                    <tr>
+                        <td>기술적 난이도 과소평가</td>
+                        <td class="warning">중간</td>
+                        <td>버퍼 시간 3시간 확보</td>
+                    </tr>
+                    <tr>
+                        <td>백엔드 API 지연</td>
+                        <td class="danger">높음</td>
+                        <td>Mock API 선제공 (Week 1)</td>
+                    </tr>
+                    <tr>
+                        <td>프론트-백엔드 API 불일치</td>
+                        <td class="warning">중간</td>
+                        <td>Swagger 문서화 + 협업 가이드</td>
+                    </tr>
+                    <tr>
+                        <td>실제 작업 시간 부족</td>
+                        <td class="warning">중간</td>
+                        <td>핵심 기능만 집중 (MVP)</td>
+                    </tr>
+                    <tr>
+                        <td>예상치 못한 버그</td>
+                        <td class="success">낮음</td>
+                        <td>CI/CD 자동 배포 + 즉시 수정</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Phase 2 계획 -->
+        <div class="section">
+            <h2>🎯 다음 단계 (Phase 2)</h2>
+            
+            <h3>MVP 완료 후 계획 (2026년 3월 중순~)</h3>
+            
+            <p><strong>1단계: 사용자 피드백 수집 (1주)</strong></p>
+            <ul>
+                <li>Beta 테스터 모집</li>
+                <li>사용성 테스트</li>
+                <li>피드백 분석</li>
+            </ul>
+
+            <p><strong>2단계: 우선순위 재평가 (1주)</strong></p>
+            <ul>
+                <li>MVP 성과 분석</li>
+                <li>Phase 2 기능 우선순위 결정</li>
+                <li>일정 재산정</li>
+            </ul>
+
+            <p><strong>3단계: Phase 2 개발 (8~10주 예상)</strong></p>
+            <ul>
+                <li>4개 프로그램 상세 페이지</li>
+                <li>문서 표준화 (지원/비자 서류)</li>
+                <li>미국 생활 정보 허브</li>
+                <li>고급 검색 기능</li>
+                <li>총 약 250시간 추가 예상</li>
+            </ul>
+        </div>
+
+        <!-- 승인 요청 사항 -->
+        <div class="section">
+            <h2>✅ 승인 요청 사항</h2>
+            
+            <p>본 보고서를 통해 다음 사항에 대한 승인을 요청드립니다:</p>
+
+            <div class="summary-box">
+                <h3>1. MVP 개발 계획 승인</h3>
+                <ul>
+                    <li>핵심 7개 기능 우선 개발</li>
+                    <li>나머지 기능은 Phase 2로 연기</li>
+                </ul>
+
+                <h3>2. 일정 재평가 시점 합의</h3>
+                <ul>
+                    <li>2026년 2월 10일 (약 2주 후)</li>
+                    <li>실제 작업 속도 기반 일정 보정</li>
+                </ul>
+
+                <h3>3. Phase 2 논의 일정</h3>
+                <ul>
+                    <li>MVP 완료 후 (3월 중순)</li>
+                    <li>사용자 피드백 기반 우선순위 재논의</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 핵심 메시지 -->
+        <div class="section">
+            <h2>📌 핵심 메시지</h2>
+            
+            <h3>긍정적 측면</h3>
+            <div class="info-box">
+                <p><strong>1. 체계적 계획 완료</strong></p>
+                <p>JIRA 기반 프로젝트 관리 체계 구축 완료</p>
+
+                <p><strong>2. 빠른 개발 속도</strong></p>
+                <p>AI 도구 활용으로 33% 개발 시간 단축</p>
+
+                <p><strong>3. 리스크 최소화</strong></p>
+                <p>Mock API 전략으로 프론트-백엔드 블로킹 해소</p>
+
+                <p><strong>4. 병렬 개발 전략</strong></p>
+                <p>6주 만에 백엔드+프론트엔드 동시 완료</p>
+            </div>
+
+            <h3>유의 사항</h3>
+            <div class="warning-box">
+                <p><strong>1. 일정 검증 필요</strong></p>
+                <p>AI 기반 예측이므로 2주 후 재평가 필요</p>
+
+                <p><strong>2. MVP 집중</strong></p>
+                <p>핵심 기능만 구현, 나머지는 Phase 2</p>
+
+                <p><strong>3. 실제 작업 속도 확인</strong></p>
+                <p>1~2주 실제 작업 후 일정 보정 예정</p>
+            </div>
+        </div>
+
+        <!-- 푸터 -->
+        <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #7f8c8d;">
+            <p><strong>보고서 작성일:</strong> 2026년 1월 27일</p>
+            <p><strong>다음 보고 예정일:</strong> 2026년 2월 10일 (1차 일정 검증)</p>
+        </div>
+    </div>
+</body>
+</html>

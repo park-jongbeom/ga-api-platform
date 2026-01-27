@@ -1,6 +1,8 @@
 package com.goalmond.audit.controller
 
+import com.goalmond.audit.domain.dto.AuditLogResponse
 import com.goalmond.common.dto.ApiResponse
+import java.time.LocalDateTime
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -193,8 +195,32 @@ class AuditController {
             example = "20"
         )
         @RequestParam(defaultValue = "20") size: Int
-    ): ApiResponse<Map<String, Any>> {
+    ): ApiResponse<AuditLogResponse> {
         // TODO: 구현 필요
-        return ApiResponse.success(mapOf("message" to "Audit logs endpoint"))
+        return ApiResponse.success(
+            AuditLogResponse(
+                logs = listOf(
+                    AuditLogResponse.AuditLogItem(
+                        id = "audit-1",
+                        tableName = tableName ?: "users",
+                        recordId = recordId ?: "123e4567-e89b-12d3-a456-426614174000",
+                        action = "INSERT",
+                        oldValues = null,
+                        newValues = mapOf(
+                            "email" to "user@example.com",
+                            "name" to "홍길동"
+                        ),
+                        userId = "admin-1",
+                        timestamp = LocalDateTime.now()
+                    )
+                ),
+                pagination = AuditLogResponse.Pagination(
+                    totalElements = 100,
+                    totalPages = 5,
+                    currentPage = page,
+                    pageSize = size
+                )
+            )
+        )
     }
 }

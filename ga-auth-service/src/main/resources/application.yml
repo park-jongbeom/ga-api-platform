@@ -72,11 +72,15 @@ springdoc:
     # 통합 Swagger UI: 모든 마이크로서비스의 API 문서를 하나로 통합
     urls:
       - name: 인증/인가 서비스 (Auth Service)
-        url: http://${AUTH_SERVICE_HOST:localhost}:8081/v3/api-docs
+        url: https://${AUTH_SERVICE_HOST:go-almond.ddnsfree.com}:8081/v3/api-docs
       - name: 사용자 프로필 서비스 (User Service)
-        url: http://${USER_SERVICE_HOST:localhost}:8082/v3/api-docs
+        url: https://${USER_SERVICE_HOST:go-almond.ddnsfree.com}:8082/v3/api-docs
       - name: 감사 로그 서비스 (Audit Service)
-        url: http://${AUDIT_SERVICE_HOST:localhost}:8083/v3/api-docs
+        url: https://${AUDIT_SERVICE_HOST:go-almond.ddnsfree.com}:8083/v3/api-docs
+      - name: AI 상담 서비스 (AI Consultant Service)
+        url: https://${AI_SERVICE_HOST:go-almond.ddnsfree.com}:8084/v3/api-docs
+      - name: 매칭 서비스 (Matching Service)
+        url: https://${MATCHING_SERVICE_HOST:go-almond.ddnsfree.com}:8085/v3/api-docs
     # 기본으로 표시할 서비스 (첫 번째 서비스)
     urls-primary-name: 인증/인가 서비스 (Auth Service)
   info:

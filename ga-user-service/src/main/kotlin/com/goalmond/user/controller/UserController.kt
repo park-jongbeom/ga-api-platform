@@ -1,6 +1,9 @@
 package com.goalmond.user.controller
 
 import com.goalmond.common.dto.ApiResponse
+import com.goalmond.user.domain.dto.UserProfileResponseDto
+import com.goalmond.user.domain.dto.UserResponseDto
+import java.time.LocalDateTime
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -120,9 +123,16 @@ class UserController {
             example = "123e4567-e89b-12d3-a456-426614174000"
         )
         @PathVariable userId: String
-    ): ApiResponse<Map<String, String>> {
+    ): ApiResponse<UserResponseDto> {
         // TODO: 구현 필요
-        return ApiResponse.success(mapOf("userId" to userId))
+        return ApiResponse.success(
+            UserResponseDto(
+                userId = userId,
+                email = "user@example.com",
+                name = "홍길동",
+                createdAt = LocalDateTime.now()
+            )
+        )
     }
     
     @Operation(
@@ -208,8 +218,37 @@ class UserController {
             example = "123e4567-e89b-12d3-a456-426614174000"
         )
         @PathVariable userId: String
-    ): ApiResponse<Map<String, String>> {
+    ): ApiResponse<UserProfileResponseDto> {
         // TODO: 구현 필요
-        return ApiResponse.success(mapOf("userId" to userId, "type" to "profile"))
+        return ApiResponse.success(
+            UserProfileResponseDto(
+                userId = userId,
+                email = "user@example.com",
+                name = "홍길동",
+                academicProfiles = listOf(
+                    UserProfileResponseDto.AcademicProfileDto(
+                        id = "academic-1",
+                        degree = "Bachelor",
+                        major = "Computer Science",
+                        gpa = 3.8,
+                        institution = "Seoul University"
+                    )
+                ),
+                financialProfiles = listOf(
+                    UserProfileResponseDto.FinancialProfileDto(
+                        id = "financial-1",
+                        budgetRange = "10000-20000",
+                        fundingSource = "Personal"
+                    )
+                ),
+                preferences = listOf(
+                    UserProfileResponseDto.PreferenceDto(
+                        id = "pref-1",
+                        preferredMajor = "Engineering",
+                        careerTrack = "Software Developer"
+                    )
+                )
+            )
+        )
     }
 }

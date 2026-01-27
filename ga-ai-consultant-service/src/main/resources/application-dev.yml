@@ -25,11 +25,12 @@ spring:
 server:
   port: 8083
 
-# LangChain4j 개발 설정 (테스트용 Mock)
+# LangChain4j 개발 설정 (Google Gemini)
 langchain4j:
-  openai:
-    api-key: ${OPENAI_API_KEY:sk-test-key}
-    model-name: gpt-4-turbo
+  google-ai-gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model-name: ${GEMINI_MODEL:gemini-1.5-flash}
+    embedding-model: ${GEMINI_EMBEDDING_MODEL:text-embedding-004}
     temperature: 0.7
 
 # Rate Limiting 개발 설정 (느슨하게)

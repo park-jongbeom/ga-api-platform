@@ -6,5 +6,6 @@ include(
     "ga-auth-service",
     "ga-user-service",
     "ga-audit-service",
-    "ga-ai-consultant-service"
+    "ga-ai-consultant-service",
+    "ga-matching-service"
 )

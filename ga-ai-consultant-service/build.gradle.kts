@@ -26,9 +26,9 @@ dependencies {
     // AOP for Performance Monitoring
     implementation("org.springframework.boot:spring-boot-starter-aop")
     
-    // LangChain4j - AI/LLM 통합
+    // LangChain4j - AI/LLM 통합 (Gemini)
     implementation("dev.langchain4j:langchain4j:0.36.2")
-    implementation("dev.langchain4j:langchain4j-open-ai:0.36.2")
+    implementation("dev.langchain4j:langchain4j-google-ai-gemini:0.36.2")
     implementation("dev.langchain4j:langchain4j-embeddings:0.36.2")
     implementation("dev.langchain4j:langchain4j-pgvector:0.36.2")
     

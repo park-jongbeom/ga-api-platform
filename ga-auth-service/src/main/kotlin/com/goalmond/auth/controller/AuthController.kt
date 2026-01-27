@@ -1,5 +1,8 @@
 package com.goalmond.auth.controller
 
+import com.goalmond.auth.domain.dto.LoginRequest
+import com.goalmond.auth.domain.dto.RefreshTokenRequest
+import com.goalmond.auth.domain.dto.TokenResponse
 import com.goalmond.common.dto.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -115,9 +118,18 @@ class AuthController {
         ]
     )
     @PostMapping("/login")
-    fun login(): ApiResponse<Map<String, String>> {
+    fun login(
+        @RequestBody request: LoginRequest
+    ): ApiResponse<TokenResponse> {
         // TODO: 구현 필요
-        return ApiResponse.success(mapOf("message" to "Login endpoint"))
+        return ApiResponse.success(
+            TokenResponse(
+                accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                tokenType = "Bearer",
+                expiresIn = 3600
+            )
+        )
     }
     
     @Operation(
@@ -168,9 +180,18 @@ class AuthController {
         ]
     )
     @PostMapping("/refresh")
-    fun refresh(): ApiResponse<Map<String, String>> {
+    fun refresh(
+        @RequestBody request: RefreshTokenRequest
+    ): ApiResponse<TokenResponse> {
         // TODO: 구현 필요
-        return ApiResponse.success(mapOf("message" to "Refresh endpoint"))
+        return ApiResponse.success(
+            TokenResponse(
+                accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                refreshToken = request.refreshToken,
+                tokenType = "Bearer",
+                expiresIn = 3600
+            )
+        )
     }
     
     @Operation(

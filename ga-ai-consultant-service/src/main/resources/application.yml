@@ -64,17 +64,15 @@ server:
     include-stacktrace: never
     include-binding-errors: never
 
-# LangChain4j 설정
+# LangChain4j 설정 (Google Gemini)
 langchain4j:
-  openai:
-    api-key: ${OPENAI_API_KEY:}
-    model-name: ${OPENAI_MODEL:gpt-4-turbo}
+  google-ai-gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model-name: ${GEMINI_MODEL:gemini-1.5-flash}
+    embedding-model: ${GEMINI_EMBEDDING_MODEL:text-embedding-004}
     temperature: 0.7
     max-tokens: 2000
     timeout: 30s
-  
-  embeddings:
-    model-name: text-embedding-ada-002
     dimension: 1536
 
 # Rate Limiting 설정

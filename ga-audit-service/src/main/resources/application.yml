@@ -31,7 +31,7 @@ spring:
         use_sql_comments: true
 
 server:
-  port: 8083
+  port: 9083
 
 # gRPC 서버 설정
 grpc:

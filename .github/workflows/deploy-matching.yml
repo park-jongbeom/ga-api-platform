@@ -88,14 +88,50 @@ jobs:
             DB_PASSWORD=${DB_PASSWORD}
             EOF
             
-            # Docker Compose V2 사용 시도, 없으면 docker-compose 사용
-            if command -v docker &> /dev/null && docker compose version &> /dev/null; then
-              docker compose --env-file .env pull ga-matching-service
-              docker compose --env-file .env up -d ga-matching-service
-            elif command -v docker-compose &> /dev/null; then
-              docker-compose --env-file .env pull ga-matching-service
-              docker-compose --env-file .env up -d ga-matching-service
+            # Docker Compose 명령어 확인 (docker-compose 우선 사용)
+            if command -v docker-compose &> /dev/null; then
+              DOCKER_COMPOSE_CMD="docker-compose"
+            elif command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
+              DOCKER_COMPOSE_CMD="docker compose"
             else
               echo "Docker Compose를 찾을 수 없습니다. 설치가 필요합니다."
               exit 1
             fi
+            
+            echo "Using: $DOCKER_COMPOSE_CMD"
+            
+            # 기존 컨테이너 중지 및 제거 (포트 충돌 방지)
+            echo "Stopping existing ga-matching-service container..."
+            $DOCKER_COMPOSE_CMD --env-file .env stop ga-matching-service || true
+            $DOCKER_COMPOSE_CMD --env-file .env rm -f ga-matching-service || true
+            
+            # 이미지 pull (재시도 로직 포함)
+            echo "Pulling latest image for ga-matching-service..."
+            MAX_ATTEMPTS=3
+            ATTEMPT=1
+            while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+              echo "Attempt $ATTEMPT of $MAX_ATTEMPTS: Pulling ga-matching-service..."
+              if timeout 120 $DOCKER_COMPOSE_CMD --env-file .env pull ga-matching-service 2>&1; then
+                echo "Successfully pulled ga-matching-service"
+                break
+              fi
+              if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
+                WAIT_TIME=$((ATTEMPT * 10))
+                echo "Pull failed. Waiting ${WAIT_TIME}s before retry..."
+                sleep $WAIT_TIME
+              else
+                echo "Warning: Failed to pull ga-matching-service after $MAX_ATTEMPTS attempts. Continuing with existing image..."
+              fi
+              ATTEMPT=$((ATTEMPT + 1))
+            done
+            
+            # 서비스 시작
+            echo "Starting ga-matching-service..."
+            $DOCKER_COMPOSE_CMD --env-file .env up -d ga-matching-service
+            
+            # 서비스 상태 확인
+            echo "Checking service status..."
+            sleep 5
+            $DOCKER_COMPOSE_CMD --env-file .env ps ga-matching-service
+            
+            echo "Deployment completed successfully!"

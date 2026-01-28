@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: ga-matching-service
+  
+  # Path Matching 전략 (SpringDoc 2.8.15 호환성)
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  
   jackson:
     property-naming-strategy: SNAKE_CASE
 

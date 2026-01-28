@@ -2,6 +2,11 @@ spring:
   application:
     name: ga-ai-consultant-service
   
+  # Path Matching 전략 (SpringDoc 2.8.15 호환성)
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  
   # 데이터베이스 설정
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/goalmond_ai}

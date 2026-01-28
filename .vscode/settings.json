@@ -10,5 +10,30 @@
     "files.encoding": "utf8"
   },
   "java.compile.nullAnalysis.mode": "automatic",
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "sqltools.connections": [
+    {
+      "pgOptions": {
+        "ssl": {
+          "rejectUnauthorized": false,
+          "requestCert": false
+        }
+      },
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "ls-584229d62cccd625a5fa723267dbdbc614b3b0e5.c9wi0gwweu9n.ap-northeast-2.rds.amazonaws.com",
+      "port": 5432,
+      "sshOptions": {
+        "port": 22,
+        "host": "3.37.222.156",
+        "username": "ubuntu",
+        "privateKeyPath": "C:\\Users\\qk54r\\IdeaProjects\\ssh\\LightsailDefaultKey-ap-northeast-2.pem"
+      },
+      "driver": "PostgreSQL",
+      "name": "GA_DB",
+      "database": "ga_db",
+      "username": "dbmasteruser",
+      "password": "w,*i.uAk7f^Gj;Gk`3O`oqZx3`0fj9Vm"
+    }
+  ]
 }

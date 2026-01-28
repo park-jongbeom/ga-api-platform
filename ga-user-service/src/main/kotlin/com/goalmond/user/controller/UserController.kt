@@ -70,7 +70,7 @@ class UserController {
               "data": {
                 "userId": "123e4567-e89b-12d3-a456-426614174000",
                 "email": "user@example.com",
-                "name": "홍길동",
+                "fullName": "홍길동",
                 "createdAt": "2024-01-01T00:00:00"
               },
               "message": null,
@@ -95,7 +95,7 @@ class UserController {
                               "data": {
                                 "userId": "123e4567-e89b-12d3-a456-426614174000",
                                 "email": "user@example.com",
-                                "name": "홍길동",
+                                "fullName": "홍길동",
                                 "createdAt": "2024-01-01T00:00:00"
                               },
                               "message": null,
@@ -129,7 +129,7 @@ class UserController {
             UserResponseDto(
                 userId = userId,
                 email = "user@example.com",
-                name = "홍길동",
+                fullName = "홍길동",
                 createdAt = LocalDateTime.now()
             )
         )
@@ -162,13 +162,17 @@ class UserController {
               "data": {
                 "userId": "123e4567-e89b-12d3-a456-426614174000",
                 "email": "user@example.com",
-                "name": "홍길동",
+                "fullName": "홍길동",
                 "academicProfiles": [
                   {
                     "id": "academic-1",
-                    "degree": "Bachelor",
+                    "schoolName": "Seoul University",
+                    "degreeType": "Bachelor",
+                    "degree": "BACHELOR",
                     "major": "Computer Science",
                     "gpa": 3.8,
+                    "gpaScale": 4.0,
+                    "graduationDate": "2024-06-15",
                     "institution": "Seoul University"
                   }
                 ],
@@ -176,14 +180,18 @@ class UserController {
                   {
                     "id": "financial-1",
                     "budgetRange": "10000-20000",
+                    "totalBudgetUsd": 50000,
+                    "tuitionLimitUsd": 30000,
                     "fundingSource": "Personal"
                   }
                 ],
                 "preferences": [
                   {
                     "id": "pref-1",
-                    "preferredMajor": "Engineering",
-                    "careerTrack": "Software Developer"
+                    "targetMajor": "Engineering",
+                    "targetLocation": "Seoul",
+                    "careerGoal": "Software Developer",
+                    "preferredTrack": "Software Developer"
                   }
                 ]
               },
@@ -224,13 +232,17 @@ class UserController {
             UserProfileResponseDto(
                 userId = userId,
                 email = "user@example.com",
-                name = "홍길동",
+                fullName = "홍길동",
                 academicProfiles = listOf(
                     UserProfileResponseDto.AcademicProfileDto(
                         id = "academic-1",
-                        degree = "Bachelor",
+                        schoolName = "Seoul University",
+                        degreeType = "Bachelor",
+                        degree = "BACHELOR",
                         major = "Computer Science",
-                        gpa = 3.8,
+                        gpa = java.math.BigDecimal("3.8"),
+                        gpaScale = java.math.BigDecimal("4.0"),
+                        graduationDate = java.time.LocalDate.of(2024, 6, 15),
                         institution = "Seoul University"
                     )
                 ),
@@ -238,14 +250,18 @@ class UserController {
                     UserProfileResponseDto.FinancialProfileDto(
                         id = "financial-1",
                         budgetRange = "10000-20000",
+                        totalBudgetUsd = 50000,
+                        tuitionLimitUsd = 30000,
                         fundingSource = "Personal"
                     )
                 ),
                 preferences = listOf(
                     UserProfileResponseDto.PreferenceDto(
                         id = "pref-1",
-                        preferredMajor = "Engineering",
-                        careerTrack = "Software Developer"
+                        targetMajor = "Engineering",
+                        targetLocation = "Seoul",
+                        careerGoal = "Software Developer",
+                        preferredTrack = "Software Developer"
                     )
                 )
             )

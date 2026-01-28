@@ -9,8 +9,8 @@ data class UserResponseDto(
     val userId: String,
     @field:Schema(description = "이메일", example = "user@example.com")
     val email: String,
-    @field:Schema(description = "이름", example = "홍길동")
-    val name: String,
+    @field:Schema(description = "전체 이름", example = "홍길동")
+    val fullName: String,
     @field:Schema(description = "생성일시", example = "2024-01-01T00:00:00")
     val createdAt: LocalDateTime
 )

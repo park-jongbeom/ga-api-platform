@@ -18,7 +18,7 @@ services:
     image: patrick5471/ga-auth-service:latest
     container_name: ga-auth-service
     ports:
-      - "8081:9081"
+      - "127.0.0.1:8081:9081"
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
@@ -43,7 +43,7 @@ services:
     image: patrick5471/ga-user-service:latest
     container_name: ga-user-service
     ports:
-      - "8082:9082"
+      - "127.0.0.1:8082:9082"
       - "9090:9090"
     environment:
       DB_HOST: ${DB_HOST}
@@ -61,7 +61,7 @@ services:
     image: patrick5471/ga-audit-service:latest
     container_name: ga-audit-service
     ports:
-      - "8083:9083"
+      - "127.0.0.1:8083:9083"
       - "9091:9091"
     environment:
       DB_HOST: ${DB_HOST}
@@ -77,7 +77,7 @@ services:
     image: patrick5471/ga-ai-consultant-service:latest
     container_name: ga-ai-consultant-service
     ports:
-      - "8084:9084"
+      - "127.0.0.1:8084:9084"
     environment:
       # Database
       DB_HOST: ${DB_HOST}
@@ -124,7 +124,7 @@ services:
     image: patrick5471/ga-matching-service:latest
     container_name: ga-matching-service
     ports:
-      - "8085:9085"
+      - "127.0.0.1:8085:9085"
     environment:
       SERVER_PORT: 9085
     networks:

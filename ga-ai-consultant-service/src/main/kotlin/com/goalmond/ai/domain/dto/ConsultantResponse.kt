@@ -57,8 +57,8 @@ data class ConversationResponse(
                 id = conversation.id!!,
                 title = conversation.title,
                 status = conversation.status,
-                createdAt = conversation.createdAt,
-                updatedAt = conversation.updatedAt
+                createdAt = conversation.createdAt ?: LocalDateTime.now(),
+                updatedAt = conversation.updatedAt ?: LocalDateTime.now()
             )
         }
     }
@@ -88,7 +88,7 @@ data class MessageResponse(
                 id = message.id!!,
                 role = message.role,
                 content = message.llmResponse ?: message.originalContent,
-                createdAt = message.createdAt
+                createdAt = message.createdAt ?: LocalDateTime.now()
             )
         }
     }

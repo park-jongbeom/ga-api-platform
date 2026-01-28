@@ -56,7 +56,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     
     // SpringDoc OpenAPI (Swagger)
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
     
     // OWASP Java Encoder - XSS 방어
     implementation("org.owasp.encoder:encoder:1.2.3")

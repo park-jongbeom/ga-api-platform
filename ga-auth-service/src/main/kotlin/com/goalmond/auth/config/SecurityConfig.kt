@@ -41,6 +41,8 @@ class SecurityConfig(
                         "/v3/api-docs/**",
                         "/swagger-ui.html"
                     ).permitAll()
+                    // Actuator health check는 인증 없이 접근 가능
+                    .requestMatchers("/actuator/health").permitAll()
                     // 인증 API는 인증 없이 접근 가능
                     .requestMatchers("/api/auth/**").permitAll()
                     // 나머지 요청은 인증 필요

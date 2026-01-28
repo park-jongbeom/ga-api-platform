@@ -17,7 +17,7 @@ spring:
   # JPA 설정
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update  # 임시: validate에서 update로 변경 (DB 스키마 자동 업데이트)
     show-sql: false
     properties:
       hibernate:

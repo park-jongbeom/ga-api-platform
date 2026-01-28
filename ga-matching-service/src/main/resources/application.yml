@@ -13,3 +13,10 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+    enabled: true
+    # 성능 최적화: 지연 로딩 및 캐싱 활성화
+    try-it-out-enabled: true
+    filter: true
+  # API 문서 생성 최적화
+  show-actuator: false
+  cache-disabled: false

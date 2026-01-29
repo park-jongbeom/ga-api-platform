@@ -101,7 +101,7 @@ SO THAT 백엔드 로직 완성 전에 UI를 구현할 수 있다
   - 전략 경로 (매칭 점수 60-69)
 
 **Tasks**:
-- [ ] GAM-11-1: ga-matching-service 모듈 생성 (Spring Boot)
+- [ ] GAM-11-1: 단일 모듈 구조 확인 (ga-api-platform 루트)
 - [ ] GAM-11-2: MockMatchingController.kt 생성
 - [ ] GAM-11-3: MatchingResponse DTO 정의
 - [ ] GAM-11-4: SchoolResponse DTO 정의
@@ -110,8 +110,8 @@ SO THAT 백엔드 로직 완성 전에 UI를 구현할 수 있다
 
 **Technical Notes**:
 ```kotlin
-// 파일 위치
-ga-matching-service/src/main/kotlin/com/goalmond/matching/
+// 파일 위치 (단일 모듈 구조)
+src/main/kotlin/com/goalmond/api/
 ├── controller/MockMatchingController.kt
 ├── domain/dto/MatchingResponse.kt
 ├── domain/dto/SchoolResponse.kt
@@ -168,7 +168,7 @@ SO THAT 백엔드 레포를 clone 하지 않고도 통합 작업을 진행할 �
 
 ---
 
-### Story GAM-13: DB 인프라 구축 (단일 모듈 ga-matching-api)
+### Story GAM-13: DB 인프라 구축 (단일 모듈 프로젝트)
 
 **Story Type**: Task  
 **Priority**: Critical  
@@ -178,7 +178,7 @@ SO THAT 백엔드 레포를 clone 하지 않고도 통합 작업을 진행할 �
 **Labels**: `infrastructure`, `setup`, `week1`
 
 **Description**:
-단일 모듈(ga-matching-api) 환경에서 Lightsail PostgreSQL 기반 DB 인프라를 구축합니다. 기본 실행은 Mock API(DB 없음), lightsail/local 프로파일에서만 DB 연결 및 Flyway 마이그레이션 적용.
+단일 모듈 프로젝트(ga-api-platform) 환경에서 Lightsail PostgreSQL 기반 DB 인프라를 구축합니다. 기본 실행은 Mock API(DB 없음), lightsail/local 프로파일에서만 DB 연결 및 Flyway 마이그레이션 적용.
 
 **Acceptance Criteria**:
 - [ ] build.gradle.kts 의존성 설정
@@ -224,7 +224,7 @@ SO THAT 백엔드 레포를 clone 하지 않고도 통합 작업을 진행할 �
 **Labels**: `database`, `migration`, `week2`
 
 **Description**:
-AI 매칭에 필요한 전체 데이터베이스 스키마를 설계하고 Flyway 마이그레이션을 작성합니다.
+AI 매칭에 필요한 매칭 관련 데이터베이스 스키마를 설계하고 Flyway 마이그레이션을 작성합니다. (사용자 관련 테이블은 GAM-13에서 이미 생성됨)
 
 **User Story**:
 ```
@@ -234,15 +234,12 @@ SO THAT 사용자 데이터와 매칭 결과를 안전하게 저장할 수 있�
 ```
 
 **Acceptance Criteria**:
-- [ ] 8개 테이블 생성
-  - `users` (기본 정보)
-  - `user_education` (학력 정보)
-  - `user_preference` (유학 목표)
+- [ ] 매칭 관련 테이블 생성 (GAM-13에서 users, academic_profiles, financial_profiles, user_preferences 등은 이미 생성됨)
   - `schools` (학교 마스터)
   - `programs` (프로그램 마스터)
   - `matching_results` (매칭 결과)
   - `applications` (지원 현황)
-  - `documents` (문서 관리)
+  - `documents` (문서 관리, AI Consultant의 documents와 별도)
 - [ ] 외래 키 제약 조건 설정
 - [ ] 인덱스 설계
   - `user_id`, `tenant_id` 복합 인덱스
@@ -255,31 +252,32 @@ SO THAT 사용자 데이터와 매칭 결과를 안전하게 저장할 수 있�
 - [ ] Flyway 마이그레이션 성공
 
 **Tasks**:
-- [ ] GAM-21-1: V1__create_matching_tables.sql 작성
+- [ ] GAM-21-1: V2__create_matching_tables.sql 작성 (GAM-13의 V1 이후)
 - [ ] GAM-21-2: 테이블 스키마 정의 (컬럼, 타입, 제약조건)
 - [ ] GAM-21-3: 인덱스 생성 쿼리 작성
-- [ ] GAM-21-4: Flyway 설정 (application.yml)
+- [ ] GAM-21-4: Flyway 설정 확인 (application.yml, 이미 GAM-13에서 설정됨)
 - [ ] GAM-21-5: 마이그레이션 테스트 (로컬 DB)
 - [ ] GAM-21-6: ERD 다이어그램 작성 (docs/erd.png)
 
 **Technical Notes**:
 ```sql
--- 주요 테이블 구조
-CREATE TABLE users (
-    id UUID PRIMARY KEY,
-    tenant_id VARCHAR(50) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    birth_date DATE,
-    nationality VARCHAR(50),
-    mbti VARCHAR(4),
-    personality_tags JSONB,
-    bio TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- 주요 테이블 구조 (users는 GAM-13 V1에서 이미 생성됨)
+-- GAM-21에서는 매칭 관련 테이블만 추가
+CREATE TABLE schools (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    location VARCHAR(255),
+    -- ... 기타 컬럼
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_users_tenant ON users(tenant_id);
+CREATE TABLE programs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    school_id UUID REFERENCES schools(id),
+    -- ... 기타 컬럼
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
 **Definition of Done**:
@@ -320,10 +318,10 @@ SO THAT AI 매칭을 받을 수 있다
 - [ ] 에러 응답 표준화
 
 **Tasks**:
-- [ ] GAM-22-1: User Entity 생성
-- [ ] GAM-22-2: UserEducation Entity 생성
-- [ ] GAM-22-3: UserPreference Entity 생성
-- [ ] GAM-22-4: UserRepository 인터페이스 생성
+- [ ] GAM-22-1: User Entity 생성 (GAM-13 V1 마이그레이션의 users 테이블 매핑)
+- [ ] GAM-22-2: AcademicProfile Entity 생성 (academic_profiles 테이블 매핑)
+- [ ] GAM-22-3: UserPreference Entity 생성 (user_preferences 테이블 매핑)
+- [ ] GAM-22-4: UserRepository, AcademicProfileRepository, UserPreferenceRepository 인터페이스 생성
 - [ ] GAM-22-5: UserProfileService 구현
 - [ ] GAM-22-6: UserProfileController 구현
 - [ ] GAM-22-7: Request/Response DTO 생성
@@ -1031,14 +1029,14 @@ SO THAT 다음 단계를 계획할 수 있다
 프로젝트 문서를 최종 정리합니다.
 
 **Acceptance Criteria**:
-- [ ] ga-matching-service/README.md 작성
+- [ ] README.md 작성 (루트, 단일 모듈 구조 반영)
 - [ ] docs/04_FRONTEND_COOPERATION.md 업데이트
 - [ ] API 사용 가이드
 - [ ] 트러블슈팅 가이드
 - [ ] Cursor 협업 가이드
 
 **Tasks**:
-- [ ] GAM-63-1: README.md 작성
+- [ ] GAM-63-1: README.md 작성 (단일 모듈 구조, Docker 배포, .env 관리 등)
 - [ ] GAM-63-2: 04_FRONTEND_COOPERATION.md 업데이트
 - [ ] GAM-63-3: API 사용 예시 추가
 - [ ] GAM-63-4: 트러블슈팅 가이드 작성

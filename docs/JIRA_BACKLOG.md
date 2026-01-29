@@ -27,11 +27,11 @@
 
 ### 1) 산출물 기준 Story 규칙
 - Story는 “완료된 결과물” 기준으로 정의
-  - 예: “매칭 실행 API가 Swagger 예시/실응답으로 프론트 호출 성공”
+  - 예: “매칭 실행 API가 API 문서(Markdown) 예시/실응답으로 프론트 호출 성공”
 - “작업 활동”은 Task로만 관리
 
 ### 2) 공통 Definition of Done (DoD) 템플릿
-- [ ] Swagger 예시/스키마가 실제 응답과 일치
+- [ ] API 문서(Markdown) 예시/스키마가 실제 응답과 일치
 - [ ] 프론트에서 로컬 호출 성공 (CORS 포함)
 - [ ] 에러 응답 표준(아래 5) 적용 확인
 - [ ] 관련 문서/예시 업데이트 완료
@@ -39,7 +39,7 @@
 ### 3) Mock → 실제 전환 정책
 - Mock 스키마 = 실제 스키마 (항상 동일 유지)
 - 스키마 변경 시:
-  - Swagger 예시/스키마 동시 수정
+  - docs/api Markdown 예시/스키마 동시 수정
   - 프론트 영향 범위 기록 및 공지
 - 전환 기준일을 Story로 명시 (Week 4)
 
@@ -51,14 +51,14 @@
 ### 5) 에러 응답 표준
 - 모든 API는 다음 구조를 유지:
   - `success=false`, `code`, `message`, `timestamp`
-- Swagger 예시에서 에러 응답 포함
+- API 문서(Markdown) 예시에서 에러 응답 포함
 
 ---
 
 ## Epic 1: API 인프라 & Mock 데이터 제공
 
 **Epic ID**: GAM-1  
-**Epic Name**: Mock API 및 Swagger 문서 구축  
+**Epic Name**: Mock API 및 API 문서(Markdown) 구축  
 **Business Value**: 프론트엔드 개발자가 1주차부터 작업 시작 가능  
 **Target Sprint**: Week 1  
 **Total Story Points**: 12 SP
@@ -119,54 +119,52 @@ ga-matching-service/src/main/kotlin/com/goalmond/matching/
 ```
 
 **Definition of Done**:
-- 모든 엔드포인트가 Swagger UI에서 테스트 가능
+- 모든 엔드포인트가 API 문서(docs/api) 기준으로 확인·테스트 가능
 - Mock 응답이 API 명세서와 일치
 - 공통 DoD 템플릿 충족
 
 ---
 
-### Story GAM-12: Swagger 문서 & 프론트엔드 협업 가이드
+### Story GAM-12: API 문서(Markdown) & 프론트엔드 협업 가이드
 
 **Story Type**: Documentation  
 **Priority**: Critical  
 **Story Points**: 2 SP  
 **Assignee**: Backend Developer  
 **Sprint**: Week 1  
-**Labels**: `documentation`, `swagger`, `frontend-cooperation`, `week1`
+**Labels**: `documentation`, `frontend-cooperation`, `week1`
 
 **Description**:
-프론트엔드 개발자가 Cursor를 통해 작업할 수 있도록 상세한 협업 가이드를 작성합니다.
+프론트엔드 개발자가 API 프로젝트 데이터 없이 **전달받은 링크만** 사용해 작업할 수 있도록, Markdown API 문서와 협업 가이드를 작성하고 링크로 공유합니다.
 
 **User Story**:
 ```
 AS A 프론트엔드 개발자
-I WANT 상세한 API 문서와 Cursor 기반 협업 가이드를
-SO THAT 백엔드 개발자의 도움 없이도 통합 작업을 진행할 수 있다
+I WANT API 문서(Markdown)와 전달 링크 기반 협업 가이드를
+SO THAT 백엔드 레포를 clone 하지 않고도 통합 작업을 진행할 수 있다
 ```
 
 **Acceptance Criteria**:
-- [ ] Swagger OpenAPI 3.0 명세 작성
-- [ ] Swagger UI에서 모든 API "Try it out" 기능 동작
-- [ ] `docs/04_FRONTEND_COOPERATION.md` 문서 작성
-  - API 사용 예시 (cURL, JavaScript Fetch)
-  - 에러 처리 가이드
-  - 응답 형식 설명
-  - Cursor 프롬프트 예시
+- [ ] `docs/api/` Markdown API 문서 작성 (API.md, matching.md, programs.md, schools.md)
+  - 요청/응답 예시, TypeScript 타입 예시, cURL/JavaScript Fetch 예시
+  - 에러 응답 형식 설명
+- [ ] `docs/FRONTEND_HANDOFF.md` 작성
+  - 전달받는 링크: API Base URL, API 문서 링크(예: GitHub docs/api)
+  - Cursor에서 전달받은 문서 링크로 스펙 확인 후 Base URL로 호출하는 방식 안내
 - [ ] Mock 응답 예시 포함
-- [ ] 인증 방법 설명 (JWT Bearer Token)
+- [ ] 인증 필요 시 방법 설명 (현재 Mock 단계는 생략 가능)
 
 **Tasks**:
-- [ ] GAM-12-1: SpringDoc OpenAPI 의존성 추가
-- [ ] GAM-12-2: SwaggerConfig.kt 설정
-- [ ] GAM-12-3: API 컨트롤러에 @Operation 어노테이션 추가
-- [ ] GAM-12-4: 04_FRONTEND_COOPERATION.md 작성
-- [ ] GAM-12-5: API 사용 예시 코드 작성
-- [ ] GAM-12-6: Cursor 프롬프트 템플릿 작성
+- [ ] GAM-12-1: docs/api/ API.md (공통 형식, API 목록)
+- [ ] GAM-12-2: docs/api/ 엔드포인트별 Markdown (matching, programs, schools)
+- [ ] GAM-12-3: docs/FRONTEND_HANDOFF.md 작성 (링크 공유 방식, Base URL, 일정)
+- [ ] GAM-12-4: docs/04_FRONTEND_COOPERATION.md 참조 또는 통합
+- [ ] GAM-12-5: README "프론트엔드 협업"에 FRONTEND_HANDOFF.md 링크 추가
 
 **Definition of Done**:
-- Swagger UI 접속 가능 (http://localhost:8084/swagger-ui.html)
-- 프론트 개발자가 문서만으로 개발 시작 가능
-- 모든 API에 상세 설명 포함
+- API 문서는 Markdown만 제공되며, 전달 링크로 공유 가능
+- 프론트 개발자가 전달받은 링크(문서 + Base URL)만으로 개발 시작 가능
+- 모든 API에 요청/응답 예시 및 TypeScript 타입 예시 포함
 
 ---
 
@@ -337,7 +335,7 @@ SO THAT AI 매칭을 받을 수 있다
 
 **Definition of Done**:
 - 모든 API 엔드포인트 정상 동작
-- Swagger UI에서 테스트 가능
+- API 문서(docs/api) 기준으로 테스트 가능
 - Validation 에러 적절히 처리
 
 ---
@@ -766,7 +764,7 @@ SO THAT Mock에서 실제 API로 안전하게 전환할 수 있다
 
 **Acceptance Criteria**:
 - [ ] 프로필 입력 → 매칭 실행 → 결과 조회 E2E 동작 확인
-- [ ] Swagger 예시와 실제 응답 스키마 일치
+- [ ] API 문서(Markdown) 예시와 실제 응답 스키마 일치
 - [ ] 프론트 로컬 호출 성공 (CORS 포함)
 - [ ] 에러 응답 표준 적용 확인
 
@@ -1063,7 +1061,7 @@ SO THAT 다음 단계를 계획할 수 있다
 - **Goal**: 프론트엔드 개발 시작 가능
 - **Stories**: GAM-11, GAM-12, GAM-13
 - **Total SP**: 10 SP
-- **Deliverables**: Mock API, Swagger UI, 협업 가이드
+- **Deliverables**: Mock API, API 문서(Markdown), 협업 가이드(링크 제공)
 
 ### Sprint 2 (Week 2): User Profile & DB
 - **Goal**: 사용자 데이터 수집
@@ -1101,7 +1099,7 @@ SO THAT 다음 단계를 계획할 수 있다
 
 ### Epic 생성
 1. Project → Create Issue → Epic
-2. Epic Name 입력 (예: "Mock API 및 Swagger 문서 구축")
+2. Epic Name 입력 (예: "Mock API 및 API 문서(Markdown) 구축")
 3. Business Value 명시
 4. Target Sprint 설정
 

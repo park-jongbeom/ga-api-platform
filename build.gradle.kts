@@ -38,9 +38,6 @@ dependencies {
     // Jackson Kotlin
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     
-    // SpringDoc OpenAPI (Swagger)
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.15")
-    
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

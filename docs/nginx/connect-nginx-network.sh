@@ -33,4 +33,4 @@ fi
 echo "3. 확인..."
 docker network inspect "$NETWORK" --format '{{range .Containers}}{{.Name}} {{end}}'
 echo ""
-echo "https://go-almond.ddnsfree.com/swagger-ui.html 접속 테스트하세요."
+echo "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college 접속 테스트하세요."

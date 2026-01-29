@@ -8,7 +8,6 @@ AI 매칭 Mock API - 경량화된 단일 프로젝트
 - **Kotlin**
 - **Spring Boot 3.4+**
 - **Gradle Kotlin DSL**
-- **SpringDoc OpenAPI (Swagger)**
 - **Docker & Docker Compose**
 
 ## 프로젝트 구조
@@ -22,7 +21,6 @@ ga-api-platform/
 │       ├── kotlin/com/goalmond/api/
 │       │   ├── ApiApplication.kt          # 메인 애플리케이션 진입점
 │       │   ├── config/
-│       │   │   ├── SwaggerConfig.kt       # Swagger UI 설정
 │       │   │   └── WebConfig.kt          # CORS 설정
 │       │   ├── controller/
 │       │   │   └── MockMatchingController.kt  # Mock API 컨트롤러
@@ -64,6 +62,8 @@ ga-api-platform/
 
 ## 로컬 개발
 
+로컬에서 빌드·테스트·API 확인까지 한 번에 하려면 **[로컬 테스트 가이드](docs/LOCAL_TEST_GUIDE.md)**를 참고하세요.
+
 ### 사전 요구사항
 
 - JDK 21 이상
@@ -83,8 +83,8 @@ ga-api-platform/
 
 3. **애플리케이션 접근**:
    - API: http://localhost:8080
-   - Swagger UI: http://localhost:8080/swagger-ui.html
-   - OpenAPI JSON: http://localhost:8080/v3/api-docs
+
+4. **API 문서**: Markdown으로만 제공됩니다. [docs/api/API.md](docs/api/API.md)가 메인 문서이며, [matching](docs/api/matching.md), [programs](docs/api/programs.md), [schools](docs/api/schools.md)에 상세가 있습니다. Cursor에서 `@docs/api`로 참조하면 편합니다.
 
 ## Docker를 통한 실행
 
@@ -111,25 +111,6 @@ docker-compose logs -f ga-matching-api
 ```bash
 docker-compose down
 ```
-
-## Swagger UI 사용법
-
-### 접근 방법
-
-- **로컬 개발 환경**: http://localhost:8080/swagger-ui.html
-- **프로덕션 환경**: `http://{서버주소}:8080/swagger-ui.html`
-
-### 주요 기능
-
-1. **API 문서 확인**: 각 엔드포인트의 상세 설명, 파라미터, 응답 형식 확인
-2. **API 테스트**: "Try it out" 버튼을 클릭하여 브라우저에서 직접 API를 호출하고 응답을 확인
-3. **요청/응답 예시**: 각 API의 요청 및 응답 예시 확인
-
-### OpenAPI JSON 스펙
-
-OpenAPI JSON 스펙을 다운로드하여 Postman, Insomnia 등에서 사용할 수 있습니다:
-- **로컬**: http://localhost:8080/v3/api-docs
-- **프로덕션**: `http://{서버주소}:8080/v3/api-docs`
 
 ## 배포
 
@@ -165,6 +146,8 @@ docker-compose up -d
 
 ### 배포 확인
 
+배포 후 서버·외부에서 어떻게 확인하는지는 **[배포 후 확인](docs/DEPLOYMENT_VERIFICATION.md)**을 참고하세요.
+
 ```bash
 # 컨테이너 상태 확인
 docker-compose ps
@@ -172,8 +155,8 @@ docker-compose ps
 # 로그 확인
 docker-compose logs -f ga-matching-api
 
-# 헬스 체크
-curl http://localhost:8080/swagger-ui.html
+# 헬스 체크 (서버에서)
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/v1/programs?type=community_college
 ```
 
 ## API 사용 예시
@@ -206,9 +189,9 @@ curl http://localhost:8080/api/v1/schools/school-001
 
 ## 프론트엔드 협업
 
-프론트엔드 개발자는 Swagger UI를 통해 API를 테스트하고 통합할 수 있습니다.
+API 문서는 [docs/api/](docs/api/)의 Markdown으로만 제공됩니다. Cursor에서 `@docs/api` 또는 [docs/api/API.md](docs/api/API.md)를 참조해 작업하면 됩니다.
 
-자세한 내용은 `docs/04_FRONTEND_COOPERATION.md`를 참고하세요.
+자세한 협업 정책은 `docs/04_FRONTEND_COOPERATION.md`를 참고하세요.
 
 ## 참고사항
 

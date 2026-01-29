@@ -1,4 +1,4 @@
-# 502 Bad Gateway (Swagger) 해결 (서버 실행 가이드)
+# 502 Bad Gateway 해결 (서버 실행 가이드)
 
 502 = nginx는 동작하지만 **백엔드(ga-matching-api:8080)로의 요청이 실패**한 상태입니다. 아래 순서대로 서버에서 확인·조치하세요.
 
@@ -14,7 +14,7 @@ docker ps -a --format "table {{.Names}}\t{{.Status}}" | grep -E "ga-nginx|ga-mat
 docker network inspect ga-api-platform_ga-network --format '{{range .Containers}}{{.Name}} {{end}}'
 
 # 3) ga-nginx 안에서 백엔드 접속 테스트 (선택)
-docker exec ga-nginx wget -qO- --timeout=5 http://ga-matching-api:8080/swagger-ui.html | head -5
+docker exec ga-nginx wget -qO- --timeout=5 "http://ga-matching-api:8080/api/v1/programs?type=community_college" | head -5
 ```
 
 - **2)** 에 ga-matching-api만 있고 ga-nginx가 없으면 → 네트워크 불일치. 2단계 A 적용.
@@ -31,7 +31,7 @@ docker exec ga-nginx wget -qO- --timeout=5 http://ga-matching-api:8080/swagger-u
 docker network connect ga-api-platform_ga-network ga-nginx
 ```
 
-이후 `https://go-almond.ddnsfree.com/swagger-ui.html` 다시 접속.
+이후 `https://go-almond.ddnsfree.com/api/v1/programs?type=community_college` 다시 접속.
 
 ---
 
@@ -56,7 +56,7 @@ docker exec ga-nginx wget -qO- --timeout=10 http://ga-matching-api:8080/swagger-
 |-----------|--------|
 | ga-nginx가 네트워크에 없음 | `docker network connect ga-api-platform_ga-network ga-nginx` 후 Swagger 재접속 |
 | ga-matching-api Exited/미기동 | `docker-compose restart ga-matching-api` 후 10~20초 대기, 다시 접속 |
-| 둘 다 같은 네트워크·Up인데 502 | `docker exec ga-nginx wget ... http://ga-matching-api:8080/swagger-ui.html` 로 백엔드 직접 확인. 실패 시 ga-matching-api 로그: `docker logs ga-matching-api` |
+| 둘 다 같은 네트워크·Up인데 502 | `docker exec ga-nginx wget ... "http://ga-matching-api:8080/api/v1/programs?type=community_college"` 로 백엔드 직접 확인. 실패 시 ga-matching-api 로그: `docker logs ga-matching-api` |
 
 ---
 

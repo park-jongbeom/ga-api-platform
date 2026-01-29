@@ -33,11 +33,10 @@ ga-nginx가 80, 443을 리스닝하고, 같은 Docker 네트워크의 `ga-matchi
 
 ### 3. 동작 확인
 
-- Swagger UI: `https://go-almond.ddnsfree.com/swagger-ui.html`
-- API: `https://go-almond.ddnsfree.com/api/v1/matching/result`
+- API: `https://go-almond.ddnsfree.com/api/v1/programs?type=community_college` 또는 `https://go-almond.ddnsfree.com/api/v1/matching/result`
 - 로그: `docker logs ga-nginx`
 
-### 4. Swagger/API 미동작 시 (ga-nginx가 네트워크에 없는 경우)
+### 4. API 미동작 시 (ga-nginx가 네트워크에 없는 경우)
 
 `docker network inspect ga-api-platform_ga-network` 에 ga-nginx가 없으면 [NETWORK_FIX.md](NETWORK_FIX.md) 참고. 서버에서 `bash docs/nginx/connect-nginx-network.sh` 실행.
 

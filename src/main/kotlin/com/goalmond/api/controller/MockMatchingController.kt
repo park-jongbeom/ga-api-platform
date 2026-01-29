@@ -1,19 +1,10 @@
 package com.goalmond.api.controller
 
 import com.goalmond.api.domain.dto.ApiResponse
-import com.goalmond.api.domain.dto.ErrorResponse
 import com.goalmond.api.domain.dto.MatchingResponse
 import com.goalmond.api.domain.dto.ProgramListResponse
 import com.goalmond.api.domain.dto.ProgramResponse
 import com.goalmond.api.domain.dto.SchoolResponse
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.ExampleObject
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
-import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -29,7 +20,6 @@ import kotlin.random.Random
 
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Matching Mock API", description = "AI 매칭 Mock API")
 class MockMatchingController {
 
     private var lastMatchingResult: MatchingResponse? = null
@@ -38,78 +28,6 @@ class MockMatchingController {
         val userId: String
     )
 
-    @Operation(
-        summary = "매칭 실행",
-        description = """
-            사용자 ID를 입력받아 Mock 매칭 결과를 반환합니다.
-            
-            ## 인증
-            - 로컬/Mock 단계에서는 인증 생략 가능
-        """
-    )
-    @ApiResponses(
-        value = [
-            SwaggerApiResponse(
-                responseCode = "200",
-                description = "매칭 결과 반환",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ErrorResponse::class),
-                    examples = [ExampleObject(
-                        value = """
-                            {
-                              "success": true,
-                              "data": {
-                                "matchingId": "880e8400-e29b-41d4-a716-446655440003",
-                                "userId": "550e8400-e29b-41d4-a716-446655440000",
-                                "totalMatches": 5,
-                                "executionTimeMs": 2340,
-                                "results": [],
-                                "createdAt": "2024-01-01T00:00:00Z"
-                              }
-                            }
-                        """
-                    )]
-                )]
-            ),
-            SwaggerApiResponse(
-                responseCode = "400",
-                description = "요청 형식 오류",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ErrorResponse::class),
-                    examples = [ExampleObject(
-                        value = """
-                            {
-                              "success": false,
-                              "code": "INVALID_REQUEST",
-                              "message": "요청 형식이 올바르지 않습니다.",
-                              "timestamp": "2024-01-01T00:00:00Z"
-                            }
-                        """
-                    )]
-                )]
-            ),
-            SwaggerApiResponse(
-                responseCode = "500",
-                description = "서버 오류",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ErrorResponse::class),
-                    examples = [ExampleObject(
-                        value = """
-                            {
-                              "success": false,
-                              "code": "INTERNAL_SERVER_ERROR",
-                              "message": "서버 오류가 발생했습니다.",
-                              "timestamp": "2024-01-01T00:00:00Z"
-                            }
-                        """
-                    )]
-                )]
-            )
-        ]
-    )
     @PostMapping("/matching/run")
     fun runMatching(@RequestBody request: MatchingRunRequest): ResponseEntity<ApiResponse<MatchingResponse>> {
         val scenario = MockScenario.values().random()
@@ -118,33 +36,6 @@ class MockMatchingController {
         return ResponseEntity.ok(ApiResponse(success = true, data = response))
     }
 
-    @Operation(
-        summary = "최신 매칭 결과 조회",
-        description = "가장 최근에 실행된 매칭 결과를 반환합니다."
-    )
-    @ApiResponses(
-        value = [
-            SwaggerApiResponse(responseCode = "200", description = "조회 성공"),
-            SwaggerApiResponse(
-                responseCode = "404",
-                description = "결과 없음",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ErrorResponse::class),
-                    examples = [ExampleObject(
-                        value = """
-                            {
-                              "success": false,
-                              "code": "MATCHING_RESULT_NOT_FOUND",
-                              "message": "매칭 결과가 없습니다.",
-                              "timestamp": "2024-01-01T00:00:00Z"
-                            }
-                        """
-                    )]
-                )]
-            )
-        ]
-    )
     @GetMapping("/matching/result")
     fun getLatestMatchingResult(): ResponseEntity<ApiResponse<MatchingResponse>> {
         if (lastMatchingResult == null) {
@@ -157,42 +48,11 @@ class MockMatchingController {
         return ResponseEntity.ok(ApiResponse(success = true, data = lastMatchingResult))
     }
 
-    @Operation(
-        summary = "프로그램 목록 조회",
-        description = "프로그램 목록을 타입/지역 조건으로 조회합니다."
-    )
-    @ApiResponses(
-        value = [
-            SwaggerApiResponse(responseCode = "200", description = "조회 성공"),
-            SwaggerApiResponse(
-                responseCode = "400",
-                description = "요청 파라미터 오류",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ErrorResponse::class),
-                    examples = [ExampleObject(
-                        value = """
-                            {
-                              "success": false,
-                              "code": "INVALID_PROGRAM_TYPE",
-                              "message": "허용되지 않은 프로그램 유형입니다.",
-                              "timestamp": "2024-01-01T00:00:00Z"
-                            }
-                        """
-                    )]
-                )]
-            )
-        ]
-    )
     @GetMapping("/programs")
     fun getPrograms(
-        @Parameter(description = "프로그램 유형", example = "community_college")
         @RequestParam type: String,
-        @Parameter(description = "주 코드", example = "CA")
         @RequestParam(required = false) state: String?,
-        @Parameter(description = "페이지 번호", example = "1")
         @RequestParam(defaultValue = "1") page: Int,
-        @Parameter(description = "페이지 크기", example = "10")
         @RequestParam(defaultValue = "10") size: Int
     ): ResponseEntity<ApiResponse<ProgramListResponse>> {
         val allowedTypes = setOf("university", "community_college", "vocational")
@@ -235,36 +95,8 @@ class MockMatchingController {
         )
     }
 
-    @Operation(
-        summary = "학교 상세 조회",
-        description = "학교 ID를 기준으로 상세 정보를 조회합니다."
-    )
-    @ApiResponses(
-        value = [
-            SwaggerApiResponse(responseCode = "200", description = "조회 성공"),
-            SwaggerApiResponse(
-                responseCode = "404",
-                description = "학교 없음",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ApiResponse::class),
-                    examples = [ExampleObject(
-                        value = """
-                            {
-                              "success": false,
-                              "code": "SCHOOL_NOT_FOUND",
-                              "message": "학교 정보를 찾을 수 없습니다.",
-                              "timestamp": "2024-01-01T00:00:00Z"
-                            }
-                        """
-                    )]
-                )]
-            )
-        ]
-    )
     @GetMapping("/schools/{schoolId}")
     fun getSchoolDetail(
-        @Parameter(description = "학교 ID", example = "school-001")
         @PathVariable schoolId: String
     ): ResponseEntity<ApiResponse<SchoolResponse>> {
         val response = SchoolResponse(

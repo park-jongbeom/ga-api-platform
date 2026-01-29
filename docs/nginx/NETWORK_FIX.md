@@ -37,7 +37,7 @@ docker network inspect ga-api-platform_ga-network
 ```
 
 `Containers`에 `ga-matching-api`와 `ga-nginx` 둘 다 있어야 합니다.  
-이후 `https://go-almond.ddnsfree.com/swagger-ui.html` 접속 테스트.
+이후 `https://go-almond.ddnsfree.com/api/v1/programs?type=community_college` 접속 테스트.
 
 ---
 

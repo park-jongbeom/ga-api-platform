@@ -96,7 +96,11 @@ docker build -t ga-matching-api:latest .
 
 ### Docker Compose로 실행
 
+**환경 정보 단일 관리**: 런타임 환경(프로파일, DB 연결 등)은 **`.env` 한 파일**에서만 관리합니다. 저장소의 `env.example`을 복사해 `.env`를 만든 뒤 값을 채우고, 같은 디렉터리에서 실행하세요.
+
 ```bash
+cp env.example .env
+# .env 에 DB_HOST, DB_PASSWORD 등 실제 값 입력 후
 docker-compose up -d
 ```
 
@@ -136,7 +140,7 @@ GitHub Actions를 통해 자동 빌드 및 배포가 설정되어 있습니다.
 
 ### 수동 배포
 
-서버에서 직접 Docker Compose를 실행하는 경우:
+서버에서 직접 Docker Compose를 실행하는 경우, **해당 디렉터리에 `.env`가 있어야** 합니다. 없으면 `env.example`을 복사해 `.env`를 만들고 값을 채운 뒤 실행하세요.
 
 ```bash
 cd /home/$USER/ga-api-platform

@@ -1,3 +1,16 @@
+# Default profile: no DB (Mock API only). Use profile dev, lightsail, or local for DB.
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+  flyway:
+    enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+---
 server:
   port: 8080
 
@@ -6,3 +19,5 @@ spring:
     name: ga-matching-api
   jackson:
     property-naming-strategy: SNAKE_CASE
+  jpa:
+    open-in-view: false

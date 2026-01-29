@@ -168,7 +168,7 @@ SO THAT 백엔드 레포를 clone 하지 않고도 통합 작업을 진행할 �
 
 ---
 
-### Story GAM-13: 신규 서비스 모듈 구조 생성
+### Story GAM-13: DB 인프라 구축 (단일 모듈 ga-matching-api)
 
 **Story Type**: Task  
 **Priority**: Critical  
@@ -178,33 +178,29 @@ SO THAT 백엔드 레포를 clone 하지 않고도 통합 작업을 진행할 �
 **Labels**: `infrastructure`, `setup`, `week1`
 
 **Description**:
-ga-matching-service 모듈을 생성하고 기본 인프라를 구축합니다.
+단일 모듈(ga-matching-api) 환경에서 Lightsail PostgreSQL 기반 DB 인프라를 구축합니다. 기본 실행은 Mock API(DB 없음), lightsail/local 프로파일에서만 DB 연결 및 Flyway 마이그레이션 적용.
 
 **Acceptance Criteria**:
-- [ ] ga-matching-service 모듈 생성
 - [ ] build.gradle.kts 의존성 설정
-  - Spring Boot 3.4+
-  - Spring Data JPA
-  - PostgreSQL Driver
-  - SpringDoc OpenAPI
-  - ga-common 모듈
-- [ ] application.yml 설정 (dev, lightsail 프로파일)
-- [ ] Docker Compose에 서비스 추가 (Port 8084)
-- [ ] Health Check 엔드포인트 구현
+  - Spring Boot 3.4+, Spring Data JPA, PostgreSQL Driver, Flyway
+- [ ] application.yml: default 프로파일에서 DB/ Flyway 비활성화 (Mock API)
+- [ ] application-lightsail.yml: 운영 배포용, 환경 변수(DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD), sslmode=require, Flyway 활성화
+- [ ] application-local.yml: 로컬에서 운영 DB 직접 연결 시 동일 env 변수 사용
+- [ ] Flyway V1 마이그레이션: docs/DATABASE_SCHEMA.md 기준 테이블 생성(users, academic_profiles, financial_profiles, user_preferences, contact_infos, user_sessions, audit_logs, conversations, messages, documents는 embedding 컬럼 제외)
+- [ ] Health Check: 기존 actuator `/actuator/health` 활용
 - [ ] Gradle 빌드 성공
 
 **Tasks**:
-- [ ] GAM-13-1: settings.gradle.kts에 모듈 추가
-- [ ] GAM-13-2: build.gradle.kts 작성
-- [ ] GAM-13-3: MatchingServiceApplication.kt 생성
-- [ ] GAM-13-4: application.yml 설정
-- [ ] GAM-13-5: docker-compose.yml 업데이트
-- [ ] GAM-13-6: HealthCheckController.kt 구현
+- [ ] GAM-13-1: build.gradle.kts에 JPA, PostgreSQL, Flyway 의존성 추가
+- [ ] GAM-13-2: application.yml 프로파일 및 Flyway 기본 설정
+- [ ] GAM-13-3: application-lightsail.yml, application-local.yml 작성
+- [ ] GAM-13-4: V1__create_schema_from_doc.sql 작성 및 db/migration 배치
+- [ ] GAM-13-5: JIRA 백로그(GAM-13) 설명·AC·Tasks·DoD 반영
 
 **Definition of Done**:
-- `./gradlew :ga-matching-service:bootRun` 정상 실행
-- Health Check API 응답 확인
-- Docker Compose로 전체 서비스 실행 가능
+- `./gradlew bootRun` 정상 실행 (default: Mock API, DB 미연결)
+- `./gradlew bootRun --args='--spring.profiles.active=lightsail'` 시 DB_* 환경 변수로 Lightsail PostgreSQL 연결 및 Flyway 마이그레이션 적용
+- `/actuator/health` 응답 확인
 
 ---
 

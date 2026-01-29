@@ -1,0 +1,18 @@
+# 로컬에서 운영(Lightsail) DB 직접 연결 시 사용. 환경 변수: DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD
+# 실제 값이 들어간 이 파일은 .gitignore(application-*-local.yml)로 푸시 제외 권장.
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}?sslmode=require
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration

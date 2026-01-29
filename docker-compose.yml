@@ -1,7 +1,11 @@
+# 환경 정보 단일 관리: 서버의 .env 한 파일만 사용 (env.example 참고하여 생성, .env는 Git 제외)
 services:
   ga-matching-api:
     image: patrick5471/ga-matching-api:latest
     container_name: ga-matching-api
+    env_file:
+      - .env
+    # 프로파일·DB 등 모든 런타임 값은 .env 단일 파일에서만 관리 (env.example 참고)
     ports:
       - "8080:8080"
     healthcheck:

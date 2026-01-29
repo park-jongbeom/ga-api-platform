@@ -2,6 +2,19 @@
 
 CI/CD 또는 수동 배포가 끝난 뒤, 서버에서와 외부(본인 PC·브라우저)에서 각각 어떻게 확인할 수 있는지 정리한 가이드입니다.
 
+---
+
+## 0. 환경 정보 단일 관리 (.env)
+
+**Docker 배포 시 런타임 환경 정보(프로파일, DB 연결 등)는 서버의 `.env` 한 파일에서만 관리합니다.**
+
+- **위치**: 배포 서버의 `ga-api-platform` 디렉터리와 같은 위치에 `.env` 파일 생성
+- **생성 방법**: 저장소의 `env.example`을 복사한 뒤, 값만 채워 넣기 (Git에는 `.env`가 포함되지 않음)
+- **필수 변수**: `SPRING_PROFILES_ACTIVE`, DB 사용 시 `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`
+- **docker-compose**는 이 `.env`만 `env_file`로 참조하므로, 비밀/호스트 등은 다른 yml이나 설정 파일에 두지 말고 `.env`에만 둡니다.
+
+---
+
 (도메인은 예시로 `go-almond.ddnsfree.com`을 사용합니다. 실제 도메인이 다르면 아래 URL에서 해당 도메인으로 치환하세요.)
 
 ---
@@ -108,5 +121,6 @@ curl -s "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 ## 5. CI/CD 배포 직후 참고
 
 - 워크플로는 **ga-matching-api** 이미지 pull·재기동과 함께 **docs/nginx** 설정을 서버로 복사한 뒤 **ga-nginx**를 재시작합니다. (`main` 브랜치 push 시 `src/**`, `docker-compose.yml`, `docs/nginx/**` 등 변경 시 배포가 실행됩니다.)
+- **환경 정보**: CI/CD는 `.env`를 서버로 복사하지 않습니다. 서버에는 **배포 디렉터리에 `.env`가 이미 있어야** 합니다. 최초 1회 `env.example`을 복사해 `.env`를 만들고 값을 채운 뒤, 해당 위치에서 `docker-compose up -d`를 실행하세요.
 - ga-nginx를 쓰는 환경이면 첫 배포 시 `docker-compose up -d`로 한 번 둘 다 기동해 두었는지 확인하세요.
 - 배포 직후 healthcheck 통과까지 수십 초 걸릴 수 있으므로, 확인 전 **10~20초** 정도 대기하는 것을 권장합니다.

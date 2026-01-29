@@ -1,0 +1,17 @@
+# Lightsail PostgreSQL (운영 배포). 환경 변수: DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD
+spring:
+  config:
+    activate:
+      on-profile: lightsail
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}?sslmode=require
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration

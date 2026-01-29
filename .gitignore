@@ -49,3 +49,8 @@ docs/plan/
 
 # Cursor agent transcripts (대용량 로그로 인덱싱/성능 이슈 방지)
 .cursor/projects/**/agent-transcripts/
+
+# Local development files (로컬 개발용 파일)
+docker-compose.local.yml
+docs/nginx/go-almond.local.conf
+.git-setup-guide.md

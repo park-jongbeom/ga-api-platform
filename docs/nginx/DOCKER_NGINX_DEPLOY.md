@@ -1,7 +1,7 @@
 # Docker Nginx 전용 배포 가이드
 
 `go-almond.swagger.conf`는 **Docker 컨테이너(ga-nginx) 전용** 설정입니다.  
-upstream 호스트명(`ga-auth-service`, `ga-user-service` 등)은 Docker 네트워크(ga-network) 안에서만 동작하므로, **호스트 nginx의 sites-enabled에 이 설정을 두면 안 됩니다.**
+upstream 호스트명(`ga-matching-api`)은 Docker 네트워크(ga-network) 안에서만 동작하므로, **호스트 nginx의 sites-enabled에 이 설정을 두면 안 됩니다.**
 
 ## "host not found in upstream" 발생 시
 
@@ -29,13 +29,17 @@ cd ~/ga-api-platform   # 또는 프로젝트 실제 경로
 docker-compose up -d
 ```
 
-ga-nginx가 80, 443, 8081-8085를 리스닝하고, 같은 Docker 네트워크의 `ga-auth-service:9081` 등으로 프록시합니다.
+ga-nginx가 80, 443을 리스닝하고, 같은 Docker 네트워크의 `ga-matching-api:8080`으로 프록시합니다 (경량화: 단일 API).
 
 ### 3. 동작 확인
 
-- Swagger UI: `https://go-almond.ddnsfree.com/swagger-ui/index.html`
-- 포트별: `https://go-almond.ddnsfree.com:8081`, `:8082`, ... `:8085`
+- Swagger UI: `https://go-almond.ddnsfree.com/swagger-ui.html`
+- API: `https://go-almond.ddnsfree.com/api/v1/matching/result`
 - 로그: `docker logs ga-nginx`
+
+### 4. Swagger/API 미동작 시 (ga-nginx가 네트워크에 없는 경우)
+
+`docker network inspect ga-api-platform_ga-network` 에 ga-nginx가 없으면 [NETWORK_FIX.md](NETWORK_FIX.md) 참고. 서버에서 `bash docs/nginx/connect-nginx-network.sh` 실행.
 
 ## 요약
 

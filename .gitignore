@@ -45,3 +45,7 @@ Thumbs.db
 
 # AI Sample Files (코드 빌드와 무관한 참고 자료)
 docs/reference/
+docs/plan/
+
+# Cursor agent transcripts (대용량 로그로 인덱싱/성능 이슈 방지)
+.cursor/projects/**/agent-transcripts/

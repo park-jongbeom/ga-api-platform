@@ -1,11 +1,1 @@
-rootProject.name = "ga-api-platform"
-
-include(
-    "ga-common",
-    "ga-grpc-interface",
-    "ga-auth-service",
-    "ga-user-service",
-    "ga-audit-service",
-    "ga-ai-consultant-service",
-    "ga-matching-service"
-)
+rootProject.name = "ga-matching-api"

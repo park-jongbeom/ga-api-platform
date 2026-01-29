@@ -1,150 +1,84 @@
-name: Deploy to Server
+name: Deploy Matching API
 
 on:
   push:
-    branches:
-      - main
-      - master
-  workflow_dispatch:
-
-env:
-  SERVER_HOST: ${{ secrets.SERVER_HOST }}
-  SERVER_USER: ${{ secrets.SERVER_USER }}
-  SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
-  DB_HOST: ${{ secrets.DB_HOST }}
-  DB_PORT: ${{ secrets.DB_PORT }}
-  DB_NAME: ${{ secrets.DB_NAME }}
-  DB_USERNAME: ${{ secrets.DB_USERNAME }}
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.github/workflows/deploy.yml'
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build Application
+        working-directory: .
+        run: ./gradlew build -x test
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Image
+        working-directory: .
+        run: |
+          docker build -f Dockerfile -t patrick5471/ga-matching-api:latest .
+          for i in 1 2 3; do
+            echo "Docker push attempt $i..."
+            if docker push patrick5471/ga-matching-api:latest; then
+              echo "Docker push succeeded"
+              break
+            fi
+            if [ "$i" -eq 3 ]; then
+              echo "Docker push failed after 3 attempts"
+              exit 1
+            fi
+            sleep $((i * 10))
+          done
 
       - name: Copy docker-compose.yml to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ env.SERVER_HOST }}
-          username: ${{ env.SERVER_USER }}
-          key: ${{ env.SERVER_SSH_KEY }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           source: "docker-compose.yml"
-          target: "/home/${{ env.SERVER_USER }}/ga-api-platform"
-      
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ env.SERVER_SSH_KEY }}
-      
-      - name: Add server to known hosts
-        run: |
-          # 환경 변수 검증
-          if [ -z "${{ env.SERVER_HOST }}" ]; then
-            echo "Error: SERVER_HOST is not set"
-            exit 1
-          fi
+          target: "/home/${{ secrets.SERVER_USER }}/ga-api-platform"
           
-          # SSH 포트 설정 (기본 22번, 필요시 SSH_PORT 환경 변수로 변경 가능)
-          SSH_PORT=${SSH_PORT:-22}
-          
-          # .ssh 디렉토리 생성 및 권한 설정
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo "SSH directory created and permissions set"
-          
-          # known_hosts 파일이 없으면 생성하고 권한 설정
-          if [ ! -f ~/.ssh/known_hosts ]; then
-            touch ~/.ssh/known_hosts
-            echo "Created known_hosts file"
-          fi
-          
-          # 파일 쓰기 권한 보장 (644: 소유자 읽기/쓰기, 그룹/기타 읽기)
-          chmod 644 ~/.ssh/known_hosts
-          echo "Set permissions for known_hosts file"
-          
-          # ssh-keyscan 실행 (타임아웃 10초)
-          echo "Scanning SSH keys for ${{ env.SERVER_HOST }}:$SSH_PORT"
-          if ssh-keyscan -T 10 -p $SSH_PORT -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts 2>&1; then
-            echo "Successfully added server to known_hosts"
-            # 실행 후 권한 재설정 (보안을 위해 644 유지)
-            chmod 644 ~/.ssh/known_hosts
-          else
-            echo "Warning: ssh-keyscan failed, but continuing..."
-            echo "SSH action will handle host key verification"
-            # appleboy/ssh-action은 내부적으로 host key를 처리하므로 계속 진행
-          fi
-          
-          # 최종 권한 확인
-          ls -la ~/.ssh/known_hosts || echo "known_hosts file does not exist"
-      
-      - name: Deploy to server
+      - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ env.SERVER_HOST }}
-          username: ${{ env.SERVER_USER }}
-          key: ${{ env.SERVER_SSH_KEY }}
-          command_timeout: 300s
-          envs: DB_HOST,DB_PORT,DB_NAME,DB_USERNAME,DB_PASSWORD
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            #!/bin/bash
-            set -e
-            
             # 디렉토리 생성 (없는 경우)
-            mkdir -p /home/${{ env.SERVER_USER }}/ga-api-platform
-            cd /home/${{ env.SERVER_USER }}/ga-api-platform
+            mkdir -p /home/${{ secrets.SERVER_USER }}/ga-api-platform
+            cd /home/${{ secrets.SERVER_USER }}/ga-api-platform
             
-            # .env 파일 생성 또는 업데이트 (환경 변수 저장)
-            cat > .env << EOF
-            DB_HOST=${DB_HOST}
-            DB_PORT=${DB_PORT}
-            DB_NAME=${DB_NAME}
-            DB_USERNAME=${DB_USERNAME}
-            DB_PASSWORD=${DB_PASSWORD}
-            EOF
-            
-            # 함수: 재시도 로직을 포함한 이미지 pull
-            pull_with_retry() {
-              local service=$1
-              local max_attempts=3
-              local attempt=1
-              
-              while [ $attempt -le $max_attempts ]; do
-                echo "Attempt $attempt of $max_attempts: Pulling $service..."
-                
-                # timeout 명령어로 각 pull에 개별 타임아웃 설정 (120초)
-                if timeout 120 docker compose pull "$service" 2>&1; then
-                  echo "Successfully pulled $service"
-                  return 0
-                fi
-                
-                if [ $attempt -lt $max_attempts ]; then
-                  wait_time=$((attempt * 10))
-                  echo "Pull failed. Waiting ${wait_time}s before retry..."
-                  sleep $wait_time
-                fi
-                
-                attempt=$((attempt + 1))
-              done
-              
-              echo "Warning: Failed to pull $service after $max_attempts attempts"
-              return 1
-            }
-            
-            # 함수: 이미지 존재 확인
-            image_exists() {
-              local image=$1
-              docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^${image}$" 2>/dev/null
-            }
-            
-            # Docker Compose V2 사용 시도, 없으면 docker-compose 사용
-            DOCKER_COMPOSE_CMD=""
-            if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
-              DOCKER_COMPOSE_CMD="docker compose"
-            elif command -v docker-compose &> /dev/null; then
+            # Docker Compose 명령어 확인 (docker-compose 우선 사용)
+            if command -v docker-compose &> /dev/null; then
               DOCKER_COMPOSE_CMD="docker-compose"
+            elif command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
+              DOCKER_COMPOSE_CMD="docker compose"
             else
               echo "Docker Compose를 찾을 수 없습니다. 설치가 필요합니다."
               exit 1
@@ -152,36 +86,38 @@ jobs:
             
             echo "Using: $DOCKER_COMPOSE_CMD"
             
-            # ga-user-service 배포
-            SERVICE_NAME="ga-user-service"
-            IMAGE_NAME="patrick5471/${SERVICE_NAME}:latest"
+            # 기존 컨테이너 중지 및 제거 (포트 충돌 방지)
+            echo "Stopping existing ga-matching-api container..."
+            $DOCKER_COMPOSE_CMD stop ga-matching-api || true
+            $DOCKER_COMPOSE_CMD rm -f ga-matching-api || true
             
-            echo "Checking if image ${IMAGE_NAME} exists..."
-            
-            # 이미지가 이미 존재하는지 확인
-            if image_exists "$IMAGE_NAME"; then
-              echo "이미지 ${IMAGE_NAME}가 이미 존재합니다."
-              echo "최신 버전을 위해 pull을 시도하지만, 실패해도 기존 이미지로 진행합니다."
-              
-              # Pull 시도 (실패해도 계속 진행)
-              pull_with_retry "$SERVICE_NAME" || {
-                echo "Pull 실패, 기존 이미지로 서비스를 시작합니다."
-              }
-            else
-              echo "이미지가 존재하지 않습니다. Pull이 필수입니다."
-              if ! pull_with_retry "$SERVICE_NAME"; then
-                echo "Error: 이미지 pull에 실패했습니다. 서비스를 시작할 수 없습니다."
-                exit 1
+            # 이미지 pull (재시도 로직 포함)
+            echo "Pulling latest image for ga-matching-api..."
+            MAX_ATTEMPTS=3
+            ATTEMPT=1
+            while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+              echo "Attempt $ATTEMPT of $MAX_ATTEMPTS: Pulling ga-matching-api..."
+              if timeout 120 $DOCKER_COMPOSE_CMD pull ga-matching-api 2>&1; then
+                echo "Successfully pulled ga-matching-api"
+                break
               fi
-            fi
+              if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
+                WAIT_TIME=$((ATTEMPT * 10))
+                echo "Pull failed. Waiting ${WAIT_TIME}s before retry..."
+                sleep $WAIT_TIME
+              else
+                echo "Warning: Failed to pull ga-matching-api after $MAX_ATTEMPTS attempts. Continuing with existing image..."
+              fi
+              ATTEMPT=$((ATTEMPT + 1))
+            done
             
             # 서비스 시작
-            echo "Starting service ${SERVICE_NAME}..."
-            $DOCKER_COMPOSE_CMD --env-file .env up -d "$SERVICE_NAME"
+            echo "Starting ga-matching-api..."
+            $DOCKER_COMPOSE_CMD up -d ga-matching-api
             
             # 서비스 상태 확인
             echo "Checking service status..."
             sleep 5
-            $DOCKER_COMPOSE_CMD ps "$SERVICE_NAME"
+            $DOCKER_COMPOSE_CMD ps ga-matching-api
             
             echo "Deployment completed successfully!"

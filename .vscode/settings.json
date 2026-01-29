@@ -1,8 +1,56 @@
 {
+  "cursor.chat.autoStart": false,
+  "cursor.composer.autoStart": false,
+  "cursor.agent.autoStart": false,
+  "cursor.backgroundAgent.enabled": false,
+  "cursor.chat.enabled": false,
+  "cursor.composer.enabled": false,
   "git.commitMessageLanguage": "ko",
   "git.useCommitInputAsStashMessage": true,
   "files.encoding": "utf8",
   "files.eol": "\n",
+  "files.exclude": {
+    "**/build": true,
+    "**/.gradle": true,
+    "**/out": true,
+    "**/target": true,
+    "**/generated": true,
+    "**/.idea": true,
+    "**/*.iml": true,
+    "**/.cursor/projects/**/agent-transcripts/**": true,
+    "**/docs/plan/**": true,
+    "**/docs/plan-front/**": true,
+    "**/*.pdf": true,
+    "**/*.docx": true,
+    "**/*.png": true,
+    "**/*.jpg": true,
+    "**/*.jpeg": true
+  },
+  "files.watcherExclude": {
+    "**/build/**": true,
+    "**/.gradle/**": true,
+    "**/out/**": true,
+    "**/target/**": true,
+    "**/node_modules/**": true,
+    "**/.cursor/projects/**/agent-transcripts/**": true,
+    "**/docs/plan/**": true,
+    "**/docs/plan-front/**": true,
+    "**/*.pdf": true,
+    "**/*.docx": true
+  },
+  "search.exclude": {
+    "**/build": true,
+    "**/.gradle": true,
+    "**/out": true,
+    "**/target": true,
+    "**/generated": true,
+    "**/node_modules": true,
+    "**/.cursor/projects/**/agent-transcripts/**": true,
+    "**/docs/plan/**": true,
+    "**/docs/plan-front/**": true,
+    "**/*.pdf": true,
+    "**/*.docx": true
+  },
   "[kotlin]": {
     "files.encoding": "utf8"
   },
@@ -10,7 +58,8 @@
     "files.encoding": "utf8"
   },
   "java.compile.nullAnalysis.mode": "automatic",
-  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.configuration.updateBuildConfiguration": "manual",
+  "java.jdt.ls.vmargs": "-Xmx1G -XX:+UseG1GC",
   "sqltools.connections": [
     {
       "pgOptions": {

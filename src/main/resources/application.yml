@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ga-matching-api
+  # Path Matching 전략 (SpringDoc 2.8.15 호환성)
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+# Swagger
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    # 성능 최적화: 지연 로딩 및 캐싱 활성화
+    try-it-out-enabled: true
+    filter: true
+  # API 문서 생성 최적화
+  show-actuator: false
+  cache-disabled: false

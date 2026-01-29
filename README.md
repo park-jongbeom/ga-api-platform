@@ -1,6 +1,6 @@
-# Go Almond (GA) API Platform
+# Go Almond Matching API
 
-Modern MSA & Reactive-Alternative 플랫폼
+AI 매칭 Mock API - 경량화된 단일 프로젝트
 
 ## 기술 스택
 
@@ -8,131 +8,139 @@ Modern MSA & Reactive-Alternative 플랫폼
 - **Kotlin**
 - **Spring Boot 3.4+**
 - **Gradle Kotlin DSL**
-- **Spring Data JPA**
-- **gRPC**
-- **PostgreSQL**
-- **Redis**
+- **SpringDoc OpenAPI (Swagger)**
 - **Docker & Docker Compose**
 
 ## 프로젝트 구조
 
+**단일 모듈 프로젝트** - 모든 코드가 루트 `ga-api-platform` 디렉토리에 있습니다.
+
 ```
 ga-api-platform/
-├── ga-common/              # 공통 모듈
-│   ├── entity/            # BaseEntity, AuditEntity
-│   ├── dto/               # 공통 응답 DTO
-│   └── exception/         # 예외 처리
-├── ga-grpc-interface/     # gRPC 인터페이스
-│   └── proto/            # .proto 파일
-├── ga-auth-service/       # 인증/인가 서비스 (Port 8081)
-├── ga-user-service/       # 사용자 프로필 서비스 (Port 8082, gRPC 9090)
-└── ga-audit-service/      # 감사 로그 서비스 (Port 8083, gRPC 9091)
+├── src/
+│   └── main/
+│       ├── kotlin/com/goalmond/api/
+│       │   ├── ApiApplication.kt          # 메인 애플리케이션 진입점
+│       │   ├── config/
+│       │   │   ├── SwaggerConfig.kt       # Swagger UI 설정
+│       │   │   └── WebConfig.kt          # CORS 설정
+│       │   ├── controller/
+│       │   │   └── MockMatchingController.kt  # Mock API 컨트롤러
+│       │   └── domain/dto/
+│       │       ├── ApiResponse.kt         # 공통 API 응답 래퍼
+│       │       ├── ErrorResponse.kt       # 에러 응답 DTO
+│       │       ├── MatchingResponse.kt    # 매칭 결과 응답 DTO
+│       │       ├── ProgramResponse.kt     # 프로그램 응답 DTO
+│       │       └── SchoolResponse.kt      # 학교 응답 DTO
+│       └── resources/
+│           └── application.yml             # 애플리케이션 설정
+├── build.gradle.kts                       # Gradle 빌드 설정
+├── settings.gradle.kts                    # Gradle 프로젝트 설정
+├── Dockerfile                             # Docker 이미지 빌드 설정
+├── docker-compose.yml                     # Docker Compose 설정
+├── .github/workflows/
+│   └── deploy.yml                         # CI/CD 파이프라인
+└── README.md
 ```
 
 ## 주요 기능
 
-### 1. 가상 스레드 (Virtual Threads)
-모든 모듈의 `application.yml`에 가상 스레드가 활성화되어 있어 높은 처리량을 제공합니다.
+### Mock API 엔드포인트
 
-```yaml
-spring:
-  threads:
-    virtual:
-      enabled: true
+1. **POST /api/v1/matching/run** - 매칭 실행
+   - Request: `{ "user_id": "uuid" }`
+   - Response: 매칭 점수 및 Top 5 학교 반환
+   - 3가지 시나리오 Mock 데이터 제공 (안정권/도전권/전략)
+
+2. **GET /api/v1/matching/result** - 최신 매칭 결과 조회
+   - Response: 저장된 최신 매칭 결과 반환
+
+3. **GET /api/v1/programs?type={type}** - 프로그램 목록 조회
+   - type: `university`, `community_college`, `vocational`
+   - Response: 프로그램 목록 (10개 샘플)
+
+4. **GET /api/v1/schools/{schoolId}** - 학교 상세 조회
+   - Response: 학교 상세 정보
+
+## 로컬 개발
+
+### 사전 요구사항
+
+- JDK 21 이상
+- Gradle 8.5 이상 (또는 Gradle Wrapper 사용)
+
+### 실행 방법
+
+1. **프로젝트 빌드**:
+```bash
+./gradlew build
 ```
 
-### 2. UUID v4 기본키
-모든 Entity는 `BaseEntity`를 상속받아 UUID v4를 Primary Key로 사용합니다.
+2. **애플리케이션 실행**:
+```bash
+./gradlew bootRun
+```
 
-### 3. gRPC 통신
-서비스 간 통신은 gRPC를 사용하여 초저지연 통신을 제공합니다.
+3. **애플리케이션 접근**:
+   - API: http://localhost:8080
+   - Swagger UI: http://localhost:8080/swagger-ui.html
+   - OpenAPI JSON: http://localhost:8080/v3/api-docs
 
-### 4. Spring Data JPA
-복잡한 정규화 테이블 간의 관계를 안정적으로 관리합니다.
+## Docker를 통한 실행
 
-## 초기 설정
-
-### Gradle Wrapper 생성
-
-프로젝트를 처음 클론한 경우, Gradle Wrapper를 생성해야 합니다:
+### Docker 이미지 빌드
 
 ```bash
-gradle wrapper --gradle-version 8.5
+docker build -t ga-matching-api:latest .
 ```
 
-또는 이미 설치된 Gradle이 있다면:
-
-```bash
-./gradlew wrapper
-```
-
-## 빌드 및 실행
-
-### 로컬 개발
-
-1. PostgreSQL과 Redis를 실행합니다:
-```bash
-docker-compose up -d postgres redis
-```
-
-2. 애플리케이션을 빌드합니다:
-```bash
-./gradlew clean build
-```
-
-3. 각 서비스를 실행합니다:
-```bash
-./gradlew :ga-auth-service:bootRun
-./gradlew :ga-user-service:bootRun
-./gradlew :ga-audit-service:bootRun
-```
-
-### Docker Compose로 전체 실행
+### Docker Compose로 실행
 
 ```bash
 docker-compose up -d
 ```
 
-## 환경 변수
-
-### 로컬 개발
-
-`.env` 파일을 생성하여 다음 변수를 설정하세요:
-
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=ga_db
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-REDIS_HOST=localhost
-REDIS_PORT=6379
-JWT_SECRET=your-secret-key-change-in-production-min-256-bits
-```
-
-### 프로덕션 배포 (외부 DB 사용)
-
-이 프로젝트는 외부 PostgreSQL 데이터베이스(예: AWS Lightsail Managed DB)를 사용합니다.
-
-#### 서버에 .env 파일 생성
-
-배포 서버의 `/home/{USER}/ga-api-platform/` 디렉토리에 `.env` 파일을 생성하세요:
+### 컨테이너 로그 확인
 
 ```bash
-cd /home/ubuntu/ga-api-platform
-cat > .env << EOF
-DB_HOST=your-external-db-host.example.com
-DB_PORT=5432
-DB_NAME=ga_db
-DB_USERNAME=your-db-username
-DB_PASSWORD=your-db-password
-EOF
-chmod 600 .env  # 보안을 위해 권한 제한
+docker-compose logs -f ga-matching-api
 ```
 
-#### GitHub Secrets 설정
+### 컨테이너 중지
 
-GitHub Actions에서 자동 배포를 사용하려면 다음 Secrets를 설정하세요:
+```bash
+docker-compose down
+```
+
+## Swagger UI 사용법
+
+### 접근 방법
+
+- **로컬 개발 환경**: http://localhost:8080/swagger-ui.html
+- **프로덕션 환경**: `http://{서버주소}:8080/swagger-ui.html`
+
+### 주요 기능
+
+1. **API 문서 확인**: 각 엔드포인트의 상세 설명, 파라미터, 응답 형식 확인
+2. **API 테스트**: "Try it out" 버튼을 클릭하여 브라우저에서 직접 API를 호출하고 응답을 확인
+3. **요청/응답 예시**: 각 API의 요청 및 응답 예시 확인
+
+### OpenAPI JSON 스펙
+
+OpenAPI JSON 스펙을 다운로드하여 Postman, Insomnia 등에서 사용할 수 있습니다:
+- **로컬**: http://localhost:8080/v3/api-docs
+- **프로덕션**: `http://{서버주소}:8080/v3/api-docs`
+
+## 배포
+
+### CI/CD 자동 배포
+
+GitHub Actions를 통해 자동 빌드 및 배포가 설정되어 있습니다.
+
+1. `main` 브랜치에 푸시하면 자동으로 빌드 및 Docker Hub에 푸시됩니다.
+2. 배포는 서버로 자동 진행됩니다.
+
+### GitHub Secrets 설정
 
 **Repository Settings > Secrets and variables > Actions**에서 다음을 추가:
 
@@ -145,132 +153,68 @@ GitHub Actions에서 자동 배포를 사용하려면 다음 Secrets를 설정�
    - `SERVER_USER`: SSH 사용자명
    - `SERVER_SSH_KEY`: SSH 개인 키
 
-3. **데이터베이스 관련 (필수):**
-   - `DB_HOST`: 외부 PostgreSQL 호스트 주소
-   - `DB_PORT`: PostgreSQL 포트 (기본값: 5432)
-   - `DB_NAME`: 데이터베이스 이름
-   - `DB_USERNAME`: 데이터베이스 사용자명
-   - `DB_PASSWORD`: 데이터베이스 비밀번호
-
-#### 수동 배포 시 환경 변수 설정
+### 수동 배포
 
 서버에서 직접 Docker Compose를 실행하는 경우:
 
 ```bash
-export DB_HOST=your-external-db-host.example.com
-export DB_PORT=5432
-export DB_NAME=ga_db
-export DB_USERNAME=your-db-username
-export DB_PASSWORD=your-db-password
-
-docker compose --env-file .env up -d
-```
-
-## API 엔드포인트
-
-- **Auth Service**: http://localhost:8081
-- **User Service**: http://localhost:8082
-- **Audit Service**: http://localhost:8083
-
-## Swagger API 문서
-
-모든 마이크로서비스의 API 문서를 하나의 통합 Swagger UI에서 확인할 수 있습니다.
-
-### 통합 Swagger UI (권장)
-
-**ga-auth-service**를 메인 문서 페이지로 사용하여 모든 서비스의 API를 한 곳에서 확인할 수 있습니다.
-
-#### 접근 방법
-
-- **로컬 개발 환경**: http://localhost:8081/swagger-ui.html
-- **프로덕션 환경**: `http://{서버주소}:8081/swagger-ui.html`
-
-#### 사용 방법
-
-1. **서비스 선택**: Swagger UI 상단의 드롭다운에서 원하는 서비스를 선택합니다.
-   - 인증/인가 서비스 (Auth Service) - 기본 선택
-   - 사용자 프로필 서비스 (User Service)
-   - 감사 로그 서비스 (Audit Service)
-
-2. **API 탐색**: 선택한 서비스의 모든 API 엔드포인트를 확인할 수 있습니다.
-
-3. **API 테스트**: "Try it out" 버튼을 클릭하여 브라우저에서 직접 API를 호출하고 응답을 확인할 수 있습니다.
-
-### 개별 서비스 Swagger UI
-
-각 서비스의 개별 Swagger UI에도 접근할 수 있습니다:
-
-#### 로컬 개발 환경
-- **Auth Service (인증/인가)**: http://localhost:8081/swagger-ui.html
-- **User Service (사용자 프로필)**: http://localhost:8082/swagger-ui.html
-- **Audit Service (감사 로그)**: http://localhost:8083/swagger-ui.html
-
-#### 프로덕션 환경
-- **Auth Service Swagger**: `http://{서버주소}:8081/swagger-ui.html`
-- **User Service Swagger**: `http://{서버주소}:8082/swagger-ui.html`
-- **Audit Service Swagger**: `http://{서버주소}:8083/swagger-ui.html`
-
-### OpenAPI JSON 스펙
-
-각 서비스의 OpenAPI JSON 스펙을 다운로드하여 Postman, Insomnia 등에서 사용할 수 있습니다:
-- **Auth Service**: `http://{서버주소}:8081/v3/api-docs`
-- **User Service**: `http://{서버주소}:8082/v3/api-docs`
-- **Audit Service**: `http://{서버주소}:8083/v3/api-docs`
-
-### Swagger UI 주요 기능
-1. **API 문서 확인**: 각 엔드포인트의 상세 설명, 파라미터, 응답 형식 확인
-2. **API 테스트**: 브라우저에서 직접 API 호출 및 응답 확인
-3. **인증 토큰 설정**: "Authorize" 버튼을 통해 JWT 토큰 설정 가능
-4. **요청/응답 예시**: 각 API의 요청 및 응답 예시 확인
-
-### API 사용 가이드
-각 서비스의 Swagger UI에서 다음 정보를 확인할 수 있습니다:
-- **인증/인가 API**: 로그인, 토큰 갱신, 로그아웃 방법
-- **사용자 프로필 API**: 사용자 정보 및 프로필 조회 방법
-- **감사 로그 API**: 감사 로그 조회 및 필터링 방법
-
-### 참고사항
-- 모든 REST API는 JWT Access Token 인증이 필요합니다 (인증 API 제외)
-- Swagger UI에서 "Authorize" 버튼을 클릭하여 토큰을 설정할 수 있습니다
-- 토큰 형식: `Bearer {accessToken}`
-
-## gRPC 포트
-
-- **User Service**: 9090
-- **Audit Service**: 9091
-
-## CI/CD
-
-GitHub Actions를 통해 자동 빌드 및 배포가 설정되어 있습니다.
-
-1. `main` 브랜치에 푸시하면 자동으로 빌드 및 Docker Hub에 푸시됩니다.
-2. 배포는 AWS Lightsail 서버로 자동 진행됩니다.
-
-**참고:** GitHub Actions 워크플로우는 자동으로 서버에 `.env` 파일을 생성하고 환경 변수를 주입합니다. 
-서버에 직접 접속하여 수동으로 `.env` 파일을 생성할 수도 있습니다.
-
-### docker-compose.yml 자동 반영 확인 방법
-
-`docker-compose.yml` 변경 사항이 서버에 반영되지 않는 경우, 아래 순서로 확인하세요.
-
-1. **GitHub Actions 로그 확인**
-   - 워크플로우 `Deploy to Server`에서 `docker-compose.yml`을 서버로 전송(SCP)하는 단계가 성공했는지 확인합니다.
-
-2. **서버에서 실제 파일 확인**
-   - 서버에서 아래 경로의 파일이 최신인지 확인합니다.
-
-```bash
-ls -al /home/$USER/ga-api-platform/docker-compose.yml
-sed -n '70,120p' /home/$USER/ga-api-platform/docker-compose.yml
-```
-
-3. **컨테이너 재생성(환경변수/포트 반영)**
-   - `docker-compose.yml`의 `environment`, `ports`, `healthcheck` 변경은 기존 컨테이너에 자동 반영되지 않으므로 재생성이 필요합니다.
-
-```bash
 cd /home/$USER/ga-api-platform
-docker-compose --env-file .env up -d --force-recreate
+docker-compose pull
+docker-compose up -d
 ```
+
+### 배포 확인
+
+```bash
+# 컨테이너 상태 확인
+docker-compose ps
+
+# 로그 확인
+docker-compose logs -f ga-matching-api
+
+# 헬스 체크
+curl http://localhost:8080/swagger-ui.html
+```
+
+## API 사용 예시
+
+### 매칭 실행
+
+```bash
+curl -X POST http://localhost:8080/api/v1/matching/run \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "550e8400-e29b-41d4-a716-446655440000"}'
+```
+
+### 매칭 결과 조회
+
+```bash
+curl http://localhost:8080/api/v1/matching/result
+```
+
+### 프로그램 목록 조회
+
+```bash
+curl "http://localhost:8080/api/v1/programs?type=community_college&page=1&size=10"
+```
+
+### 학교 상세 조회
+
+```bash
+curl http://localhost:8080/api/v1/schools/school-001
+```
+
+## 프론트엔드 협업
+
+프론트엔드 개발자는 Swagger UI를 통해 API를 테스트하고 통합할 수 있습니다.
+
+자세한 내용은 `docs/04_FRONTEND_COOPERATION.md`를 참고하세요.
+
+## 참고사항
+
+- 현재는 Mock API 단계로 인증이 필요하지 않습니다.
+- 보안 강화는 추후 진행 예정입니다.
+- 데이터베이스 연동은 추후 진행 예정입니다.
 
 ## 라이선스
 

@@ -107,5 +107,6 @@ curl -s "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 
 ## 5. CI/CD 배포 직후 참고
 
-- 워크플로는 **ga-matching-api만** 재기동합니다. ga-nginx도 쓰는 환경이면, 서버에서 한 번 `docker-compose up -d`로 둘 다 기동해 두었는지 확인하세요.
+- 워크플로는 **ga-matching-api** 이미지 pull·재기동과 함께 **docs/nginx** 설정을 서버로 복사한 뒤 **ga-nginx**를 재시작합니다. (`main` 브랜치 push 시 `src/**`, `docker-compose.yml`, `docs/nginx/**` 등 변경 시 배포가 실행됩니다.)
+- ga-nginx를 쓰는 환경이면 첫 배포 시 `docker-compose up -d`로 한 번 둘 다 기동해 두었는지 확인하세요.
 - 배포 직후 healthcheck 통과까지 수십 초 걸릴 수 있으므로, 확인 전 **10~20초** 정도 대기하는 것을 권장합니다.

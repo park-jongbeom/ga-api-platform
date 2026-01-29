@@ -9,6 +9,7 @@ on:
       - 'settings.gradle.kts'
       - 'Dockerfile'
       - 'docker-compose.yml'
+      - 'docs/nginx/**'
       - '.github/workflows/deploy.yml'
 
 jobs:
@@ -62,6 +63,23 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "docker-compose.yml"
           target: "/home/${{ secrets.SERVER_USER }}/ga-api-platform"
+
+      - name: Ensure docs/nginx directory on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: mkdir -p /home/${{ secrets.SERVER_USER }}/ga-api-platform/docs/nginx
+
+      - name: Copy nginx config to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "docs/nginx/go-almond.swagger.conf"
+          target: "/home/${{ secrets.SERVER_USER }}/ga-api-platform/docs/nginx"
           
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
@@ -119,5 +137,11 @@ jobs:
             echo "Checking service status..."
             sleep 5
             $DOCKER_COMPOSE_CMD ps ga-matching-api
+
+            # nginx 설정 반영 (복사된 설정으로 재시작)
+            echo "Reloading ga-nginx with updated config..."
+            $DOCKER_COMPOSE_CMD restart ga-nginx || true
+            sleep 2
+            $DOCKER_COMPOSE_CMD ps ga-nginx
             
             echo "Deployment completed successfully!"

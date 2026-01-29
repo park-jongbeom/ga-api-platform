@@ -189,9 +189,9 @@ curl http://localhost:8080/api/v1/schools/school-001
 
 ## 프론트엔드 협업
 
-프론트엔드 개발 시작 시 **[docs/FRONTEND_HANDOFF.md](docs/FRONTEND_HANDOFF.md)** 에서 사용 가능 API, Cursor 참조 방법(@docs/api), 이후 일정을 확인하세요.
+프론트엔드 개발 시작 시 **[docs/FRONTEND_HANDOFF.md](docs/FRONTEND_HANDOFF.md)** 에서 사용 가능 API, 전달 링크 사용 방법, 이후 일정을 확인하세요.
 
-API 문서는 [docs/api/](docs/api/)의 Markdown으로만 제공됩니다. Cursor에서 `@docs/api` 또는 [docs/api/API.md](docs/api/API.md)를 참조해 작업하면 됩니다.
+프론트엔드는 API 프로젝트 데이터 없이 **전달받은 링크만** 사용합니다. API 문서는 링크로 전달되며, 전달받은 API 문서 링크와 Base URL만 사용해 연동하세요.
 
 자세한 협업 정책은 `docs/04_FRONTEND_COOPERATION.md`를 참고하세요.
 

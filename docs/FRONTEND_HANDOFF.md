@@ -1,18 +1,15 @@
 # 프론트엔드 개발 시작 안내 (Mock API 기준)
 
-이 레포(ga-api-platform)는 API 스펙·Mock API·작업 일정을 담고 있습니다. **GitHub 레포 링크**를 공유받았다면, Cursor에서 이 레포를 참조하며 프론트 작업을 진행하면 됩니다.
+프론트엔드에서는 **API 프로젝트(ga-api-platform) 레포를 clone 하지 않습니다.** 백엔드에서 **전달받은 링크만** 사용해 개발합니다.
 
----
+## 전달받는 링크
 
-## Cursor에서 이 레포 참조하기
+| 구분 | 설명 | 예시 |
+|------|------|------|
+| **API Base URL** | 배포된 API 서버 주소. 모든 API 요청의 기준 URL. | `https://go-almond.ddnsfree.com` |
+| **API 문서 링크** | 스펙 확인용. 요청/응답 형식, TypeScript 타입 예시 등. | GitHub `docs/api` 페이지 링크 (예: `.../ga-api-platform/blob/main/docs/api/API.md`) |
 
-이 레포(ga-api-platform)를 Cursor에서 열어 두고, **프론트 프로젝트**에서 작업할 때:
-
-1. Cursor 채팅/에이전트 입력창에서 **@** 를 누른 뒤, 이 레포의 **`docs/api`** 폴더 또는 **`docs/FRONTEND_HANDOFF.md`** 파일을 선택합니다.
-2. 예: *"매칭 결과 화면 만들어줘. @docs/api 참고해서 API 호출해."*
-3. 그러면 Cursor가 docs/api의 Markdown(요청/응답 예시, TypeScript 타입 등)을 참고해 코드를 제안합니다.
-
-**참조하려면**: 레포를 clone 해서 로컬에 두거나, Cursor 워크스페이스에 이 레포 폴더를 추가해 두면 @로 참조할 수 있습니다.
+전달받은 **문서 링크**로 스펙을 확인한 뒤, **Base URL**로 API를 호출하면 됩니다.
 
 ---
 
@@ -25,20 +22,27 @@
 | GET | `/api/v1/programs?type=...` | 프로그램 목록 (type: university, community_college, vocational) |
 | GET | `/api/v1/schools/{schoolId}` | 학교 상세 조회 |
 
-상세 스펙·요청/응답 예시·TypeScript 타입 예시는 **docs/api/** Markdown에 있습니다. Cursor에서 `@docs/api` 로 참조하면 됩니다.
+상세 스펙·요청/응답 예시·TypeScript 타입 예시는 전달받은 **API 문서 링크**의 Markdown에서 확인하세요.
 
 ---
 
 ## Base URL
 
-- **로컬**: `http://localhost:8080`
-- **배포**: 실제 배포 주소 (예: https://go-almond.ddnsfree.com)
+실제 사용하는 주소는 **전달받은 배포 URL**을 사용합니다.
+
+- **배포**: 전달받은 API Base URL (예: `https://go-almond.ddnsfree.com`)
 
 ---
 
-## 로컬에서 API 확인하는 방법
+## API 호출 확인 방법
 
-백엔드 실행 후 curl/브라우저로 확인하려면 [로컬 테스트 가이드](LOCAL_TEST_GUIDE.md)를 참고하세요.
+배포된 API 주소(전달받은 Base URL)로 브라우저 또는 curl로 호출해 확인할 수 있습니다.
+
+```bash
+curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
+```
+
+(실제 주소는 전달받은 Base URL로 치환하세요.)
 
 ---
 
@@ -52,7 +56,7 @@ Mock 제공 후 **바로 다음** 작업은 아래와 같습니다.
 | **Week 4** | 매칭 API 실제 전환, 학교/프로그램 실제 데이터 |
 | **Week 5** | Application API, Document API, Dashboard API |
 
-상세 일정은 [JIRA_BACKLOG.md](JIRA_BACKLOG.md)를 참고하세요.
+상세 일정은 전달받은 백로그/일정 링크를 참고하세요.
 
 ---
 
@@ -60,7 +64,7 @@ Mock 제공 후 **바로 다음** 작업은 아래와 같습니다.
 
 - **응답 래퍼**: `success`, `data`, `code`, `message`, `timestamp`
 - **에러 시**: `success: false`, `code`, `message` 포함
-- 자세한 형식은 [docs/api/API.md](api/API.md)를 참고하세요.
+- 자세한 형식은 전달받은 API 문서(예: API.md)를 참고하세요.
 
 ---
 

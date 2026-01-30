@@ -38,4 +38,5 @@
 |------|------|
 | 최신 보고서 | `reports/report-latest.md` 또는 GitHub 이슈 "프로젝트 진행 상황 보고서 (최신)" |
 | push/날짜별 | `reports/report-YYYY-MM-DD.md` 또는 이슈 "프로젝트 진행 상황 보고서 - YYYY-MM-DD" |
+| 로컬 조건부 | commit 후 `jira-report-if-needed.py` 실행 시, 일정 관련·미완료인 경우에만 생성. |
 | push 제외 | **docs/** 전체 제외. **예외**: **reports/** (루트, docs 하위 아님) 만 push. |

@@ -59,9 +59,5 @@ docs/nginx/go-almond.local.conf
 .git-setup-guide.md
 
 # docs: push 제외 (내부 문서·운영 자료는 원격에 올리지 않음)
-# 예외: docs/jira/reports/ 만 push (워크플로·로컬 스크립트가 보고서 생성·push)
-docs/*
-!docs/jira/
-docs/jira/*
-!docs/jira/reports/
-!docs/jira/reports/*
+# 예외는 docs 하위가 아님 → 프로젝트 루트의 reports/ 폴더만 push
+docs/

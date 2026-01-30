@@ -42,7 +42,7 @@ if [ -z "$JIRA_URL" ] || [ -z "$JIRA_EMAIL" ] || [ -z "$JIRA_API_TOKEN" ]; then
 fi
 
 REPORT_DATE=$(date +%Y-%m-%d)
-REPORTS_DIR="docs/jira/reports"
+REPORTS_DIR="reports"
 REPORT_FILE="${REPORTS_DIR}/report-${REPORT_DATE}.md"
 LATEST_FILE="${REPORTS_DIR}/report-latest.md"
 

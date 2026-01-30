@@ -88,6 +88,26 @@ def get_jira_status(jira_url: str, headers: dict, issue_key: str) -> Optional[st
         return None
 
 
+def load_jira_env_from_file(path: str) -> None:
+    """docs/jira/jira.env 등 KEY=value 형식 파일을 읽어 os.environ에 설정."""
+    if not path or not os.path.exists(path):
+        return
+    with open(path, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            if '=' in line:
+                key, _, value = line.partition('=')
+                key, value = key.strip(), value.strip()
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1].replace('\\"', '"')
+                elif value.startswith("'") and value.endswith("'"):
+                    value = value[1:-1].replace("\\'", "'")
+                if key:
+                    os.environ[key] = value
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='로컬 commit 시, JIRA 일정 관련 작업인 경우에만 조건을 확인하고 필요 시 보고서 생성'
@@ -103,11 +123,33 @@ def main():
     project_root = Path(__file__).resolve().parent.parent.parent
     os.chdir(project_root)
 
+    # 보고서 경로: .github/jira-config.json 의 reportsDir 사용 (로컬/CI와 동일)
+    reports_dir = project_root / args.reports_dir
+    report_latest_path = project_root / args.report_latest
+    config_path = project_root / ".github" / "jira-config.json"
+    if config_path.is_file():
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                cfg = json.load(f)
+            rd = cfg.get('reportsDir') or args.reports_dir
+            reports_dir = project_root / rd
+            report_latest_path = reports_dir / "report-latest.md"
+        except Exception:
+            pass
+
+    # 환경 변수가 없으면 docs/jira/jira.env 참조 (docs는 push 제외)
+    if not os.getenv('JIRA_URL'):
+        for p in ('docs/jira/jira.env', 'jira.env'):
+            load_jira_env_from_file(str(project_root / p))
+            if os.getenv('JIRA_URL'):
+                break
+
     jira_url = (os.getenv('JIRA_URL') or '').rstrip('/')
     jira_email = os.getenv('JIRA_EMAIL', '')
     jira_api_token = os.getenv('JIRA_API_TOKEN', '')
     if not jira_url or not jira_email or not jira_api_token:
         print("JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN 환경 변수가 필요합니다.", file=sys.stderr)
+        print("env.jira.example 을 복사해 docs/jira/jira.env 에 값을 채우거나 export 하세요.", file=sys.stderr)
         sys.exit(1)
 
     # 1) 커밋 메시지에서 이슈 키 추출
@@ -134,8 +176,7 @@ def main():
         sys.exit(0)
 
     # 3) 최신 보고서에 이미 완료로 기록되었는지
-    latest_path = project_root / args.report_latest
-    done_in_report = parse_done_keys_from_report(str(latest_path))
+    done_in_report = parse_done_keys_from_report(str(report_latest_path))
     if done_in_report and schedule_keys <= done_in_report:
         print("최신 보고서에 이미 완료로 기록된 작업입니다. 보고서 미생성.", file=sys.stderr)
         sys.exit(0)
@@ -157,12 +198,11 @@ def main():
         print("실제 JIRA에 이미 완료로 처리된 작업 일정입니다. 보고서 미생성.", file=sys.stderr)
         sys.exit(0)
 
-    # 5) 보고서 생성
+    # 5) 보고서 생성 (옵션은 .github/jira-config.json 에서 로드, 로컬/CI와 동일 규칙)
     report_date = datetime.now().strftime('%Y-%m-%d')
-    reports_dir = project_root / args.reports_dir
     reports_dir.mkdir(parents=True, exist_ok=True)
     report_file = reports_dir / f"report-{report_date}.md"
-    latest_file = project_root / args.report_latest
+    latest_file = reports_dir / "report-latest.md"
 
     script_dir = Path(__file__).resolve().parent
     generate_script = script_dir / "jira-generate-report.py"
@@ -173,8 +213,7 @@ def main():
     cmd = [
         sys.executable,
         str(generate_script),
-        "--project-key", "GAM",
-        "--report-web-url", "https://go-almond.ddnsfree.com/",
+        "--config", str(project_root / ".github" / "jira-config.json"),
         "--canonical-only",
         "--output", str(report_file),
         "--date", report_date,

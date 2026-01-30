@@ -8,6 +8,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
+# JIRA 환경: 없으면 docs/jira/jira.env 참조 (docs는 push 제외)
+if [ -f "docs/jira/jira.env" ]; then
+  set -a
+  # shellcheck source=/dev/null
+  . "docs/jira/jira.env"
+  set +a
+fi
+
 COMMIT=false
 for arg in "$@"; do
   if [ "$arg" = "--commit" ]; then
@@ -25,32 +33,33 @@ fi
 # requests 패키지 확인
 if ! python3 -c "import requests" 2>/dev/null; then
   echo "오류: requests 패키지가 설치되어 있지 않습니다." >&2
-  echo "설치: pip3 install requests" >&2
+  echo "Ubuntu: sudo apt update && sudo apt install -y python3-requests" >&2
+  echo "또는 가상환경: python3 -m venv .venv && ./.venv/bin/pip install requests" >&2
   exit 1
 fi
 
-# JIRA 환경 변수 확인
+# JIRA 환경 변수 확인 (환경 변수 또는 docs/jira/jira.env)
 if [ -z "$JIRA_URL" ] || [ -z "$JIRA_EMAIL" ] || [ -z "$JIRA_API_TOKEN" ]; then
   echo "오류: JIRA 환경 변수가 설정되지 않았습니다." >&2
   echo "" >&2
-  echo "사용법:" >&2
-  echo "  export JIRA_URL=https://your-domain.atlassian.net" >&2
-  echo "  export JIRA_EMAIL=your-email@example.com" >&2
-  echo "  export JIRA_API_TOKEN=YOUR_API_TOKEN" >&2
+  echo "다음 중 하나를 사용하세요:" >&2
+  echo "  1) env.jira.example 을 복사해 docs/jira/jira.env 에 값을 채운 뒤 실행" >&2
+  echo "  2) export JIRA_URL=... JIRA_EMAIL=... JIRA_API_TOKEN=... 후 실행" >&2
+  echo "" >&2
   echo "  ./.github/scripts/jira-report-local.sh [--commit]" >&2
   exit 1
 fi
 
 REPORT_DATE=$(date +%Y-%m-%d)
-REPORTS_DIR="reports"
+# 보고서 경로는 .github/jira-config.json 과 동일 규칙 (로컬/커밋/CI 공통)
+REPORTS_DIR=$(python3 -c "import json; c=json.load(open('.github/jira-config.json')); print(c.get('reportsDir','reports'))" 2>/dev/null || echo "reports")
 REPORT_FILE="${REPORTS_DIR}/report-${REPORT_DATE}.md"
 LATEST_FILE="${REPORTS_DIR}/report-latest.md"
 
 mkdir -p "$REPORTS_DIR"
 
+# 보고서 옵션은 .github/jira-config.json 에서 로드 (로컬/커밋/CI 공통)
 python3 .github/scripts/jira-generate-report.py \
-  --project-key GAM \
-  --report-web-url "https://go-almond.ddnsfree.com/" \
   --canonical-only \
   --output "$REPORT_FILE" \
   --date "$REPORT_DATE"

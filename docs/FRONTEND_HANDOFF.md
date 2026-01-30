@@ -7,22 +7,22 @@
 | 구분 | 설명 | 예시 |
 |------|------|------|
 | **API Base URL** | 배포된 API 서버 주소. 모든 API 요청의 기준 URL. | `https://go-almond.ddnsfree.com` |
-| **API 문서 링크** | 스펙 확인용. 요청/응답 형식, TypeScript 타입 예시 등. | GitHub `docs/api` 페이지 링크 (예: `.../ga-api-platform/blob/main/docs/api/API.md`) |
+| **API 문서 링크** | 스펙 확인용. 요청/응답 형식, TypeScript 타입 예시 등. **이 문서와 같은 저장소의 `docs/api/` 폴더**에 있음. | GitHub `docs/api` 페이지 링크 (예: `.../ga-api-platform/blob/main/docs/api/matching.md`) |
 
-전달받은 **문서 링크**로 스펙을 확인한 뒤, **Base URL**로 API를 호출하면 됩니다.
+전달받은 **문서 링크**로 스펙을 확인한 뒤, **Base URL**로 API를 호출하면 됩니다. 상세 스펙·요청/응답 예시 파일은 **이 문서(FRONTEND_HANDOFF.md)와 같은 위치의 `docs/api/` 폴더** 안에 있습니다.
 
 ---
 
 ## 지금 사용 가능한 API (Week 1 완료)
 
-| 메서드 | 경로 | 설명 |
-|--------|------|------|
-| POST | `/api/v1/matching/run` | 매칭 실행 (body: `{"user_id":"..."}`) |
-| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 |
-| GET | `/api/v1/programs?type=...` | 프로그램 목록 (type: university, community_college, vocational) |
-| GET | `/api/v1/schools/{schoolId}` | 학교 상세 조회 |
+아래 API의 상세 스펙·요청/응답 예시는 **같은 저장소의 `docs/api/`** 안 문서를 링크했습니다.
 
-상세 스펙·요청/응답 예시·TypeScript 타입 예시는 전달받은 **API 문서 링크**의 Markdown에서 확인하세요.
+| 메서드 | 경로 | 설명 | 상세 문서 |
+|--------|------|------|-----------|
+| POST | `/api/v1/matching/run` | 매칭 실행 (body: `{"user_id":"..."}`) | [matching.md](api/matching.md) |
+| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 | [matching.md](api/matching.md) |
+| GET | `/api/v1/programs?type=...` | 프로그램 목록 (type: university, community_college, vocational) | [programs.md](api/programs.md) |
+| GET | `/api/v1/schools/{schoolId}` | 학교 상세 조회 | [schools.md](api/schools.md) |
 
 ---
 
@@ -64,7 +64,7 @@ Mock 제공 후 **바로 다음** 작업은 아래와 같습니다.
 
 - **응답 래퍼**: `success`, `data`, `code`, `message`, `timestamp`
 - **에러 시**: `success: false`, `code`, `message` 포함
-- 자세한 형식은 전달받은 API 문서(예: API.md)를 참고하세요.
+- 자세한 형식은 **같은 저장소의 `docs/api/`** 안 API 문서를 참고하세요. 예: [matching.md](api/matching.md), [programs.md](api/programs.md), [schools.md](api/schools.md), [README.md](api/README.md).
 
 ---
 

@@ -49,8 +49,17 @@ docs/plan/
 
 # Cursor agent transcripts (대용량 로그로 인덱싱/성능 이슈 방지)
 .cursor/projects/**/agent-transcripts/
+.cursor/projects/**/indexes/
+.cursor/projects/**/cache/
+.cursor/projects/**/workspace-state/
 
 # Local development files (로컬 개발용 파일)
 docker-compose.local.yml
 docs/nginx/go-almond.local.conf
 .git-setup-guide.md
+
+# docs: push 불필요 (내부 운영·계정 정보·스냅샷)
+docs/jira/*.pdf
+docs/jira/PERMISSION_SETUP_GUIDE.md
+docs/jira/BULK_DELETE_GUIDE.md
+docs/jira/BULK_DELETE_PERMISSION_FIX.md

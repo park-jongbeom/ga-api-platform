@@ -1,0 +1,19 @@
+{
+  "projectKey": "GAM",
+  "issuePattern": "GAM-\\d+",
+  "workflow": {
+    "toDo": "해야 할 일",
+    "inProgress": "진행 중",
+    "codeReview": "Code Review",
+    "testing": "Testing",
+    "done": "완료"
+  },
+  "backlogDocument": "docs/jira/JIRA_BACKLOG.md",
+  "backlogProjectKey": "GAM",
+  "mappingFile": ".github/jira-mapping.json",
+  "startDate": "2026-01-27",
+  "backendWeeks": 6,
+  "frontendWeeks": 2.5,
+  "workDaysPerWeek": 4,
+  "reportWebUrl": "https://go-almond.ddnsfree.com/"
+}

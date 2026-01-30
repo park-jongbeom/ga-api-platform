@@ -1,0 +1,81 @@
+name: JIRA Progress Report
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 9 * * 1'  # 매주 월요일 09:00 UTC
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate JIRA report
+        env:
+          JIRA_URL: ${{ secrets.JIRA_URL }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          mkdir -p docs/jira/reports
+          REPORT_DATE=$(date +%Y-%m-%d)
+          python3 .github/scripts/jira-generate-report.py \
+            --project-key GAM \
+            --report-web-url "https://go-almond.ddnsfree.com/" \
+            --canonical-only \
+            --output "docs/jira/reports/report-${REPORT_DATE}.md" \
+            --date "${REPORT_DATE}" || true
+          echo "REPORT_DATE=${REPORT_DATE}" >> $GITHUB_OUTPUT
+
+      - name: Create or update GitHub Issue from report (중복 이슈 방지)
+        if: success()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPORT_DATE=$(date +%Y-%m-%d)
+          REPORT_FILE="docs/jira/reports/report-${REPORT_DATE}.md"
+          TITLE="프로젝트 진행 상황 보고서 - ${REPORT_DATE}"
+          if [ ! -f "$REPORT_FILE" ]; then exit 0; fi
+          BODY=$(python3 -c "import json,sys; print(json.dumps(open(sys.argv[1]).read()))" "$REPORT_FILE")
+          # 동일 제목의 기존 이슈 검색 (중복 일정 방지)
+          EXISTING=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues?labels=report&state=open&per_page=50" \
+            | python3 -c "
+          import json,sys
+          data=json.load(sys.stdin)
+          title='${TITLE}'
+          for i in data:
+            if i.get('title')==title:
+              print(i.get('number','')); break
+          " 2>/dev/null || true)
+          if [ -n "$EXISTING" ]; then
+            echo "기존 보고서 이슈 #${EXISTING} 본문 업데이트 (중복 생성 방지)"
+            curl -s -X PATCH \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/${EXISTING}" \
+              -d "{\"body\":${BODY}}" || true
+          else
+            echo "새 보고서 이슈 생성"
+            curl -s -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/issues" \
+              -d "{\"title\":\"${TITLE}\",\"body\":${BODY},\"labels\":[\"report\",\"status-update\"]}" || true
+          fi
+
+      - name: Commit and push report file
+        if: success()
+        run: |
+          REPORT_DATE=$(date +%Y-%m-%d)
+          REPORT_FILE="docs/jira/reports/report-${REPORT_DATE}.md"
+          if [ -f "$REPORT_FILE" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add "$REPORT_FILE"
+            git diff --staged --quiet || (git commit -m "docs: JIRA 진행 보고서 ${REPORT_DATE} [skip ci]" && git push) || true
+          fi

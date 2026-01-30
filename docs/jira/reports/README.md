@@ -18,9 +18,9 @@
 
 ## 2. 생성 주체 및 수동 push
 
-- **생성·커밋·push**: `.github/workflows/jira-report.yml` (JIRA Progress Report)만 수행합니다.
-- **개발자가 이 폴더의 보고서 파일을 수동으로 push할 필요 없습니다.** 워크플로가 `[skip ci]`로 커밋·push합니다.
-- **docs 또는 다른 경로만 push할 때**에도, 보고서 파일이 아직 없거나 오래됐다면 **main에 push하거나** Actions에서 **JIRA Progress Report → Run workflow**로 한 번 실행하면 생성·갱신됩니다. (보고서 워크플로는 `push` 시 경로 제한 없이 main만 대상으로 실행됩니다.)
+- **CI**: `.github/workflows/jira-report.yml` (JIRA Progress Report)가 main push·수동 실행·스케줄 시 생성·커밋·push합니다. 개발자가 보고서 파일을 수동으로 push할 필요는 없습니다.
+- **로컬**: Actions에서 보고서가 생성되지 않는 환경에서는 **push 전에** `.github/scripts/jira-report-local.sh` 를 실행해 보고서를 생성·스테이징(및 선택적 `--commit`)한 뒤, 커밋·push 하면 됩니다. (사용법: [SCHEDULE_MANAGEMENT - push 전 로컬에서 보고서 생성 후 push](../SCHEDULE_MANAGEMENT.md#push-전-로컬에서-보고서-생성-후-push))
+- **docs 또는 다른 경로만 push할 때**에도, 보고서 파일이 아직 없거나 오래됐다면 **main에 push하거나** Actions에서 **JIRA Progress Report → Run workflow**로 한 번 실행하거나, 위 **로컬** 스크립트를 사용하면 됩니다.
 
 ---
 
@@ -46,5 +46,5 @@
 |------|------|
 | 최신 보고서 | `report-latest.md` 또는 GitHub 이슈 "프로젝트 진행 상황 보고서 (최신)" |
 | push/날짜별 보고서 | `report-YYYY-MM-DD.md` 또는 이슈 "프로젝트 진행 상황 보고서 - YYYY-MM-DD" |
-| 생성·push | 워크플로만 수행. 개발자 수동 push 불필요. |
+| 생성·push | 워크플로(CI) 또는 로컬 `jira-report-local.sh` 실행 후 커밋·push. |
 | .gitignore | `docs/jira/reports/` 및 `report-*.md` 미포함 유지. |

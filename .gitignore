@@ -59,6 +59,7 @@ docs/nginx/go-almond.local.conf
 .git-setup-guide.md
 
 # docs: push 불필요 (내부 운영·계정 정보·스냅샷)
+# 주의: docs/jira/reports/ 및 report-*.md 는 제외하지 않음 (워크플로가 생성·push함)
 docs/jira/*.pdf
 docs/jira/PERMISSION_SETUP_GUIDE.md
 docs/jira/BULK_DELETE_GUIDE.md

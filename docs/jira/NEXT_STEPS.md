@@ -61,6 +61,7 @@ CI에서 JIRA에 접근하려면 저장소에 시크릿을 넣어야 합니다.
   - JIRA 이슈를 조회해 `docs/jira/reports/report-YYYY-MM-DD.md`와 `report-latest.md`를 만들고, **정규 이슈만** 포함(`--canonical-only` 적용됨).
 - **자동 실행**: main push 시 및 매주 **월요일 09:00 UTC**에 같은 워크플로가 실행됩니다.
 - **보고서가 생성되지 않을 때**: [SCHEDULE_MANAGEMENT - 보고서가 생성되지 않을 때](SCHEDULE_MANAGEMENT.md#보고서가-생성되지-않을-때)에서 Secrets·Actions 로그 확인 방법을 참고하세요.
+- **보고서 폴더 규칙**(최신/날짜별 파일, docs push 미포함 정책): [docs/jira/reports/README.md](reports/README.md)
 
 ---
 

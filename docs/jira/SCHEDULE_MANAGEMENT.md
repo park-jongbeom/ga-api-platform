@@ -170,6 +170,14 @@ Repository Settings → Secrets and variables → Actions에서 다음을 설정
 
 보고서는 **JIRA GAM 프로젝트 전체**를 조회해 생성하므로, 백엔드·프론트 작업이 모두 JIRA에 반영되어 있으면 한 보고서에 함께 나옵니다.
 
+### 보고서 폴더 규칙 (report-latest / push별 보고서)
+
+- **폴더**: `docs/jira/reports/` — 워크플로가 생성·갱신하는 보고서만 둡니다.
+- **최신 보고서**: `report-latest.md` — 항상 최종 스냅샷. 한곳에서 보려면 이 파일 또는 GitHub 이슈 "프로젝트 진행 상황 보고서 (최신)"를 사용하세요.
+- **push/날짜별 보고서**: `report-YYYY-MM-DD.md` — 해당 일자 스냅샷. 같은 날 여러 push 시 같은 파일을 덮어씁니다.
+- **생성·push**: 워크플로만 수행합니다. 개발자가 보고서 파일을 수동으로 push할 필요 없으며, **docs/jira/reports/** 및 **report-*.md** 는 .gitignore에 넣지 마세요 (CI가 커밋·push함).
+- 자세한 명명 규칙과 docs push 미포함 정책: [docs/jira/reports/README.md](reports/README.md)
+
 ### Push 시 자동 생성
 
 - **main 브랜치에 push**할 때마다 **JIRA Progress Report** 워크플로우가 실행됩니다.

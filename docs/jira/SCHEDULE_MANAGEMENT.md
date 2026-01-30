@@ -22,6 +22,18 @@
 
 **정리**: 보고서 스크립트는 **GAM 프로젝트 전체** 이슈를 JIRA API로 조회해 완료/진행 중/할 일을 나눕니다. 백엔드·프론트 이슈가 모두 같은 GAM 프로젝트에 있으므로, **JIRA만 최신 상태로 유지**하면 보고서에는 두 사람 작업이 모두 들어갑니다. 별도로 “백엔드용 / 프론트용” 보고서를 나눌 필요 없습니다.
 
+### API·Front 저장소가 분리된 경우
+
+API(백엔드)와 Front(프론트엔드)가 **서로 다른 Git 저장소**인 경우에도, **JIRA를 단일 소스**로 두고 **보고서는 API repo 한곳**에서만 생성하면 됩니다. 저장소를 하나로 합칠 필요 없습니다.
+
+| 구분 | 설명 |
+|------|------|
+| **JIRA** | 백엔드·프론트 이슈 모두 **GAM 프로젝트**에 있음. 상태만 최신이면 됨. |
+| **보고서** | **API repo(이 저장소)** 의 `jira-report.yml`에서만 실행. JIRA GAM 전체를 조회하므로 **백엔드+프론트 진행이 한 보고서에** 나옴. |
+| **Front repo에서 진행 반영** | (A) API repo에 PR로 커밋(`GAM-xxx`) 후 merge → push 시 기존 워크플로가 JIRA 완료 전환. (B) **Front repo에 동일한 JIRA 연동 워크플로 추가**: push 시 커밋 메시지에서 `GAM-xxx` 추출 후 JIRA API로 Done 전환(JIRA_URL/EMAIL/API_TOKEN은 Front repo Secrets에 설정). (C) JIRA에서 직접 해당 이슈 완료 처리. |
+
+**정리**: "병합"은 **저장소 병합이 아니라**, JIRA 단일 소스 + API repo에서 보고서 생성 + (선택) Front repo에서 JIRA만 업데이트하는 구조로 해결합니다.
+
 ### 중복 방지 정책
 
 진행 중 **중복된 일정/이슈가 계속 추가되지 않도록** 다음이 적용됩니다.
@@ -66,6 +78,26 @@ python3 .github/scripts/jira-close-unmapped-issues.py --dry-run
 # 취소 전환 실행 (확인 필요 시 --yes 제외 후 실행하면 안내만 출력)
 python3 .github/scripts/jira-close-unmapped-issues.py --yes
 ```
+
+### 보고서 생성 시점과 중복 push
+
+- 보고서는 **JIRA 현재 상태 스냅샷**으로 생성됩니다.
+- 같은 날 여러 번 push가 있어도:
+  - 당일 보고서 파일 `report-YYYY-MM-DD.md`는 **같은 파일을 덮어씁니다**.
+  - 당일 제목의 GitHub 이슈("프로젝트 진행 상황 보고서 - YYYY-MM-DD")는 **본문만 업데이트**합니다(중복 이슈 방지).
+- **이미 완료된 작업**에 대한 push: 커밋에 `GAM-xxx`가 있어도 JIRA가 이미 **완료** 상태면 전환 스크립트는 Idempotent하게 동작합니다. 보고서는 **그날 마지막 생성 시점의 JIRA 상태**를 보여줍니다.
+
+### 최종 보고서 한곳에서 보기
+
+항상 **최신 보고서만 한곳**에서 보려면 다음을 사용합니다.
+
+| 대상 | 설명 |
+|------|------|
+| **파일** | `docs/jira/reports/report-latest.md` — 보고서 생성 시마다 당일 보고서 내용으로 **덮어쓰기**됩니다. |
+| **GitHub 이슈** | 제목 **"프로젝트 진행 상황 보고서 (최신)"** 인 이슈 1개가 유지되며, 매 실행 시 **본문만 업데이트**됩니다. 라벨: `report`, `latest`. |
+
+- **보고서 파일**: 저장소에서 `docs/jira/reports/report-latest.md` 경로로 열면 최신 스냅샷을 볼 수 있습니다.
+- **보고서 이슈**: Issues에서 제목 "프로젝트 진행 상황 보고서 (최신)" 또는 라벨 `latest`로 검색하면 됩니다.
 
 ---
 
@@ -182,8 +214,9 @@ python3 .github/scripts/jira-generate-report.py -o docs/jira/reports/report-$(da
 
 ## 4. 보스에게 보고서 제출
 
-- **GitHub 링크**: 저장소 → Issues에서 `report`, `status-update` 라벨이 붙은 이슈를 열면 최신 보고서를 볼 수 있습니다.
-- **문서 링크**: `docs/jira/reports/report-YYYY-MM-DD.md` 파일 경로를 공유하면 해당 일자 보고서를 확인할 수 있습니다.
+- **최신 보고서 한곳에서 보기**: `docs/jira/reports/report-latest.md` 또는 Issues에서 제목 **"프로젝트 진행 상황 보고서 (최신)"**(라벨 `report`, `latest`)인 이슈를 열면 항상 최신 스냅샷을 볼 수 있습니다.
+- **GitHub 링크(날짜별)**: 저장소 → Issues에서 `report`, `status-update` 라벨이 붙은 이슈를 열면 해당 일자 보고서를 볼 수 있습니다.
+- **문서 링크(날짜별)**: `docs/jira/reports/report-YYYY-MM-DD.md` 파일 경로를 공유하면 해당 일자 보고서를 확인할 수 있습니다.
 - **작업물 확인**: 보고서 본문에 포함된 [Go Almond](https://go-almond.ddnsfree.com/) 링크로 실제 서비스를 확인할 수 있습니다.
 
 ---

@@ -1,6 +1,6 @@
 # 당신이 해야 할 단계
 
-JIRA·일정 설정이 끝난 뒤, 아래 순서대로 진행하면 됩니다. (GitHub 보고서 이슈는 아직 미사용이므로 JIRA만 사용하면 됩니다.)
+JIRA·일정 설정이 끝난 뒤, 아래 순서대로 진행하면 됩니다.
 
 ---
 
@@ -32,8 +32,9 @@ CI에서 JIRA에 접근하려면 저장소에 시크릿을 넣어야 합니다.
 ### Push 후 보고서가 자동 생성됐는지 확인하는 방법
 
 1. **Actions 탭**: GitHub 저장소 → **Actions** → **JIRA Progress Report** 워크플로우가 **push 이후 실행**되었는지 확인합니다. (트리거: `push` to `main` 또는 `workflow_dispatch` / 매주 월요일)
-2. **보고서 파일**: `docs/jira/reports/report-YYYY-MM-DD.md` 파일이 새로 생겼거나, 오늘 날짜 보고서가 최신 내용으로 커밋되었는지 확인합니다.
-3. **GitHub Issue**: **Issues** 탭에서 제목이 "프로젝트 진행 상황 보고서 - YYYY-MM-DD"인 이슈가 생성되었거나, 같은 제목의 기존 이슈 본문이 갱신되었는지 확인합니다.
+2. **최신 보고서 한곳**: `docs/jira/reports/report-latest.md` 또는 Issues에서 제목 **"프로젝트 진행 상황 보고서 (최신)"**(라벨 `latest`)인 이슈를 열면 항상 최신 스냅샷을 볼 수 있습니다.
+3. **날짜별 보고서**: `docs/jira/reports/report-YYYY-MM-DD.md` 파일이 새로 생겼거나, 오늘 날짜 보고서가 최신 내용으로 커밋되었는지 확인합니다.
+4. **GitHub Issue(날짜별)**: **Issues** 탭에서 제목이 "프로젝트 진행 상황 보고서 - YYYY-MM-DD"인 이슈가 생성되었거나, 같은 제목의 기존 이슈 본문이 갱신되었는지 확인합니다.
 
 ---
 
@@ -55,10 +56,10 @@ CI에서 JIRA에 접근하려면 저장소에 시크릿을 넣어야 합니다.
 
 ## 4. (선택) 진행 보고서
 
+- **최신 보고서 한곳에서 보기**: 항상 최신 스냅샷을 보려면 [docs/jira/reports/report-latest.md](reports/report-latest.md)를 열거나, GitHub Issues에서 제목 **"프로젝트 진행 상황 보고서 (최신)"**(라벨 `report`, `latest`)인 이슈를 엽니다. push·수동·스케줄 실행 시마다 이 파일과 이슈 본문이 갱신됩니다. 자세한 내용은 [SCHEDULE_MANAGEMENT.md - 최종 보고서 한곳에서 보기](SCHEDULE_MANAGEMENT.md#최종-보고서-한곳에서-보기)를 참고하세요.
 - **수동 실행**: Actions → **JIRA Progress Report** → **Run workflow**
-  - JIRA 이슈를 조회해 `docs/jira/reports/report-YYYY-MM-DD.md`를 만들고, **정규 이슈만** 포함(`--canonical-only` 적용됨).
-- **자동 실행**: 매주 **월요일 09:00 UTC**에 같은 워크플로가 실행됩니다.
-- 지금은 JIRA만 사용하면 되고, 보고서는 필요할 때 수동 실행하거나 스케줄에 맡기면 됩니다.
+  - JIRA 이슈를 조회해 `docs/jira/reports/report-YYYY-MM-DD.md`와 `report-latest.md`를 만들고, **정규 이슈만** 포함(`--canonical-only` 적용됨).
+- **자동 실행**: main push 시 및 매주 **월요일 09:00 UTC**에 같은 워크플로가 실행됩니다.
 
 ---
 

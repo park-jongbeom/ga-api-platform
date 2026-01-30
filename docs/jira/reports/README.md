@@ -24,11 +24,11 @@
 
 ---
 
-## 3. .gitignore 및 push 미포함 정책
+## 3. .gitignore 및 push 제외 정책
 
-- **이 폴더와 그 안의 `report-*.md` 파일은 .gitignore에 넣지 마세요.**  
-  워크플로가 생성한 파일을 커밋·push해야 저장소에 반영됩니다. .gitignore에 넣으면 CI가 push할 수 없습니다.
-- **docs/jira** 아래 다른 파일(예: pdf, 일부 가이드)만 push 제외 대상이며, **reports/** 는 제외하지 않습니다.
+- **docs/** 전체는 .gitignore로 push 제외됩니다. **예외**: `docs/jira/reports/` 만 원격에 올라갑니다.
+- 이 폴더와 그 안의 `report-*.md`·README.md는 .gitignore 예외이므로, 워크플로·로컬 스크립트가 생성·커밋·push할 수 있습니다.
+- 그 밖의 docs(api, jira 백로그, nginx, plan 등)는 로컬에만 두고 push되지 않습니다.
 
 ---
 

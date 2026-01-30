@@ -58,9 +58,10 @@ docker-compose.local.yml
 docs/nginx/go-almond.local.conf
 .git-setup-guide.md
 
-# docs: push 불필요 (내부 운영·계정 정보·스냅샷)
-# 주의: docs/jira/reports/ 및 report-*.md 는 제외하지 않음 (워크플로가 생성·push함)
-docs/jira/*.pdf
-docs/jira/PERMISSION_SETUP_GUIDE.md
-docs/jira/BULK_DELETE_GUIDE.md
-docs/jira/BULK_DELETE_PERMISSION_FIX.md
+# docs: push 제외 (내부 문서·운영 자료는 원격에 올리지 않음)
+# 예외: docs/jira/reports/ 만 push (워크플로·로컬 스크립트가 보고서 생성·push)
+docs/*
+!docs/jira/
+docs/jira/*
+!docs/jira/reports/
+!docs/jira/reports/*

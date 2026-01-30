@@ -147,7 +147,7 @@ jobs:
             echo "Deployment completed successfully!"
 
       - name: Update JIRA Issues
-        if: success() && secrets.JIRA_API_TOKEN != ''
+        if: success()
         env:
           JIRA_URL: ${{ secrets.JIRA_URL }}
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}

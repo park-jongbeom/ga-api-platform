@@ -13,6 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Python dependencies
+        run: pip install requests
+
       - name: Generate JIRA report
         env:
           JIRA_URL: ${{ secrets.JIRA_URL }}
@@ -26,7 +29,7 @@ jobs:
             --report-web-url "https://go-almond.ddnsfree.com/" \
             --canonical-only \
             --output "docs/jira/reports/report-${REPORT_DATE}.md" \
-            --date "${REPORT_DATE}" || true
+            --date "${REPORT_DATE}"
           echo "REPORT_DATE=${REPORT_DATE}" >> $GITHUB_OUTPUT
 
       - name: Copy report to report-latest.md

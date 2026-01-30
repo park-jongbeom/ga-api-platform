@@ -210,6 +210,13 @@ python3 .github/scripts/jira-generate-report.py -o docs/jira/reports/report-$(da
 - **완료된 작업** / **진행 중인 작업** / **남은 작업** 목록
 - **작업물 링크**: [https://go-almond.ddnsfree.com/](https://go-almond.ddnsfree.com/)
 
+### 보고서가 생성되지 않을 때
+
+보고서 파일이나 GitHub 이슈가 생성되지 않으면 다음을 확인하세요.
+
+1. **Repository Secrets**: GitHub 저장소 → **Settings** → **Secrets and variables** → **Actions**에서 `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`이 모두 설정되어 있는지 확인합니다.
+2. **Actions 로그**: **Actions** → **JIRA Progress Report** 워크플로우 → 최근 실행에서 **"Generate JIRA report"** 스텝을 열고, stderr 메시지를 확인합니다. 예: `JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN이 필요합니다.`, `ModuleNotFoundError: No module named 'requests'`, JIRA 인증/API 오류 메시지 등. 워크플로우는 실패 시 해당 스텝에서 빨간 X로 표시되므로, 실패한 스텝의 로그에서 원인을 파악할 수 있습니다.
+
 ---
 
 ## 4. 보스에게 보고서 제출

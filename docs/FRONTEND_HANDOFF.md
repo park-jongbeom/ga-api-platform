@@ -40,6 +40,19 @@
 
 User Profile API는 **JWT 인증이 필요**합니다. 로그인 후 받은 토큰을 `Authorization: Bearer <token>` 헤더에 포함하여 호출하세요.
 
+### 테스트 계정 (개발/연동용)
+
+Auth·User Profile API 연동 시 바로 로그인해서 토큰을 받을 수 있도록 테스트 계정을 제공합니다. **배포 환경(local/lightsail)에서 시드되어 있습니다.**
+
+| 항목 | 값 |
+|------|-----|
+| **이메일** | `test@example.com` |
+| **비밀번호** | `test1234` |
+| **이름** | 테스트 사용자 |
+
+- 로그인: `POST /api/v1/auth/login` body `{"email":"test@example.com","password":"test1234"}`
+- 받은 토큰으로 `PUT /api/v1/user/profile`, `POST /api/v1/user/education`, `POST /api/v1/user/preference` 등 호출 시 사용하세요.
+
 ---
 
 ## 예정 API (Week 4~5)

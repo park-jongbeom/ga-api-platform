@@ -16,17 +16,15 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
-import org.testcontainers.utility.DockerImageName
 
+/**
+ * Auth & User Profile 통합 테스트 — 실제 Lightsail PostgreSQL 연동.
+ * resources/application-local.yml (또는 DB_* 환경 변수)로 DB 접속.
+ * 시드 계정(test@example.com / test1234)이 DB에 있어야 함.
+ */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("local", "test")
-@Testcontainers
-@DisplayName("Auth & User Profile 통합 테스트 (실제 DB)")
+@DisplayName("Auth & User Profile 통합 테스트 (Lightsail PostgreSQL 실제 연동)")
 class AuthAndUserProfileIntegrationTest {
 
     @Autowired
@@ -34,25 +32,41 @@ class AuthAndUserProfileIntegrationTest {
 
     private val objectMapper = jacksonObjectMapper()
 
-    companion object {
-        @Container
-        @JvmStatic
-        val postgres: PostgreSQLContainer<*> = PostgreSQLContainer(DockerImageName.parse("postgres:17"))
-            .withDatabaseName("ga_test")
-            .withUsername("test")
-            .withPassword("test")
-
-        @DynamicPropertySource
-        @JvmStatic
-        fun configureDataSource(registry: DynamicPropertyRegistry) {
-            registry.add("spring.datasource.url", postgres::getJdbcUrl)
-            registry.add("spring.datasource.username", postgres::getUsername)
-            registry.add("spring.datasource.password", postgres::getPassword)
-            registry.add("spring.datasource.driver-class-name", { "org.postgresql.Driver" })
-        }
-    }
-
     private fun uniqueEmail() = "integration-${java.util.UUID.randomUUID().toString().take(8)}@example.com"
+
+    /** 시드된 테스트 계정 (TestUserSeeder). application-local.yml / app.seed-test-user */
+    private val seededTestEmail = "test@example.com"
+    private val seededTestPassword = "test1234"
+
+    @Test
+    @DisplayName("시드된 테스트 계정으로 로그인 후 프로필 API 호출")
+    fun loginWithSeededTestAccountThenCallProfileApi() {
+        val jsonHeaders = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val loginBody = """{"email":"$seededTestEmail","password":"$seededTestPassword"}"""
+        val loginRes = restTemplate.exchange(
+            "/api/v1/auth/login",
+            HttpMethod.POST,
+            HttpEntity(loginBody, jsonHeaders),
+            String::class.java
+        )
+        assertEquals(HttpStatus.OK, loginRes.statusCode, "시드 계정 로그인 실패: ${loginRes.body}")
+        val loginJson = objectMapper.readValue<Map<String, Any>>(loginRes.body!!)
+        @Suppress("UNCHECKED_CAST")
+        val loginData = loginJson["data"] as Map<String, Any>
+        val token = loginData["token"] as String
+        assertNotNull(token)
+        assertTrue(token.isNotBlank())
+
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            set("Authorization", "Bearer $token")
+        }
+        val profileBody = """{"mbti":"INTJ","tags":"시드계정 검증","bio":"테스트용"}"""
+        val profileRes = restTemplate.exchange(
+            "/api/v1/user/profile", HttpMethod.PUT, HttpEntity(profileBody, headers), String::class.java
+        )
+        assertEquals(HttpStatus.OK, profileRes.statusCode, "시드 계정으로 프로필 수정 실패: ${profileRes.body}")
+    }
 
     @Test
     @DisplayName("회원가입 -> 로그인 -> 토큰으로 프로필/학력/유학목표 저장")

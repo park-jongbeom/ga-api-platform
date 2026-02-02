@@ -14,7 +14,8 @@
   "mappingFile": ".github/jira-mapping.json",
   "startDate": "2026-01-27",
   "backendWeeks": 6,
-  "frontendWeeks": 2.5,
+  "frontendWeeks": 6,
+  "frontendTargetDate": "2026-03-06",
   "workDaysPerWeek": 4,
   "reportWebUrl": "https://go-almond.ddnsfree.com/",
   "reportsDir": "reports"

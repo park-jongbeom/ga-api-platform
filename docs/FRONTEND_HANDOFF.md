@@ -26,6 +26,19 @@
 
 ---
 
+## 예정 API (Week 2~5)
+
+| 메서드 | 경로 | 설명 | 예정 시점 |
+|--------|------|------|----------|
+| POST | `/api/v1/auth/signup` | 회원가입 | Week 2 |
+| POST | `/api/v1/auth/login` | 로그인 (JWT 발급) | Week 2 |
+| POST | `/api/v1/bookmarks` | 보관하기 | Week 5 |
+| DELETE | `/api/v1/bookmarks/{id}` | 보관 해제 | Week 5 |
+
+상세 스펙은 백엔드 구현 완료 후 `docs/api/` 에 추가됩니다.
+
+---
+
 ## Base URL
 
 실제 사용하는 주소는 **전달받은 배포 URL**을 사용합니다.
@@ -48,13 +61,17 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 
 ## 작업 일정 (다음 단계)
 
-Mock 제공 후 **바로 다음** 작업은 아래와 같습니다.
+Mock 제공 후 **바로 다음** 작업은 아래와 같습니다. 프론트엔드는 백엔드 API 완성 시점에 맞춰 실제 API로 직접 개발합니다.
 
-| 주차 | 내용 |
-|------|------|
-| **Week 2** | User Profile API (실제 구현) — PUT /api/v1/user/profile, POST /api/v1/user/education, POST /api/v1/user/preference → 프로필 입력 화면 연동 |
-| **Week 4** | 매칭 API 실제 전환, 학교/프로그램 실제 데이터 |
-| **Week 5** | Application API, Document API, Dashboard API |
+| 주차 | API | 내용 |
+|------|-----|------|
+| **Week 2** | Auth API | POST /api/v1/auth/signup, POST /api/v1/auth/login → 회원가입/로그인 연동 |
+| **Week 2** | User Profile API | PUT /api/v1/user/profile, POST /api/v1/user/education, POST /api/v1/user/preference → 프로필 입력 화면 연동 |
+| **Week 4** | 매칭 API | POST /api/v1/matching/run, GET /api/v1/matching/result → 매칭 결과 UI 연동 |
+| **Week 5** | Application API | POST /api/v1/applications, GET /api/v1/applications, PATCH /api/v1/applications/{id}/status |
+| **Week 5** | Bookmark API | POST /api/v1/bookmarks, DELETE /api/v1/bookmarks/{id} → 보관하기 기능 연동 |
+| **Week 5** | Dashboard API | GET /api/v1/dashboard |
+| **Week 5** | Document API | POST /api/v1/documents/upload, GET /api/v1/documents |
 
 상세 일정은 전달받은 백로그/일정 링크를 참고하세요.
 

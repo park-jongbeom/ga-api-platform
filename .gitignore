@@ -58,6 +58,11 @@ docker-compose.local.yml
 docs/nginx/go-almond.local.conf
 .git-setup-guide.md
 
+# Local config with sensitive data (DB credentials, secrets)
+application-local-secret.yml
+**/application-local-secret.yml
+**/application-*-secret.yml
+
 # docs: push 제외 (내부 문서·운영 자료는 원격에 올리지 않음)
 # 예외: 프로젝트 루트 reports/; 협업 문서 FRONTEND_HANDOFF.md; API 문서 docs/api/
 docs/*

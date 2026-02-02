@@ -61,6 +61,8 @@ interface MatchingResult {
 
 | API | 메서드 | 경로 | 설명 |
 |-----|--------|------|------|
+| [회원가입](auth.md#회원가입) | POST | `/api/v1/auth/signup` | 이메일/비밀번호 회원가입 (local 프로파일) |
+| [로그인](auth.md#로그인) | POST | `/api/v1/auth/login` | 로그인 및 JWT 발급 (local 프로파일) |
 | [매칭 실행](matching.md#매칭-실행) | POST | `/api/v1/matching/run` | 사용자 ID로 Mock 매칭 실행 |
 | [최신 매칭 결과 조회](matching.md#최신-매칭-결과-조회) | GET | `/api/v1/matching/result` | 가장 최근 매칭 결과 조회 |
 | [프로그램 목록 조회](programs.md#프로그램-목록-조회) | GET | `/api/v1/programs` | 타입/지역별 프로그램 목록 |

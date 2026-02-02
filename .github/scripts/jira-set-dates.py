@@ -17,9 +17,17 @@ from pathlib import Path
 
 
 def parse_week_number(sprint_text: str) -> Optional[int]:
-    """Sprint/Week 텍스트에서 주차 번호 추출 (예: Week 1 -> 1)"""
+    """Sprint/Week 텍스트에서 주차 번호 추출.
+    범위 형식 (Week 1-2, Week 5-6)인 경우 마지막 주차 번호 반환.
+    예: Week 1 -> 1, Week 1-2 -> 2, Week 5-6 -> 6
+    """
     if not sprint_text:
         return None
+    # 먼저 범위 형식 체크 (Week 1-2, Week 5-6)
+    range_match = re.search(r'Week\s*(\d+)\s*-\s*(\d+)', sprint_text, re.IGNORECASE)
+    if range_match:
+        return int(range_match.group(2))  # 마지막 주차 반환
+    # 단일 주차 (Week 1, Week 4 등)
     m = re.search(r'Week\s*(\d+)', sprint_text, re.IGNORECASE)
     return int(m.group(1)) if m else None
 
@@ -45,8 +53,9 @@ def week_range(start_date: datetime, week_index: int, days_per_week: int = 4) ->
 
 def parse_backlog_structure(backlog_path: str, is_frontend: bool) -> List[Dict]:
     """
-    백로그 문서를 파싱하여 (id, week_number, type) 목록 반환.
+    백로그 문서를 파싱하여 (id, week_number, type, explicit_date) 목록 반환.
     type: 'epic' | 'story' | 'task'
+    explicit_date: 명시적으로 지정된 날짜 (YYYY-MM-DD) 또는 None
     """
     with open(backlog_path, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -57,9 +66,16 @@ def parse_backlog_structure(backlog_path: str, is_frontend: bool) -> List[Dict]:
     for m in re.finditer(epic_pattern, content, re.DOTALL):
         epic_id = m.group(1).strip()
         sprint = m.group(2).strip()
+        
+        # "기한: YYYY-MM-DD" 형식이 있는지 먼저 확인
+        explicit_date = None
+        date_match = re.search(r'기한:\s*(\d{4}-\d{2}-\d{2})', sprint)
+        if date_match:
+            explicit_date = date_match.group(1)
+        
         week = parse_week_number(sprint)
-        if week:
-            items.append({'id': epic_id, 'week': week, 'type': 'epic'})
+        if week or explicit_date:
+            items.append({'id': epic_id, 'week': week, 'type': 'epic', 'explicit_date': explicit_date})
 
     # Story 패턴: ### Story GAM-11: ... **Sprint**: Week 1
     story_pattern = r'### Story (\S+):\s*(.+?)(?=### Story \S+:|## Epic \d+:|$)'
@@ -68,16 +84,23 @@ def parse_backlog_structure(backlog_path: str, is_frontend: bool) -> List[Dict]:
         story_text = m.group(2)
         sprint_match = re.search(r'\*\*Sprint\*\*:\s*(.+?)(?:\n|$)', story_text)
         sprint = sprint_match.group(1).strip() if sprint_match else ""
+        
+        # "기한: YYYY-MM-DD" 형식이 있는지 먼저 확인
+        explicit_date = None
+        date_match = re.search(r'기한:\s*(\d{4}-\d{2}-\d{2})', sprint)
+        if date_match:
+            explicit_date = date_match.group(1)
+        
         week = parse_week_number(sprint)
-        if week:
-            items.append({'id': story_id, 'week': week, 'type': 'story'})
+        if week or explicit_date:
+            items.append({'id': story_id, 'week': week, 'type': 'story', 'explicit_date': explicit_date})
 
     # Task 패턴: - [ ] GAM-11-1: ...
-    # Task는 부모 Story의 주차를 사용하므로 Story 목록을 먼저 만들어서 story_id -> week 매핑
-    story_week = {}
+    # Task는 부모 Story의 주차를 사용하므로 Story 목록을 먼저 만들어서 story_id -> (week, explicit_date) 매핑
+    story_info = {}
     for it in items:
         if it['type'] == 'story':
-            story_week[it['id']] = it['week']
+            story_info[it['id']] = {'week': it.get('week'), 'explicit_date': it.get('explicit_date')}
 
     task_pattern = r'- \[ \] (\S+):\s*'
     for m in re.finditer(task_pattern, content):
@@ -86,9 +109,14 @@ def parse_backlog_structure(backlog_path: str, is_frontend: bool) -> List[Dict]:
         parts = task_id.split('-')
         if len(parts) >= 2 and re.match(r'^[\w]+-\d+-\d+$', task_id):
             story_id = '-'.join(parts[:-1])  # GAM-11
-            week = story_week.get(story_id)
-            if week:
-                items.append({'id': task_id, 'week': week, 'type': 'task'})
+            info = story_info.get(story_id)
+            if info and (info['week'] or info['explicit_date']):
+                items.append({
+                    'id': task_id, 
+                    'week': info['week'], 
+                    'type': 'task',
+                    'explicit_date': info['explicit_date']
+                })
 
     return items
 
@@ -97,14 +125,11 @@ def build_week_calendar(start_date_str: str, backend_weeks: int, frontend_weeks:
     """주차별 (시작일, 종료일) 캘린더 생성. 평일만 (월~목)."""
     start = datetime.strptime(start_date_str, '%Y-%m-%d')
     calendar = {}
-    for w in range(1, backend_weeks + 1):
+    # 백엔드와 프론트엔드 모두 같은 주차 캘린더 사용 (최대 6주)
+    max_weeks = max(backend_weeks, int(frontend_weeks) if frontend_weeks == int(frontend_weeks) else int(frontend_weeks) + 1)
+    for w in range(1, max_weeks + 1):
         week_start, week_end = week_range(start, w)
         calendar[w] = (week_start.strftime('%Y-%m-%d'), week_end.strftime('%Y-%m-%d'))
-    # 프론트 2.5주: Week 3는 2일만 (월, 화)
-    if frontend_weeks == 2.5:
-        week_start, _ = week_range(start, 3)
-        week_end = week_start + timedelta(days=1)
-        calendar['front_3'] = (week_start.strftime('%Y-%m-%d'), week_end.strftime('%Y-%m-%d'))
     return calendar
 
 
@@ -139,10 +164,7 @@ class JiraSetDates:
 
     def get_dates_for_week(self, week: int, is_frontend: bool, index_in_week: int = 0, total_in_week: int = 1) -> Tuple[str, str]:
         """해당 주차의 시작일/종료일. 동일 주 내에서 여러 이슈가 있으면 일자 분배."""
-        if is_frontend and week == 3:
-            range_key = 'front_3'
-        else:
-            range_key = week
+        range_key = week
         start_str, end_str = self.calendar[range_key]
         start_d = datetime.strptime(start_str, '%Y-%m-%d')
         end_d = datetime.strptime(end_str, '%Y-%m-%d')
@@ -195,12 +217,21 @@ class JiraSetDates:
         def assign_dates(items: List[Dict], is_frontend: bool) -> List[Tuple[str, str, str]]:
             week_totals: Dict[int, int] = {}
             for it in items:
-                w = it['week']
-                week_totals[w] = week_totals.get(w, 0) + 1
+                w = it.get('week')
+                if w:
+                    week_totals[w] = week_totals.get(w, 0) + 1
             week_indices: Dict[int, int] = {}
             result = []
             for it in items:
-                w = it['week']
+                # 명시적 날짜가 있으면 그것을 우선 사용
+                if it.get('explicit_date'):
+                    explicit = it['explicit_date']
+                    result.append((it['id'], explicit, explicit))
+                    continue
+                    
+                w = it.get('week')
+                if not w:
+                    continue
                 idx = week_indices.get(w, 0)
                 total = week_totals[w]
                 start_d, end_d = self.get_dates_for_week(w, is_frontend, idx, total)

@@ -23,7 +23,7 @@
 |------|------------|------|
 | **설정 파일** | `.github/jira-config.json` | projectKey, reportWebUrl, mappingFile, backlogDocument, frontendBacklog, **reportsDir** |
 | **출력 경로** | config의 `reportsDir` (기본 `reports`) | `{reportsDir}/report-YYYY-MM-DD.md`, `{reportsDir}/report-latest.md` |
-| **생성 스크립트** | `.github/scripts/jira-generate-report.py` | `--config .github/jira-config.json` 로 위 옵션 로드, `--canonical-only` 적용 |
+| **생성 스크립트** | `reports/jira-generate-report.py` | `--config .github/jira-config.json` 로 위 옵션 로드, `--canonical-only` 적용 |
 
 경로나 프로젝트 키·백로그 문서를 바꿀 때는 **`.github/jira-config.json`만 수정**하면 로컬/커밋 시 생성에 반영됩니다.
 
@@ -32,8 +32,8 @@
 ## 3. 생성 주체 (로컬만, CI 없음)
 
 - **CI**: 보고서 생성 워크플로는 **제거**되어 있습니다. CI에서는 JIRA 참조·완료 처리(`jira-auto-update.yml`)만 수행합니다.
-- **로컬 (요청 시 생성)**: **commit 트리거가 아닌, 내가 요청할 때** `.github/scripts/jira-report-local.sh` 를 실행합니다. **JIRA만** 참조하여 `report-latest.md`·날짜별 보고서를 생성·갱신합니다.
-- **로컬 (commit 시 조건부)**: **commit 후** `.github/scripts/jira-report-if-needed.py` 를 실행하면, JIRA 일정과 연관된 커밋인 경우에만 필요 시 보고서를 생성합니다.
+- **로컬 (요청 시 생성)**: **commit 트리거가 아닌, 내가 요청할 때** `reports/jira-report-local.sh` 를 실행합니다. **JIRA만** 참조하여 `report-latest.md`·날짜별 보고서를 생성·갱신합니다.
+- **로컬 (commit 시 조건부)**: **commit 후** `reports/jira-report-if-needed.py` 를 실행하면, JIRA 일정과 연관된 커밋인 경우에만 필요 시 보고서를 생성합니다.
 - **docs/** 전체는 .gitignore로 push 제외됩니다. **예외는 이 reports/ 폴더만** (docs 하위 아님).
 
 ---
@@ -55,17 +55,17 @@
 cd /path/to/ga-api-platform
 
 # (1) 요청 시 보고서 생성 — JIRA만 참조해 report-latest 갱신 (commit 트리거 아님)
-./.github/scripts/jira-report-local.sh
+./reports/jira-report-local.sh
 # 커밋까지 하려면:
-./.github/scripts/jira-report-local.sh --commit
+./reports/jira-report-local.sh --commit
 
 # (2) commit 후 조건부 보고서 생성 — 일정 관련·미완료일 때만 생성
-python3 .github/scripts/jira-report-if-needed.py
+python3 reports/jira-report-if-needed.py
 # 커밋까지 하려면:
-python3 .github/scripts/jira-report-if-needed.py --commit
+python3 reports/jira-report-if-needed.py --commit
 ```
 
-스크립트가 `docs/jira/jira.env` 를 자동으로 읽습니다. `jira-report-local.sh` 는 실행 권한이 있어야 하며, 없으면 `chmod +x .github/scripts/jira-report-local.sh` 로 부여하세요.
+스크립트가 `docs/jira/jira.env` 를 자동으로 읽습니다. `jira-report-local.sh` 는 실행 권한이 있어야 하며, 없으면 `chmod +x reports/jira-report-local.sh` 로 부여하세요.
 
 ---
 
@@ -95,7 +95,7 @@ python3 .github/scripts/jira-report-if-needed.py --commit
 | 최신 보고서 | `reports/report-latest.md` (로컬에서 생성·push) |
 | 날짜별 | `reports/report-YYYY-MM-DD.md` (로컬에서 생성·push) |
 | CI | 보고서 생성 없음. JIRA 완료 처리만 `jira-auto-update.yml` 에서 수행. |
-| 로컬 요청 시 | **요청할 때** `jira-report-local.sh` 실행 → JIRA만 참조, report-latest 대조·갱신 (commit 트리거 아님). |
-| 로컬 조건부 | commit 후 `jira-report-if-needed.py` 실행 시, 일정 관련·미완료인 경우에만 생성. |
+| 로컬 요청 시 | **요청할 때** `reports/jira-report-local.sh` 실행 → JIRA만 참조, report-latest 대조·갱신 (commit 트리거 아님). |
+| 로컬 조건부 | commit 후 `reports/jira-report-if-needed.py` 실행 시, 일정 관련·미완료인 경우에만 생성. |
 | push 제외 | **docs/** 전체 제외. **예외**: **reports/** (루트, docs 하위 아님) 만 push. |
 | 표시 이름 | 백로그 문서(Epic/Story 제목) 우선, 없으면 JIRA summary. |

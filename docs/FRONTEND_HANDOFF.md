@@ -13,9 +13,11 @@
 
 ---
 
-## 지금 사용 가능한 API (Week 1 완료)
+## 지금 사용 가능한 API
 
 아래 API의 상세 스펙·요청/응답 예시는 **같은 저장소의 `docs/api/`** 안 문서를 링크했습니다.
+
+### Mock API (Week 1, default 프로파일)
 
 | 메서드 | 경로 | 설명 | 상세 문서 |
 |--------|------|------|-----------|
@@ -24,18 +26,29 @@
 | GET | `/api/v1/programs?type=...` | 프로그램 목록 (type: university, community_college, vocational) | [programs.md](api/programs.md) |
 | GET | `/api/v1/schools/{schoolId}` | 학교 상세 조회 | [schools.md](api/schools.md) |
 
+### Auth & User Profile (Week 2, local/lightsail 프로파일)
+
+**참고**: Auth API·User Profile API는 DB가 연결된 환경(local/lightsail 프로파일)에서만 사용 가능합니다. 배포 시 해당 프로파일이 적용되어 있으면 사용할 수 있습니다.
+
+| 메서드 | 경로 | 설명 | 상세 문서 |
+|--------|------|------|-----------|
+| POST | `/api/v1/auth/signup` | 회원가입 | [auth.md](api/auth.md) |
+| POST | `/api/v1/auth/login` | 로그인 (JWT 발급) | [auth.md](api/auth.md) |
+| PUT | `/api/v1/user/profile` | 프로필 기본 정보 (MBTI, 태그, 자기소개) | [user-profile.md](api/user-profile.md) |
+| POST | `/api/v1/user/education` | 학력 정보 입력 | [user-profile.md](api/user-profile.md) |
+| POST | `/api/v1/user/preference` | 유학 목표 설정 | [user-profile.md](api/user-profile.md) |
+
+User Profile API는 **JWT 인증이 필요**합니다. 로그인 후 받은 토큰을 `Authorization: Bearer <token>` 헤더에 포함하여 호출하세요.
+
 ---
 
-## 예정 API (Week 2~5)
+## 예정 API (Week 4~5)
 
 | 메서드 | 경로 | 설명 | 예정 시점 |
 |--------|------|------|----------|
-| POST | `/api/v1/auth/signup` | 회원가입 | Week 2 |
-| POST | `/api/v1/auth/login` | 로그인 (JWT 발급) | Week 2 |
 | POST | `/api/v1/bookmarks` | 보관하기 | Week 5 |
 | DELETE | `/api/v1/bookmarks/{id}` | 보관 해제 | Week 5 |
-
-상세 스펙은 백엔드 구현 완료 후 `docs/api/` 에 추가됩니다.
+| (매칭 API 실제 연동) | `/api/v1/matching/...` | 매칭 실행·결과 (실제 DB) | Week 4 |
 
 ---
 
@@ -61,12 +74,10 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 
 ## 작업 일정 (다음 단계)
 
-Mock 제공 후 **바로 다음** 작업은 아래와 같습니다. 프론트엔드는 백엔드 API 완성 시점에 맞춰 실제 API로 직접 개발합니다.
-
 | 주차 | API | 내용 |
 |------|-----|------|
-| **Week 2** | Auth API | POST /api/v1/auth/signup, POST /api/v1/auth/login → 회원가입/로그인 연동 |
-| **Week 2** | User Profile API | PUT /api/v1/user/profile, POST /api/v1/user/education, POST /api/v1/user/preference → 프로필 입력 화면 연동 |
+| **Week 2** (완료) | Auth API | POST /api/v1/auth/signup, POST /api/v1/auth/login → 회원가입/로그인 연동 |
+| **Week 2** (완료) | User Profile API | PUT /api/v1/user/profile, POST /api/v1/user/education, POST /api/v1/user/preference → 프로필 입력 화면 연동 |
 | **Week 4** | 매칭 API | POST /api/v1/matching/run, GET /api/v1/matching/result → 매칭 결과 UI 연동 |
 | **Week 5** | Application API | POST /api/v1/applications, GET /api/v1/applications, PATCH /api/v1/applications/{id}/status |
 | **Week 5** | Bookmark API | POST /api/v1/bookmarks, DELETE /api/v1/bookmarks/{id} → 보관하기 기능 연동 |
@@ -81,7 +92,7 @@ Mock 제공 후 **바로 다음** 작업은 아래와 같습니다. 프론트엔
 
 - **응답 래퍼**: `success`, `data`, `code`, `message`, `timestamp`
 - **에러 시**: `success: false`, `code`, `message` 포함
-- 자세한 형식은 **같은 저장소의 `docs/api/`** 안 API 문서를 참고하세요. 예: [matching.md](api/matching.md), [programs.md](api/programs.md), [schools.md](api/schools.md), [README.md](api/README.md).
+- 자세한 형식은 **같은 저장소의 `docs/api/`** 안 API 문서를 참고하세요. 예: [matching.md](api/matching.md), [programs.md](api/programs.md), [schools.md](api/schools.md), [auth.md](api/auth.md), [user-profile.md](api/user-profile.md), [README.md](api/README.md).
 
 ---
 

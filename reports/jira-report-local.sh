@@ -1,11 +1,11 @@
 #!/bin/bash
 # push 전 로컬에서 JIRA 진행 보고서 생성 후 스테이징(및 선택적 커밋)
-# 사용: export JIRA_URL=... JIRA_EMAIL=... JIRA_API_TOKEN=... 후 ./.github/scripts/jira-report-local.sh [--commit]
+# 사용: export JIRA_URL=... JIRA_EMAIL=... JIRA_API_TOKEN=... 후 ./reports/jira-report-local.sh [--commit]
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # JIRA 환경: 없으면 docs/jira/jira.env 참조 (docs는 push 제외)
@@ -46,7 +46,7 @@ if [ -z "$JIRA_URL" ] || [ -z "$JIRA_EMAIL" ] || [ -z "$JIRA_API_TOKEN" ]; then
   echo "  1) env.jira.example 을 복사해 docs/jira/jira.env 에 값을 채운 뒤 실행" >&2
   echo "  2) export JIRA_URL=... JIRA_EMAIL=... JIRA_API_TOKEN=... 후 실행" >&2
   echo "" >&2
-  echo "  ./.github/scripts/jira-report-local.sh [--commit]" >&2
+  echo "  ./reports/jira-report-local.sh [--commit]" >&2
   exit 1
 fi
 
@@ -59,7 +59,7 @@ LATEST_FILE="${REPORTS_DIR}/report-latest.md"
 mkdir -p "$REPORTS_DIR"
 
 # 보고서 옵션은 .github/jira-config.json 에서 로드 (로컬/커밋/CI 공통)
-python3 .github/scripts/jira-generate-report.py \
+python3 "$SCRIPT_DIR/jira-generate-report.py" \
   --canonical-only \
   --output "$REPORT_FILE" \
   --date "$REPORT_DATE"

@@ -120,7 +120,8 @@ def main():
     parser.add_argument('--reports-dir', default='reports')
     args = parser.parse_args()
 
-    project_root = Path(__file__).resolve().parent.parent.parent
+    # 스크립트가 reports/ 폴더에 있음
+    project_root = Path(__file__).resolve().parent.parent
     os.chdir(project_root)
 
     # 보고서 경로: .github/jira-config.json 의 reportsDir 사용 (로컬/CI와 동일)

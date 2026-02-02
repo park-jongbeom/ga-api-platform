@@ -63,6 +63,9 @@ interface MatchingResult {
 |-----|--------|------|------|
 | [회원가입](auth.md#회원가입) | POST | `/api/v1/auth/signup` | 이메일/비밀번호 회원가입 (local 프로파일) |
 | [로그인](auth.md#로그인) | POST | `/api/v1/auth/login` | 로그인 및 JWT 발급 (local 프로파일) |
+| [프로필 저장](user-profile.md#프로필-기본-정보-저장수정) | PUT | `/api/v1/user/profile` | MBTI, 태그, 자기소개 (JWT 필요) |
+| [학력 정보](user-profile.md#학력-정보-입력) | POST | `/api/v1/user/education` | 학교, GPA, 영어 점수 (JWT 필요) |
+| [유학 목표](user-profile.md#유학-목표-설정) | POST | `/api/v1/user/preference` | 목표 프로그램, 예산 (JWT 필요) |
 | [매칭 실행](matching.md#매칭-실행) | POST | `/api/v1/matching/run` | 사용자 ID로 Mock 매칭 실행 |
 | [최신 매칭 결과 조회](matching.md#최신-매칭-결과-조회) | GET | `/api/v1/matching/result` | 가장 최근 매칭 결과 조회 |
 | [프로그램 목록 조회](programs.md#프로그램-목록-조회) | GET | `/api/v1/programs` | 타입/지역별 프로그램 목록 |

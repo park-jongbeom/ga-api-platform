@@ -64,8 +64,12 @@ application-local-secret.yml
 **/application-*-secret.yml
 
 # docs: push 제외 (내부 문서·운영 자료는 원격에 올리지 않음)
-# 예외: 프로젝트 루트 reports/; 협업 문서 FRONTEND_HANDOFF.md; API 문서 docs/api/
+# 예외: FRONTEND_HANDOFF.md; API 문서 docs/api/; 배포용 nginx 설정 docs/nginx/ (로컬 전용 .local.conf 제외)
 docs/*
 !docs/FRONTEND_HANDOFF.md
 !docs/api/
 !docs/api/**
+!docs/nginx/
+!docs/nginx/**
+# docs/nginx 내 로컬 전용은 다시 제외 (위 58행과 동일, docs/* 예외 적용 후 재적용)
+docs/nginx/go-almond.local.conf

@@ -62,4 +62,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.mockk:mockk:1.13.10")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    // 통합 테스트: 실제 PostgreSQL (Testcontainers)
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
 }

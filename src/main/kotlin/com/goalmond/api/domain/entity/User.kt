@@ -12,7 +12,7 @@ class User(
     val id: UUID? = null,
 
     @Column(nullable = false, unique = true)
-    var email: String,
+    var email: String = "",
 
     @Column(name = "full_name", nullable = false)
     var fullName: String = "",

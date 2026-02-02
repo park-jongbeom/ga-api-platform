@@ -12,7 +12,7 @@ class UserPreference(
     val id: UUID? = null,
 
     @Column(name = "user_id", nullable = false)
-    val userId: UUID,
+    var userId: UUID? = null,
 
     @Column
     var mbti: String? = null,

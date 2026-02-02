@@ -38,10 +38,13 @@ class AuthService(
     fun login(request: LoginRequest): AuthResponse {
         val user = userRepository.findByEmail(request.email)
             ?: throw AuthException("이메일 또는 비밀번호가 올바르지 않습니다", "INVALID_CREDENTIALS")
-        if (!passwordEncoder.matches(request.password, user.passwordHash)) {
+        val hash = user.passwordHash
+            ?: throw AuthException("이메일 또는 비밀번호가 올바르지 않습니다", "INVALID_CREDENTIALS")
+        if (!passwordEncoder.matches(request.password, hash)) {
             throw AuthException("이메일 또는 비밀번호가 올바르지 않습니다", "INVALID_CREDENTIALS")
         }
-        val token = jwtUtil.generateToken(user.id.toString(), user.email)
+        val userId = user.id ?: throw AuthException("사용자 정보 오류", "INVALID_CREDENTIALS")
+        val token = jwtUtil.generateToken(userId.toString(), user.email)
         return AuthResponse(
             token = token,
             user = UserSummary(id = user.id.toString(), email = user.email, fullName = user.fullName)

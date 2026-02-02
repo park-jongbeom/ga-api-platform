@@ -12,16 +12,16 @@ class AcademicProfile(
     val id: UUID? = null,
 
     @Column(name = "user_id", nullable = false)
-    val userId: UUID,
+    var userId: UUID? = null,
 
     @Column(name = "school_name", nullable = false)
-    var schoolName: String,
+    var schoolName: String = "",
 
     @Column(name = "degree_type")
     var degreeType: String? = null,
 
     @Column(nullable = false)
-    var degree: String,
+    var degree: String = "",
 
     @Column(name = "school_location")
     var schoolLocation: String? = null,

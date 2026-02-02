@@ -1,4 +1,11 @@
 {
+  "_comment_jiraToBacklog": "JIRA 실제 이슈 키 → 백로그 문서 키. 동일 스토리일 때 JIRA 키와 백로그 키가 다를 경우 사용.",
+  "_jiraToBacklog": {
+    "GAM-7": "GAM-11",
+    "GAM-8": "GAM-12",
+    "GAM-9": "GAM-13",
+    "GAM-10": "GAM-21"
+  },
   "GAMF-1": "GAM-142",
   "GAMF-2": "GAM-143",
   "GAMF-3": "GAM-144",

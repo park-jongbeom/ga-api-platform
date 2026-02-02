@@ -14,7 +14,7 @@ import base64
 import requests
 import time
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 
 
@@ -95,9 +95,96 @@ def load_frontend_jira_keys(mapping_file: str) -> set:
     return frontend
 
 
+def _normalize_title(s: str) -> str:
+    """제목 비교용: 앞뒤 공백 제거, 연속 공백을 한 칸으로."""
+    if not s:
+        return ""
+    return re.sub(r"\s+", " ", (s or "").strip())
+
+
+def load_backlog_key_titles(backend_backlog_path: str) -> List[Tuple[str, str]]:
+    """
+    백엔드 백로그에서 (backlog_key, title) 목록을 순서대로 로드.
+    Epic ID/Name, Story GAM-xx: Title, Task GAM-xx-x: Title 패턴 파싱.
+    """
+    result: List[Tuple[str, str]] = []
+    if not os.path.exists(backend_backlog_path):
+        return result
+    content = Path(backend_backlog_path).read_text(encoding="utf-8")
+    for m in re.finditer(r"\*\*Epic ID\*\*:\s*(\S+).*?\*\*Epic Name\*\*:\s*(.+?)(?:\n|$)", content, re.DOTALL):
+        key, name = m.group(1).strip(), m.group(2).strip()
+        if key and name and not key.startswith("GAMF"):
+            result.append((key, name))
+    for m in re.finditer(r"### Story (GAM-\d+):\s*(.+?)(?:\n|$)", content):
+        key, name = m.group(1).strip(), m.group(2).strip()
+        if key and name:
+            result.append((key, name))
+    for m in re.finditer(r"- \[ \] (GAM-\d+-\d+):\s*(.+?)(?:\n|$)", content):
+        key, name = m.group(1).strip(), m.group(2).strip()
+        if key and name:
+            result.append((key, name))
+    return result
+
+
+def load_jira_to_backlog_mapping(mapping_file: str) -> Dict[str, str]:
+    """매핑 파일의 _jiraToBacklog (JIRA 실제 키 → 백로그 키) 로드."""
+    out: Dict[str, str] = {}
+    if not os.path.exists(mapping_file):
+        return out
+    with open(mapping_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    j2b = data.get("_jiraToBacklog")
+    if isinstance(j2b, dict):
+        for k, v in j2b.items():
+            if isinstance(k, str) and isinstance(v, str):
+                out[k] = v
+    return out
+
+
+def resolve_jira_to_backlog(
+    issues: List[dict],
+    backlog_key_titles: List[Tuple[str, str]],
+    jira_to_backlog_map: Dict[str, str],
+) -> Tuple[Dict[str, str], set]:
+    """
+    JIRA 이슈별로 백로그 키를 결정: 1) 명시 매핑 2) 키 일치 3) 제목 일치.
+    반환: (jira_key -> backlog_key, 매칭된 JIRA 키 집합).
+    """
+    backlog_by_key = {b[0]: b[1] for b in backlog_key_titles}
+    backlog_title_to_key: Dict[str, str] = {}
+    for bk, title in backlog_key_titles:
+        norm = _normalize_title(title)
+        if norm and norm not in backlog_title_to_key:
+            backlog_title_to_key[norm] = bk
+
+    jira_to_backlog: Dict[str, str] = {}
+    matched_jira_keys: set = set()
+
+    for raw in issues:
+        jira_key = (raw.get("key") or "").strip()
+        if not jira_key:
+            continue
+        summary = (raw.get("fields") or {}).get("summary") or ""
+        summary_norm = _normalize_title(summary)
+
+        backlog_key = None
+        if jira_key in jira_to_backlog_map:
+            backlog_key = jira_to_backlog_map[jira_key]
+        elif jira_key in backlog_by_key:
+            backlog_key = jira_key
+        elif summary_norm and summary_norm in backlog_title_to_key:
+            backlog_key = backlog_title_to_key[summary_norm]
+
+        if backlog_key:
+            jira_to_backlog[jira_key] = backlog_key
+            matched_jira_keys.add(jira_key)
+
+    return jira_to_backlog, matched_jira_keys
+
+
 def load_canonical_keys(mapping_file: str, backend_backlog_path: Optional[str] = None) -> set:
     """
-    정규(참조할) 이슈 키 집합 로드.
+    정규(참조할) 이슈 키 집합 로드 (레거시).
     - 매핑 파일의 값(GAM-xxx) + 백엔드 백로그에 등장하는 ID(GAM-*, GAM-*-*)를 정규로 간주.
     """
     canonical = set()
@@ -109,7 +196,6 @@ def load_canonical_keys(mapping_file: str, backend_backlog_path: Optional[str] =
                 canonical.add(v)
     if backend_backlog_path and os.path.exists(backend_backlog_path):
         content = Path(backend_backlog_path).read_text(encoding='utf-8')
-        # GAM-1, GAM-11, GAM-11-1 등 백엔드 ID 추출 (GAMF- 제외)
         for m in re.finditer(r'\b(GAM-\d+(?:-\d+)?)\b', content):
             canonical.add(m.group(1))
     return canonical
@@ -161,8 +247,9 @@ def build_report_markdown(
     project_name: str = "Go Almond Matching",
     display_titles: Optional[Dict[str, str]] = None,
     frontend_keys: Optional[set] = None,
+    jira_to_backlog: Optional[Dict[str, str]] = None,
 ) -> str:
-    """마크다운 보고서 본문 생성. display_titles가 있으면 백로그 제목 우선. frontend_keys가 있으면 백엔드/프론트 구분 표시."""
+    """마크다운 보고서 본문 생성. display_titles는 백로그 키 기준. jira_to_backlog가 있으면 백로그 키·제목 우선, JIRA 키와 다를 때 괄호 표기."""
     done_backend: List[str] = []
     done_frontend: List[str] = []
     in_progress_backend: List[str] = []
@@ -173,17 +260,20 @@ def build_report_markdown(
     epic_frontend: List[str] = []
     titles = display_titles or {}
     is_frontend = (frontend_keys or set())
+    j2b = jira_to_backlog or {}
 
     for raw in issues:
         key = raw.get('key', '')
         fields = raw.get('fields', {})
         summary = (fields.get('summary') or '').strip()
-        display_name = titles.get(key) or (titles.get(summary) if summary and re.match(r'^[A-Z]+-\d+$', summary) else None) or summary or key
+        backlog_key = j2b.get(key, key)
+        display_name = titles.get(backlog_key) or (titles.get(key) or (titles.get(summary) if summary and re.match(r'^[A-Z]+-\d+$', summary) else None) or summary or key)
         itype = (fields.get('issuetype') or {}).get('name', '')
         status = (fields.get('status') or {}).get('name', '')
         duedate = fields.get('duedate') or ''
         normalized = normalize_status(status)
-        entry = f"- **{key}** [{itype}] {display_name[:60]}" + (f" (기한: {duedate})" if duedate else "")
+        key_display = f"**{backlog_key}** (JIRA: {key})" if backlog_key != key else f"**{key}**"
+        entry = f"- {key_display} [{itype}] {display_name[:60]}" + (f" (기한: {duedate})" if duedate else "")
         fe = key in is_frontend
         if normalized == 'done':
             (done_frontend if fe else done_backend).append(entry)
@@ -192,7 +282,8 @@ def build_report_markdown(
         else:
             (to_do_frontend if fe else to_do_backend).append(entry)
         if '에픽' in itype or 'Epic' in itype:
-            epic_entry = f"- **{key}** {display_name[:50]}" + (f" ~ {duedate}" if duedate else "")
+            epic_key_display = f"**{backlog_key}** (JIRA: {key})" if backlog_key != key else f"**{key}**"
+            epic_entry = f"- {epic_key_display} {display_name[:50]}" + (f" ~ {duedate}" if duedate else "")
             (epic_frontend if fe else epic_backend).append(epic_entry)
 
     total = len(issues)
@@ -322,7 +413,7 @@ def main():
     parser.add_argument('--output', '-o', default='', help='저장할 마크다운 파일 경로 (없으면 stdout)')
     parser.add_argument('--date', default='', help='보고일 (YYYY-MM-DD, 기본: 오늘)')
     parser.add_argument('--canonical-only', action='store_true',
-                        help='매핑/백로그에 있는 정규 이슈만 포함 (중복·고아 이슈 제외)')
+                        help='백로그와 매칭된(키·명시 매핑·이름 기준) 이슈만 포함')
     parser.add_argument('--mapping-file', default='.github/jira-mapping.json', help='정규 이슈 목록용 매핑 파일')
     parser.add_argument('--backend-backlog', default='docs/jira/JIRA_BACKLOG.md', help='백엔드 백로그 (정규 키 추출용)')
     parser.add_argument('--frontend-backlog', default='docs/jira/FRONT_JIRA_BACKLOG.md', help='프론트엔드 백로그 (표시 제목 추출용)')
@@ -359,11 +450,18 @@ def main():
     issues = fetch_all_issues(jira_url, headers, args.project_key)
     print(f"조회 완료: {len(issues)}개 이슈", file=sys.stderr)
 
+    backlog_key_titles = load_backlog_key_titles(args.backend_backlog)
+    jira_to_backlog_map = load_jira_to_backlog_mapping(args.mapping_file)
+    jira_to_backlog, matched_jira_keys = resolve_jira_to_backlog(
+        issues, backlog_key_titles, jira_to_backlog_map
+    )
+    if jira_to_backlog:
+        print(f"JIRA→백로그 매칭: {len(jira_to_backlog)}개 (키/이름 기준)", file=sys.stderr)
+
     if args.canonical_only:
-        canonical_keys = load_canonical_keys(args.mapping_file, args.backend_backlog)
         before = len(issues)
-        issues = [i for i in issues if (i.get('key') or '') in canonical_keys]
-        print(f"정규 이슈만 포함: {before}개 → {len(issues)}개 (중복·고아 제외)", file=sys.stderr)
+        issues = [i for i in issues if (i.get("key") or "") in matched_jira_keys]
+        print(f"정규 이슈만 포함: {before}개 → {len(issues)}개 (백로그 매칭된 이슈만)", file=sys.stderr)
 
     display_titles = load_display_titles_from_backlogs(
         args.backend_backlog,
@@ -383,6 +481,7 @@ def main():
         report_web_url=args.report_web_url,
         display_titles=display_titles,
         frontend_keys=frontend_keys,
+        jira_to_backlog=jira_to_backlog,
     )
 
     if args.output:

@@ -17,7 +17,7 @@ from typing import Set, List, Dict
 
 
 def load_canonical_keys(mapping_file: str, backend_backlog_path: str) -> Set[str]:
-    """정규 이슈 키 집합: 매핑 값 + 백엔드 백로그에 등장하는 GAM-* ID."""
+    """정규 이슈 키 집합: 매핑 값 + 백엔드 백로그 GAM-* ID + _jiraToBacklog의 JIRA 키(백로그와 매칭된 실제 키)."""
     canonical = set()
     if os.path.exists(mapping_file):
         with open(mapping_file, 'r', encoding='utf-8') as f:
@@ -25,6 +25,11 @@ def load_canonical_keys(mapping_file: str, backend_backlog_path: str) -> Set[str
         for k, v in data.items():
             if not k.startswith('_') and isinstance(v, str):
                 canonical.add(v)
+        j2b = data.get('_jiraToBacklog')
+        if isinstance(j2b, dict):
+            for jira_key in j2b:
+                if isinstance(jira_key, str):
+                    canonical.add(jira_key)
     if os.path.exists(backend_backlog_path):
         content = Path(backend_backlog_path).read_text(encoding='utf-8')
         for m in re.finditer(r'\b(GAM-\d+(?:-\d+)?)\b', content):

@@ -23,7 +23,7 @@
 |------|------------|------|
 | **설정 파일** | `.github/jira-config.json` | projectKey, reportWebUrl, mappingFile, backlogDocument, frontendBacklog, **reportsDir** |
 | **출력 경로** | config의 `reportsDir` (기본 `reports`) | `{reportsDir}/report-YYYY-MM-DD.md`, `{reportsDir}/report-latest.md` |
-| **생성 스크립트** | `reports/jira-generate-report.py` | `--config .github/jira-config.json` 로 위 옵션 로드, `--canonical-only` 적용 |
+| **생성 스크립트** | `reports/jira-generate-report.py` | `--config .github/jira-config.json` 로 위 옵션 로드. `--canonical-only`: **백로그와 매칭된**(키·명시 매핑·이름 기준) 이슈만 포함 |
 
 경로나 프로젝트 키·백로그 문서를 바꿀 때는 **`.github/jira-config.json`만 수정**하면 로컬/커밋 시 생성에 반영됩니다.
 
@@ -75,14 +75,16 @@ python3 reports/jira-report-if-needed.py --commit
 
 ---
 
-## 6. 보고서에 표시되는 작업 이름
+## 6. 보고서에 표시되는 작업 이름 및 키 매칭
 
-보고서의 각 작업 줄(예: `- **GAM-11** [스토리] ...`)에서 **이름 부분**은 다음 순서로 결정됩니다.
+**JIRA 실제 키와 백로그 키**: JIRA에 등록된 이슈 키(예: GAM-7)와 백로그 문서의 키(예: GAM-11)가 다를 수 있습니다. 보고서 생성 시 **이름(제목)·내용** 또는 `.github/jira-mapping.json`의 `_jiraToBacklog`(JIRA 키 → 백로그 키)로 동일 스토리를 매칭하며, 보고서에는 **백로그 키와 백로그 제목**을 우선 표시하고, JIRA 키가 다를 경우 괄호로 표기합니다(예: `**GAM-11** (JIRA: GAM-7) Mock API 명세 구현`).
 
-1. **백로그 문서 제목**: `docs/jira/JIRA_BACKLOG.md`, `docs/jira/FRONT_JIRA_BACKLOG.md`에 있는 Epic/Story 제목(예: `### Story GAM-11: Mock API 명세 구현`)을 파싱해 **우선 사용**합니다.
+**이름 부분** 결정 순서:
+
+1. **백로그 문서 제목**: `docs/jira/JIRA_BACKLOG.md`, `docs/jira/FRONT_JIRA_BACKLOG.md`의 Epic/Story 제목을 파싱해 **우선 사용**합니다.
 2. **JIRA summary**: 백로그에 해당 키가 없거나 제목이 없으면 JIRA 이슈의 **요약(summary)** 필드를 사용합니다.
 
-그래서 JIRA에 summary가 "GAM-22"처럼 키만 들어 있어도, 백로그에 "GAM-11: Mock API 명세 구현"이 있으면 보고서에는 **"Mock API 명세 구현"**처럼 요약된 제목으로 표시됩니다. JIRA 이슈 이름을 일일이 바꾸지 않아도 됩니다.
+**정규 이슈(`--canonical-only`)**: 백로그와 **매칭된** 이슈만 포함합니다. 매칭 순서는 (1) `_jiraToBacklog` 명시 매핑 (2) JIRA 키 = 백로그 키 (3) JIRA summary와 백로그 제목 일치입니다.
 
 **백엔드/프론트엔드 구분**: 보고서는 **백엔드**·**프론트엔드**로 나누어 표시됩니다. 매핑 파일(`.github/jira-mapping.json`)에서 `GAMF-*` 키에 대응하는 JIRA 이슈(GAM-xxx)는 **프론트엔드**, 그 외는 **백엔드**로 분류됩니다. 진행도 요약·Epic 타임라인·완료/진행 중/남은 작업이 각각 백엔드·프론트엔드 섹션으로 구분됩니다.
 
@@ -99,3 +101,4 @@ python3 reports/jira-report-if-needed.py --commit
 | 로컬 조건부 | commit 후 `reports/jira-report-if-needed.py` 실행 시, 일정 관련·미완료인 경우에만 생성. |
 | push 제외 | **docs/** 전체 제외. **예외**: **reports/** (루트, docs 하위 아님) 만 push. |
 | 표시 이름 | 백로그 문서(Epic/Story 제목) 우선, 없으면 JIRA summary. |
+| 키 매칭 | JIRA 실제 키와 백로그 키가 다를 수 있음. `_jiraToBacklog` 또는 이름(제목)으로 매칭. |

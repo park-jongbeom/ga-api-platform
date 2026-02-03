@@ -11,13 +11,16 @@ class WebConfig : WebMvcConfigurer {
             .allowedOrigins(
                 "http://localhost:5173",
                 "http://localhost:3000",
+                "http://127.0.0.1:5173",
+                "http://127.0.0.1:3000",
                 "https://goalmond.com",
                 "https://www.goalmond.com",
                 "https://go-almond.ddnsfree.com",
                 "http://go-almond.ddnsfree.com"
             )
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             .allowedHeaders("*")
+            .exposedHeaders("Authorization", "Content-Disposition")
             .allowCredentials(true)
             .maxAge(3600)
     }

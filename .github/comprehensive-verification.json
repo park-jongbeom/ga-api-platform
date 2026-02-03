@@ -1,0 +1,423 @@
+{
+  "report_vs_code": {
+    "report_done_but_no_code": [
+      {
+        "key": "GAM-1",
+        "title": "Mock API 및 API 문서(Markdown) 구축",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-2",
+        "title": "사용자 프로필 및 유학 목표 관리",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-7",
+        "title": "Mock API 명세 구현",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-8",
+        "title": "API 문서(Markdown) & 프론트엔드 협업 가이드",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-9",
+        "title": "DB 인프라 구축 (단일 모듈 프로젝트)",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-10",
+        "title": "DB 스키마 설계 & 마이그레이션",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-11",
+        "title": "Mock API 명세 구현",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-12",
+        "title": "API 문서(Markdown) & 프론트엔드 협업 가이드",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-13",
+        "title": "DB 인프라 구축 (단일 모듈 프로젝트)",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-21",
+        "title": "DB 스키마 설계 & 마이그레이션",
+        "code_verified": false,
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-23",
+        "title": "단위 테스트 & 통합 테스트",
+        "code_verified": false,
+        "jira_status": "완료"
+      }
+    ],
+    "code_done_but_report_todo": [
+      {
+        "key": "GAM-51",
+        "title": "Application API 구현"
+      }
+    ]
+  },
+  "jira_vs_code": {
+    "jira_done_but_no_code": [
+      {
+        "key": "GAM-1",
+        "title": "Mock API 및 API 문서(Markdown) 구축",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-2",
+        "title": "사용자 프로필 및 유학 목표 관리",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-7",
+        "title": "Mock API 명세 구현",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-8",
+        "title": "API 문서(Markdown) & 프론트엔드 협업 가이드",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-9",
+        "title": "DB 인프라 구축 (단일 모듈 프로젝트)",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-10",
+        "title": "DB 스키마 설계 & 마이그레이션",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-11",
+        "title": "Mock API 명세 구현",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-12",
+        "title": "API 문서(Markdown) & 프론트엔드 협업 가이드",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-13",
+        "title": "DB 인프라 구축 (단일 모듈 프로젝트)",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-21",
+        "title": "DB 스키마 설계 & 마이그레이션",
+        "jira_status": "완료"
+      },
+      {
+        "key": "GAM-23",
+        "title": "단위 테스트 & 통합 테스트",
+        "jira_status": "완료"
+      }
+    ]
+  },
+  "backlog_vs_report": {
+    "backlog_stories_count": 22,
+    "report_done_count": 13,
+    "report_todo_count": 21,
+    "missing_in_report": []
+  },
+  "story_task_mapping": {
+    "GAM-7": {
+      "title": "Mock API 명세 구현",
+      "tasks": [
+        "GAM-11-1",
+        "GAM-11-2",
+        "GAM-11-3",
+        "GAM-11-4",
+        "GAM-11-5",
+        "GAM-11-6"
+      ],
+      "completion_rate": 0.67,
+      "code_verified": false
+    },
+    "GAM-8": {
+      "title": "API 문서(Markdown) & 프론트엔드 협업 가이드",
+      "tasks": [
+        "GAM-12-1",
+        "GAM-12-2",
+        "GAM-12-3",
+        "GAM-12-4",
+        "GAM-12-5"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-9": {
+      "title": "DB 인프라 구축 (단일 모듈 프로젝트)",
+      "tasks": [
+        "GAM-13-1",
+        "GAM-13-2",
+        "GAM-13-3",
+        "GAM-13-4",
+        "GAM-13-5"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-20": {
+      "title": "Auth API (회원가입/로그인)",
+      "tasks": [
+        "GAM-20-1",
+        "GAM-20-2",
+        "GAM-20-3",
+        "GAM-20-4",
+        "GAM-20-5"
+      ],
+      "completion_rate": 0.8,
+      "code_verified": true
+    },
+    "GAM-10": {
+      "title": "DB 스키마 설계 & 마이그레이션",
+      "tasks": [
+        "GAM-21-1",
+        "GAM-21-2",
+        "GAM-21-3",
+        "GAM-21-4",
+        "GAM-21-5",
+        "GAM-21-6"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-22": {
+      "title": "User Profile API 구현",
+      "tasks": [
+        "GAM-22-1",
+        "GAM-22-2",
+        "GAM-51",
+        "GAM-22-4",
+        "GAM-22-5",
+        "GAM-22-6",
+        "GAM-22-7",
+        "GAM-22-8"
+      ],
+      "completion_rate": 0.88,
+      "code_verified": true
+    },
+    "GAM-23": {
+      "title": "단위 테스트 & 통합 테스트",
+      "tasks": [
+        "GAM-23-1",
+        "GAM-23-2",
+        "GAM-23-3",
+        "GAM-23-4",
+        "GAM-23-5",
+        "GAM-23-6"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-31": {
+      "title": "매칭 엔진 Hard Filter 구현",
+      "tasks": [
+        "GAM-31-1",
+        "GAM-31-2",
+        "GAM-31-3",
+        "GAM-31-4",
+        "GAM-31-5",
+        "GAM-31-6",
+        "GAM-31-7",
+        "GAM-31-8"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-32": {
+      "title": "Base Score 계산 (6대 지표)",
+      "tasks": [
+        "GAM-32-1",
+        "GAM-32-2",
+        "GAM-32-3",
+        "GAM-32-4",
+        "GAM-32-5",
+        "GAM-32-6",
+        "GAM-32-7",
+        "GAM-32-8",
+        "GAM-32-9"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-33": {
+      "title": "경로 최적화 & 리스크 패널티",
+      "tasks": [
+        "GAM-33-1",
+        "GAM-33-2",
+        "GAM-33-3",
+        "GAM-33-4",
+        "GAM-33-5"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-41": {
+      "title": "School & Program Master Data",
+      "tasks": [
+        "GAM-41-1",
+        "GAM-41-2",
+        "GAM-41-3",
+        "GAM-41-4",
+        "GAM-41-5",
+        "GAM-41-6",
+        "GAM-41-7",
+        "GAM-41-8"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-42": {
+      "title": "매칭 실행 API 구현",
+      "tasks": [
+        "GAM-42-1",
+        "GAM-42-2",
+        "GAM-42-3",
+        "GAM-42-4",
+        "GAM-42-5",
+        "GAM-42-6",
+        "GAM-42-7"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-43": {
+      "title": "Explainable AI 설명 생성",
+      "tasks": [
+        "GAM-43-1",
+        "GAM-43-2",
+        "GAM-43-3",
+        "GAM-43-4",
+        "GAM-43-5"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-44": {
+      "title": "E2E 통합 시나리오 검증",
+      "tasks": [
+        "GAM-44-1",
+        "GAM-44-2",
+        "GAM-44-3"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-51": {
+      "title": "Application API 구현",
+      "tasks": [
+        "GAM-51-1",
+        "GAM-51-2",
+        "GAM-51-3",
+        "GAM-51-4",
+        "GAM-51-5",
+        "GAM-51-6"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-52": {
+      "title": "Document 업로드",
+      "tasks": [
+        "GAM-52-1",
+        "GAM-52-2",
+        "GAM-52-3",
+        "GAM-52-4",
+        "GAM-52-5",
+        "GAM-52-6",
+        "GAM-52-7"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-53": {
+      "title": "Dashboard API",
+      "tasks": [
+        "GAM-53-1",
+        "GAM-53-2",
+        "GAM-53-3",
+        "GAM-53-4"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-55": {
+      "title": "Bookmark API",
+      "tasks": [
+        "GAM-55-1",
+        "GAM-55-2",
+        "GAM-55-3",
+        "GAM-55-4"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-54": {
+      "title": "통합 테스트",
+      "tasks": [
+        "GAM-54-1",
+        "GAM-54-2",
+        "GAM-54-3",
+        "GAM-54-4"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-61": {
+      "title": "보안 강화",
+      "tasks": [
+        "GAM-61-1",
+        "GAM-61-2",
+        "GAM-61-3",
+        "GAM-61-4",
+        "GAM-61-5"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-62": {
+      "title": "모니터링 & 로깅",
+      "tasks": [
+        "GAM-62-1",
+        "GAM-62-2",
+        "GAM-62-3",
+        "GAM-62-4"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    },
+    "GAM-63": {
+      "title": "최종 문서화",
+      "tasks": [
+        "GAM-63-1",
+        "GAM-63-2",
+        "GAM-63-3",
+        "GAM-63-4"
+      ],
+      "completion_rate": 0.0,
+      "code_verified": false
+    }
+  }
+}

@@ -2,55 +2,24 @@
 # -*- coding: utf-8 -*-
 """
 백엔드 완료 항목(코드 검증됨) 중 JIRA에서 '해야 할 일(To Do)' 상태인 이슈만 '완료(Done)'로 전환.
-reports/backend-completion-verification.md 기준: GAM-1, 11, 12, 13, 20, 21, 22, 23
-백로그 키와 JIRA 실제 키가 다를 경우 _jiraToBacklog 역매핑으로 실제 JIRA 키를 사용.
+reports/backend-completion-verification.md 기준. 백로그 문서 키 = JIRA 키 (매핑 불필요).
 """
 import os
 import sys
-import json
 import argparse
 import base64
 import time
 import requests
-from typing import List, Set, Dict
+from typing import List
 
-# 코드 검증 완료된 백엔드 이슈 (백로그 키 기준; GAM-55, 70, 71 제외)
-BACKEND_VERIFIED_DONE_BACKLOG_KEYS: List[str] = [
+# 코드 검증 완료된 백엔드 이슈 (JIRA 키 = 백로그 키; GAM-55, 70, 71 제외)
+BACKEND_VERIFIED_DONE_JIRA_KEYS: List[str] = [
     "GAM-1",
+    "GAM-7", "GAM-8", "GAM-9", "GAM-10",
     "GAM-11", "GAM-12", "GAM-13",
     "GAM-20", "GAM-21", "GAM-22", "GAM-23",
+    "GAM-51",  # UserPreference Entity (user_preferences 테이블)
 ]
-
-
-def load_jira_to_backlog(mapping_file: str) -> Dict[str, str]:
-    """매핑 파일의 _jiraToBacklog (JIRA 키 → 백로그 키) 로드."""
-    path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), mapping_file)
-    if not path.startswith("/"):
-        path = os.path.abspath(path)
-    out: Dict[str, str] = {}
-    if not os.path.exists(path):
-        return out
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    j2b = data.get("_jiraToBacklog")
-    if isinstance(j2b, dict):
-        for k, v in j2b.items():
-            if isinstance(k, str) and isinstance(v, str):
-                out[k] = v
-    return out
-
-
-def backlog_keys_to_jira_keys(backlog_keys: List[str], mapping_file: str) -> Set[str]:
-    """백로그 키 목록을 실제 JIRA에서 사용할 이슈 키 집합으로 변환 (역매핑 + 자기 자신)."""
-    jira_to_backlog = load_jira_to_backlog(mapping_file)
-    backlog_to_jira: Dict[str, List[str]] = {}
-    for jira_key, backlog_key in jira_to_backlog.items():
-        backlog_to_jira.setdefault(backlog_key, []).append(jira_key)
-    result: Set[str] = set()
-    for b in backlog_keys:
-        result.add(b)
-        result.update(backlog_to_jira.get(b, []))
-    return result
 
 
 def load_jira_env(paths: List[str]) -> None:
@@ -127,7 +96,6 @@ def main():
     parser.add_argument("--jira-email", default=os.getenv("JIRA_EMAIL"))
     parser.add_argument("--jira-api-token", default=os.getenv("JIRA_API_TOKEN"))
     parser.add_argument("--dry-run", action="store_true", help="전환 없이 대상만 출력")
-    parser.add_argument("--mapping-file", default=".github/jira-mapping.json", help="JIRA↔백로그 매핑 파일")
     args = parser.parse_args()
 
     load_jira_env(["docs/jira/jira.env", "jira.env"])
@@ -150,11 +118,7 @@ def main():
         "Accept": "application/json",
     }
 
-    # 백로그 키 → 실제 JIRA 키 집합 (역매핑 반영)
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    mapping_path = os.path.normpath(os.path.join(project_root, args.mapping_file.lstrip("/")))
-    jira_keys_to_check = backlog_keys_to_jira_keys(BACKEND_VERIFIED_DONE_BACKLOG_KEYS, mapping_path)
-
+    jira_keys_to_check = sorted(set(BACKEND_VERIFIED_DONE_JIRA_KEYS))
     to_transition: List[str] = []
     already_done: List[str] = []
     not_found_or_error: List[str] = []
@@ -170,7 +134,7 @@ def main():
         else:
             to_transition.append(key)
 
-    print(f"백엔드 검증 완료 이슈 (백로그 기준 {len(BACKEND_VERIFIED_DONE_BACKLOG_KEYS)}개 → JIRA 키 {len(jira_keys_to_check)}개)")
+    print(f"백엔드 검증 완료 이슈 (JIRA 키 {len(jira_keys_to_check)}개)")
     print(f"  이미 완료: {len(already_done)}개 — 전환 생략")
     for x in already_done:
         print(f"    - {x}")

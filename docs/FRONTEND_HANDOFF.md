@@ -2,6 +2,16 @@
 
 프론트엔드에서는 **API 프로젝트(ga-api-platform) 레포를 clone 하지 않습니다.** 백엔드에서 **전달받은 링크만** 사용해 개발합니다.
 
+## 최근 업데이트 (2026-02-03)
+
+- **CORS**: 로컬 개발용 Origin 추가 (`http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:3000`, `http://127.0.0.1:3000`)
+- **엔티티**: School, Program 엔티티 추가 (V3 마이그레이션 schools/programs 테이블 매핑)
+- **설정**: WeightConfig (매칭 가중치) 빈 등록
+- **작업 현황**: 전체 115개 작업 중 **30개 완료** (백로그 기준, 코드 검증 반영). 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
+- **로컬 연동**: [docs/LOCAL_TESTING.md](LOCAL_TESTING.md)에 React/Vite 로컬 연동 가이드 추가
+
+---
+
 ## 전달받는 링크
 
 | 구분 | 설명 | 예시 |
@@ -17,26 +27,26 @@
 
 아래 API의 상세 스펙·요청/응답 예시는 **같은 저장소의 `docs/api/`** 안 문서를 링크했습니다.
 
-### Mock API (Week 1, default 프로파일)
+### Mock API (Week 1, default 프로파일) ✅ 구현 완료
 
-| 메서드 | 경로 | 설명 | 상세 문서 |
-|--------|------|------|-----------|
-| POST | `/api/v1/matching/run` | 매칭 실행 (body: `{"user_id":"..."}`) | [matching.md](api/matching.md) |
-| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 | [matching.md](api/matching.md) |
-| GET | `/api/v1/programs?type=...` | 프로그램 목록 (type: university, community_college, vocational) | [programs.md](api/programs.md) |
-| GET | `/api/v1/schools/{schoolId}` | 학교 상세 조회 | [schools.md](api/schools.md) |
+| 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
+|--------|------|------|-----------|------|
+| POST | `/api/v1/matching/run` | 매칭 실행 (body: `{"user_id":"..."}`) | [matching.md](api/matching.md) | ✅ |
+| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 | [matching.md](api/matching.md) | ✅ |
+| GET | `/api/v1/programs?type=...` | 프로그램 목록 (type: university, community_college, vocational) | [programs.md](api/programs.md) | ✅ |
+| GET | `/api/v1/schools/{schoolId}` | 학교 상세 조회 | [schools.md](api/schools.md) | ✅ |
 
-### Auth & User Profile (Week 2, local/lightsail 프로파일)
+### Auth & User Profile (Week 2, local/lightsail 프로파일) ✅ 구현 완료
 
 **참고**: Auth API·User Profile API는 DB가 연결된 환경(local/lightsail 프로파일)에서만 사용 가능합니다. 배포 시 해당 프로파일이 적용되어 있으면 사용할 수 있습니다.
 
-| 메서드 | 경로 | 설명 | 상세 문서 |
-|--------|------|------|-----------|
-| POST | `/api/v1/auth/signup` | 회원가입 | [auth.md](api/auth.md) |
-| POST | `/api/v1/auth/login` | 로그인 (JWT 발급) | [auth.md](api/auth.md) |
-| PUT | `/api/v1/user/profile` | 프로필 기본 정보 (MBTI, 태그, 자기소개) | [user-profile.md](api/user-profile.md) |
-| POST | `/api/v1/user/education` | 학력 정보 입력 | [user-profile.md](api/user-profile.md) |
-| POST | `/api/v1/user/preference` | 유학 목표 설정 | [user-profile.md](api/user-profile.md) |
+| 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
+|--------|------|------|-----------|------|
+| POST | `/api/v1/auth/signup` | 회원가입 | [auth.md](api/auth.md) | ✅ |
+| POST | `/api/v1/auth/login` | 로그인 (JWT 발급) | [auth.md](api/auth.md) | ✅ |
+| PUT | `/api/v1/user/profile` | 프로필 기본 정보 (MBTI, 태그, 자기소개) | [user-profile.md](api/user-profile.md) | ✅ |
+| POST | `/api/v1/user/education` | 학력 정보 입력 | [user-profile.md](api/user-profile.md) | ✅ |
+| POST | `/api/v1/user/preference` | 유학 목표 설정 | [user-profile.md](api/user-profile.md) | ✅ |
 
 User Profile API는 **JWT 인증이 필요**합니다. 로그인 후 받은 토큰을 `Authorization: Bearer <token>` 헤더에 포함하여 호출하세요.
 
@@ -67,9 +77,27 @@ Auth·User Profile API 연동 시 바로 로그인해서 토큰을 받을 수 �
 
 ## Base URL
 
-실제 사용하는 주소는 **전달받은 배포 URL**을 사용합니다.
+| 환경 | URL | 설명 |
+|------|-----|------|
+| **로컬 개발** | `http://localhost:8080` | 백엔드를 로컬에서 실행 (`./gradlew bootRun`). React/Vite 로컬(5173)에서 호출 가능 (CORS 설정됨) |
+| **배포** | 전달받은 URL (예: `https://go-almond.ddnsfree.com`) | 실제 배포된 API 서버 |
 
-- **배포**: 전달받은 API Base URL (예: `https://go-almond.ddnsfree.com`)
+### 로컬 개발 시 프론트 환경 변수
+
+`.env` 또는 `.env.local`:
+
+```bash
+VITE_API_URL=http://localhost:8080
+```
+
+API 호출 예:
+
+```typescript
+const API_URL = import.meta.env.VITE_API_URL;
+const res = await fetch(`${API_URL}/api/v1/programs?type=university`);
+```
+
+상세: [docs/LOCAL_TESTING.md](LOCAL_TESTING.md) "로컬 프론트엔드(React/Vite) 연동" 참조.
 
 ---
 
@@ -85,19 +113,41 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 
 ---
 
-## 작업 일정 (다음 단계)
+## 작업 진행 현황
 
-| 주차 | API | 내용 |
-|------|-----|------|
-| **Week 2** (완료) | Auth API | POST /api/v1/auth/signup, POST /api/v1/auth/login → 회원가입/로그인 연동 |
-| **Week 2** (완료) | User Profile API | PUT /api/v1/user/profile, POST /api/v1/user/education, POST /api/v1/user/preference → 프로필 입력 화면 연동 |
-| **Week 4** | 매칭 API | POST /api/v1/matching/run, GET /api/v1/matching/result → 매칭 결과 UI 연동 |
-| **Week 5** | Application API | POST /api/v1/applications, GET /api/v1/applications, PATCH /api/v1/applications/{id}/status |
-| **Week 5** | Bookmark API | POST /api/v1/bookmarks, DELETE /api/v1/bookmarks/{id} → 보관하기 기능 연동 |
-| **Week 5** | Dashboard API | GET /api/v1/dashboard |
-| **Week 5** | Document API | POST /api/v1/documents/upload, GET /api/v1/documents |
+작업 목록 및 완료 여부([x]/[ ])는 **[docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)** 를 기준으로 합니다. 진행률은 해당 문서의 Epic별 **Tasks** 체크 상태를 확인하세요.
+
+| 주차 | Epic | 완료/전체 | 사용 가능 API |
+|------|------|-----------|---------------|
+| Week 1 | GAM-1 | 23/23 | Mock API 4개 ✅ |
+| Week 2 | GAM-2 | 5/21 | Auth 2개 ✅, User Profile 3개 ✅ |
+| Week 3 | GAM-3 | 0/22 | - |
+| Week 4 | GAM-4 | 0/21 | - |
+| Week 5 | GAM-5 | 2/19 | - |
+| Week 6 | GAM-6 | 0/9 | - |
+
+- 전체: **30/115** (백로그 문서 Epic별 Tasks 기준. 코드 검증 기준으로 미구현 항목은 미완료 처리)
+- 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
 
 상세 일정은 전달받은 백로그/일정 링크를 참고하세요.
+
+---
+
+## 백엔드 데이터 구조 (참고)
+
+프론트에서 API 응답 구조를 이해하는 데 도움이 되도록, 백엔드 주요 엔티티와 DB 테이블 관계를 간략히 정리합니다.
+
+| 테이블 | 엔티티 | 설명 | 마이그레이션 |
+|--------|--------|------|-------------|
+| `users` | User.kt | 사용자 계정 | V1 |
+| `academic_profiles` | AcademicProfile.kt | 학력 프로필 | V1 |
+| `user_preferences` | UserPreference.kt | 유학 선호도 | V1 |
+| `schools` | School.kt | 학교 마스터 | V3 |
+| `programs` | Program.kt | 프로그램 마스터 | V3 |
+| `matching_results` | (DTO) | 매칭 결과 | V3 |
+| `applications` | (미구현) | 지원 현황 | V3 |
+
+상세: [docs/DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)
 
 ---
 

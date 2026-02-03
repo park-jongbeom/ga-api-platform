@@ -2,58 +2,25 @@
 # -*- coding: utf-8 -*-
 """
 하위 작업이 모두 완료된 백엔드 에픽을 JIRA에서 완료(Done) 처리.
-백로그 키와 JIRA 실제 키가 다를 경우 _jiraToBacklog 역매핑으로 실제 JIRA 키를 사용.
+백로그 문서 키 = JIRA 키 (매핑 불필요).
 """
 import os
 import sys
-import json
 import argparse
 import base64
 import time
 import requests
-from typing import Dict, List, Set
+from typing import Dict, List
 
+# 에픽별 하위 Story JIRA 키 (JIRA_BACKLOG.md Epic/Story 구조 기준)
 BACKEND_EPIC_CHILDREN: Dict[str, List[str]] = {
-    "GAM-1": ["GAM-11", "GAM-12", "GAM-13"],
-    "GAM-2": ["GAM-20", "GAM-21", "GAM-22", "GAM-23"],
+    "GAM-1": ["GAM-7", "GAM-8", "GAM-9"],
+    "GAM-2": ["GAM-10", "GAM-20", "GAM-21", "GAM-22", "GAM-23"],
     "GAM-3": ["GAM-31", "GAM-32", "GAM-33"],
     "GAM-4": ["GAM-41", "GAM-42", "GAM-43", "GAM-44"],
     "GAM-5": ["GAM-51", "GAM-52", "GAM-53", "GAM-54", "GAM-55"],
     "GAM-6": ["GAM-61", "GAM-62", "GAM-63"],
 }
-
-
-def load_jira_to_backlog(mapping_file_path: str) -> Dict[str, str]:
-    """매핑 파일의 _jiraToBacklog (JIRA 키 → 백로그 키) 로드."""
-    path = mapping_file_path
-    if not os.path.isabs(path):
-        base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        path = os.path.join(base, path.lstrip("/"))
-    out: Dict[str, str] = {}
-    if not os.path.exists(path):
-        return out
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    j2b = data.get("_jiraToBacklog")
-    if isinstance(j2b, dict):
-        for k, v in j2b.items():
-            if isinstance(k, str) and isinstance(v, str):
-                out[k] = v
-    return out
-
-
-def expand_backlog_children_to_jira_keys(
-    child_keys: List[str], jira_to_backlog: Dict[str, str]
-) -> Set[str]:
-    """백로그 기준 자식 키 목록을 실제 JIRA에서 사용할 이슈 키 집합으로 변환."""
-    backlog_to_jira: Dict[str, List[str]] = {}
-    for jira_key, backlog_key in jira_to_backlog.items():
-        backlog_to_jira.setdefault(backlog_key, []).append(jira_key)
-    result: Set[str] = set()
-    for c in child_keys:
-        result.add(c)
-        result.update(backlog_to_jira.get(c, []))
-    return result
 
 
 def load_jira_env(paths: List[str]) -> None:
@@ -129,7 +96,6 @@ def main():
     parser.add_argument("--jira-email", default=os.getenv("JIRA_EMAIL"))
     parser.add_argument("--jira-api-token", default=os.getenv("JIRA_API_TOKEN"))
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--mapping-file", default=".github/jira-mapping.json", help="JIRA↔백로그 매핑 파일")
     args = parser.parse_args()
 
     load_jira_env(["docs/jira/jira.env", "jira.env"])
@@ -152,10 +118,6 @@ def main():
         "Accept": "application/json",
     }
 
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    mapping_path = os.path.normpath(os.path.join(project_root, args.mapping_file.lstrip("/")))
-    jira_to_backlog = load_jira_to_backlog(mapping_path)
-
     to_done: List[str] = []
     already_done: List[str] = []
     children_not_all_done: List[str] = []
@@ -166,9 +128,8 @@ def main():
         if is_done_status(epic_status):
             already_done.append(epic_key)
             continue
-        jira_child_keys = expand_backlog_children_to_jira_keys(child_keys, jira_to_backlog)
         all_children_done = True
-        for ck in sorted(jira_child_keys):
+        for ck in sorted(child_keys):
             time.sleep(0.2)
             st = get_issue_status(jira_url, headers, ck)
             if not is_done_status(st):

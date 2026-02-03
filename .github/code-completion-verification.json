@@ -1,0 +1,1149 @@
+{
+  "total_done": 85,
+  "total_implemented": 60,
+  "results": [
+    {
+      "key": "GAM-27",
+      "summary": "단일 모듈 구조 확인 (ga-api-platform 루트)",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['settings.gradle.kts', 'build.gradle.kts']"
+    },
+    {
+      "key": "GAM-28",
+      "summary": "MockMatchingController.kt 생성",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "파일 발견: MockMatchingController.kt"
+    },
+    {
+      "key": "GAM-29",
+      "summary": "MatchingResponse DTO 정의",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "파일 발견: MatchingResponse.kt"
+    },
+    {
+      "key": "GAM-30",
+      "summary": "SchoolResponse DTO 정의",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "파일 발견: SchoolResponse.kt"
+    },
+    {
+      "key": "GAM-34",
+      "summary": "docs/api/ 엔드포인트별 Markdown (matching, programs, schools)",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "파일 발견: docs/api/matching.md"
+    },
+    {
+      "key": "GAM-35",
+      "summary": "docs/FRONTEND_HANDOFF.md 작성 (링크 공유 방식, Base URL, 일정)",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "파일 발견: docs/FRONTEND_HANDOFF.md"
+    },
+    {
+      "key": "GAM-36",
+      "summary": "docs/04_FRONTEND_COOPERATION.md 참조 또는 통합",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "파일 발견: docs/04_FRONTEND_COOPERATION.md"
+    },
+    {
+      "key": "GAM-37",
+      "summary": "README \"프론트엔드 협업\"에 FRONTEND_HANDOFF.md 링크 추가",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "파일 발견: README.md"
+    },
+    {
+      "key": "GAM-38",
+      "summary": "build.gradle.kts에 JPA, PostgreSQL, Flyway 의존성 추가",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['build.gradle.kts']"
+    },
+    {
+      "key": "GAM-39",
+      "summary": "application.yml 프로파일 및 Flyway 기본 설정",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "파일 발견: application.yml"
+    },
+    {
+      "key": "GAM-40",
+      "summary": "application-lightsail.yml, application-local.yml 작성",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "파일 발견: application-lightsail.yml"
+    },
+    {
+      "key": "GAM-52",
+      "summary": "UserRepository, AcademicProfileRepository, UserPreferenceRepository 인터페이스 생성",
+      "parent": "GAM-2",
+      "implemented": true,
+      "reason": "파일 발견: UserRepository.kt"
+    },
+    {
+      "key": "GAM-53",
+      "summary": "UserProfileService 구현",
+      "parent": "GAM-2",
+      "implemented": true,
+      "reason": "파일 발견: UserProfileService.kt"
+    },
+    {
+      "key": "GAM-54",
+      "summary": "UserProfileController 구현",
+      "parent": "GAM-2",
+      "implemented": true,
+      "reason": "파일 발견: UserProfileController.kt"
+    },
+    {
+      "key": "GAM-55",
+      "summary": "Request/Response DTO 생성",
+      "parent": "GAM-2",
+      "implemented": true,
+      "reason": "파일 발견: UserProfileRequest.kt"
+    },
+    {
+      "key": "GAM-72",
+      "summary": "학업 적합도 계산 로직",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['ScoringService', '학업', '적합도']"
+    },
+    {
+      "key": "GAM-73",
+      "summary": "영어 적합도 계산 로직",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['영어', '적합도', 'ScoringService']"
+    },
+    {
+      "key": "GAM-74",
+      "summary": "예산 적합도 계산 로직",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['예산', '적합도']"
+    },
+    {
+      "key": "GAM-75",
+      "summary": "지역 선호 계산 로직",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['지역', '선호']"
+    },
+    {
+      "key": "GAM-76",
+      "summary": "기간 적합도 계산 로직",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['기간', '적합도']"
+    },
+    {
+      "key": "GAM-77",
+      "summary": "진로 연계성 계산 로직",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['진로', '연계']"
+    },
+    {
+      "key": "GAM-78",
+      "summary": "WeightConfig.kt 설정 클래스",
+      "parent": "GAM-1",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['WeightConfig.kt']"
+    },
+    {
+      "key": "GAM-79",
+      "summary": "GPA 정규화 유틸리티",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['GPA', '정규화']"
+    },
+    {
+      "key": "GAM-80",
+      "summary": "PathOptimizationService.kt 생성",
+      "parent": "GAM-3",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['PathOptimizationService.kt']"
+    },
+    {
+      "key": "GAM-81",
+      "summary": "경로 최적화 시나리오 구현",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['경로', '최적화']"
+    },
+    {
+      "key": "GAM-82",
+      "summary": "리스크 패널티 로직 구현",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['리스크', '패널티']"
+    },
+    {
+      "key": "GAM-83",
+      "summary": "추천 유형 분류 로직",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['추천', '유형', '분류']"
+    },
+    {
+      "key": "GAM-84",
+      "summary": "최종 점수 계산 및 검증",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['최종', '점수', '검증']"
+    },
+    {
+      "key": "GAM-85",
+      "summary": "School.kt Entity 생성",
+      "parent": "GAM-1",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['School.kt']"
+    },
+    {
+      "key": "GAM-86",
+      "summary": "Program.kt Entity 생성",
+      "parent": "GAM-1",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['Program.kt']"
+    },
+    {
+      "key": "GAM-87",
+      "summary": "SchoolRepository 생성",
+      "parent": "GAM-2",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['SchoolRepository.kt']"
+    },
+    {
+      "key": "GAM-88",
+      "summary": "ProgramRepository 생성",
+      "parent": "GAM-2",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['ProgramRepository.kt']"
+    },
+    {
+      "key": "GAM-89",
+      "summary": "seed_schools.sql 작성 (20개 학교)",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['seed_schools', 'seed.*school']"
+    },
+    {
+      "key": "GAM-90",
+      "summary": "seed_programs.sql 작성 (40개 프로그램)",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['seed_programs', 'seed.*program']"
+    },
+    {
+      "key": "GAM-91",
+      "summary": "SchoolService 구현",
+      "parent": "GAM-4",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['SchoolService.kt']"
+    },
+    {
+      "key": "GAM-92",
+      "summary": "ProgramController 구현",
+      "parent": "GAM-4",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['ProgramController.kt']"
+    },
+    {
+      "key": "GAM-93",
+      "summary": "MatchingResult.kt Entity",
+      "parent": "GAM-4",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['MatchingResult.kt']"
+    },
+    {
+      "key": "GAM-94",
+      "summary": "MatchingResultRepository",
+      "parent": "GAM-2",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['MatchingResultRepository.kt']"
+    },
+    {
+      "key": "GAM-95",
+      "summary": "MatchingController.kt",
+      "parent": "GAM-4",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['MatchingController.kt']"
+    },
+    {
+      "key": "GAM-96",
+      "summary": "전체 매칭 파이프라인 구현",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['매칭', '파이프라인', 'MatchingService']"
+    },
+    {
+      "key": "GAM-97",
+      "summary": "결과 저장 로직",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['결과', '저장', 'MatchingResult']"
+    },
+    {
+      "key": "GAM-98",
+      "summary": "결과 조회 로직",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['결과', '조회']"
+    },
+    {
+      "key": "GAM-99",
+      "summary": "성능 최적화 (캐싱, 인덱스)",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['캐싱', '인덱스', 'Cache']"
+    },
+    {
+      "key": "GAM-100",
+      "summary": "ExplanationService.kt 생성",
+      "parent": "GAM-4",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['ExplanationService.kt']"
+    },
+    {
+      "key": "GAM-101",
+      "summary": "설명 템플릿 정의",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['설명', '템플릿']"
+    },
+    {
+      "key": "GAM-102",
+      "summary": "점수 기여도 분석 로직",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['점수', '기여도']"
+    },
+    {
+      "key": "GAM-103",
+      "summary": "긍정/부정 요소 추출",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['긍정', '부정', '요소']"
+    },
+    {
+      "key": "GAM-104",
+      "summary": "설명 문구 생성 로직",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['설명', '문구', '생성']"
+    },
+    {
+      "key": "GAM-105",
+      "summary": "Mock/실제 스키마 비교 체크리스트 작성",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['체크리스트', '스키마']"
+    },
+    {
+      "key": "GAM-106",
+      "summary": "프론트 호출 성공 기준 문서화",
+      "parent": "GAM-6",
+      "implemented": false,
+      "reason": "검증 매핑 없음"
+    },
+    {
+      "key": "GAM-107",
+      "summary": "E2E 호출 시나리오 테스트",
+      "parent": "GAM-4",
+      "implemented": false,
+      "reason": "검증 매핑 없음"
+    },
+    {
+      "key": "GAM-108",
+      "summary": "Application.kt Entity",
+      "parent": "GAM-5",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['Application.kt']"
+    },
+    {
+      "key": "GAM-109",
+      "summary": "ApplicationRepository",
+      "parent": "GAM-2",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['ApplicationRepository.kt']"
+    },
+    {
+      "key": "GAM-110",
+      "summary": "ApplicationService",
+      "parent": "GAM-5",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['ApplicationService.kt']"
+    },
+    {
+      "key": "GAM-111",
+      "summary": "ApplicationController",
+      "parent": "GAM-5",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['ApplicationController.kt']"
+    },
+    {
+      "key": "GAM-112",
+      "summary": "ApplicationStatus Enum",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['ApplicationStatus']"
+    },
+    {
+      "key": "GAM-113",
+      "summary": "Progress 계산 로직",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['Progress', '계산']"
+    },
+    {
+      "key": "GAM-114",
+      "summary": "Document.kt Entity",
+      "parent": "GAM-5",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['Document.kt']"
+    },
+    {
+      "key": "GAM-115",
+      "summary": "DocumentRepository",
+      "parent": "GAM-2",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['DocumentRepository.kt']"
+    },
+    {
+      "key": "GAM-116",
+      "summary": "DocumentService",
+      "parent": "GAM-5",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['DocumentService.kt']"
+    },
+    {
+      "key": "GAM-117",
+      "summary": "FileStorageService (S3 or Local)",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['FileStorageService', 'S3', 'Local']"
+    },
+    {
+      "key": "GAM-118",
+      "summary": "DocumentController",
+      "parent": "GAM-5",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['DocumentController.kt']"
+    },
+    {
+      "key": "GAM-119",
+      "summary": "파일 검증 로직",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['파일', '검증', 'validate']"
+    },
+    {
+      "key": "GAM-120",
+      "summary": "파일 삭제 로직",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['파일', '삭제', 'delete']"
+    },
+    {
+      "key": "GAM-121",
+      "summary": "DashboardController.kt",
+      "parent": "GAM-5",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['DashboardController.kt']"
+    },
+    {
+      "key": "GAM-122",
+      "summary": "DashboardService",
+      "parent": "GAM-5",
+      "implemented": false,
+      "reason": "다음 파일 없음: ['DashboardService.kt']"
+    },
+    {
+      "key": "GAM-123",
+      "summary": "집계 쿼리 작성",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['집계', '쿼리', 'dashboard']"
+    },
+    {
+      "key": "GAM-124",
+      "summary": "DashboardResponse DTO",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['DashboardResponse']"
+    },
+    {
+      "key": "GAM-125",
+      "summary": "E2E 테스트 작성",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['E2E', 'integration', 'test']"
+    },
+    {
+      "key": "GAM-126",
+      "summary": "성능 테스트 스크립트",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['성능', '테스트', 'performance']"
+    },
+    {
+      "key": "GAM-127",
+      "summary": "테스트 데이터 준비",
+      "parent": "GAM-5",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['테스트', '데이터']"
+    },
+    {
+      "key": "GAM-128",
+      "summary": "테스트 실행 및 결과 분석",
+      "parent": "GAM-5",
+      "implemented": false,
+      "reason": "검증 매핑 없음"
+    },
+    {
+      "key": "GAM-129",
+      "summary": "JwtAuthenticationFilter 적용",
+      "parent": "GAM-6",
+      "implemented": true,
+      "reason": "파일 발견: JwtAuthenticationFilter.kt"
+    },
+    {
+      "key": "GAM-130",
+      "summary": "RateLimitingFilter 구현",
+      "parent": "GAM-3",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['RateLimitingFilter', 'RateLimit']"
+    },
+    {
+      "key": "GAM-131",
+      "summary": "InputValidator 구현",
+      "parent": "GAM-6",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['InputValidator', 'Validator']"
+    },
+    {
+      "key": "GAM-132",
+      "summary": "CORS 설정",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['CORS', 'WebConfig', 'cors']"
+    },
+    {
+      "key": "GAM-133",
+      "summary": "보안 체크리스트 검증",
+      "parent": "GAM-4",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['보안', '체크리스트']"
+    },
+    {
+      "key": "GAM-134",
+      "summary": "Actuator 설정",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['Actuator', 'actuator']"
+    },
+    {
+      "key": "GAM-135",
+      "summary": "Prometheus 메트릭 추가",
+      "parent": "GAM-6",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['Prometheus', 'prometheus', 'micrometer']"
+    },
+    {
+      "key": "GAM-136",
+      "summary": "로그 포맷 설정 (JSON)",
+      "parent": "GAM-1",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['log', 'json', 'logging']"
+    },
+    {
+      "key": "GAM-137",
+      "summary": "커스텀 메트릭 추가",
+      "parent": "GAM-6",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['메트릭', 'metric', 'custom']"
+    },
+    {
+      "key": "GAM-138",
+      "summary": "README.md 작성 (단일 모듈 구조, Docker 배포, .env 관리 등)",
+      "parent": "GAM-6",
+      "implemented": true,
+      "reason": "파일 발견: README.md"
+    },
+    {
+      "key": "GAM-139",
+      "summary": "04_FRONTEND_COOPERATION.md 업데이트",
+      "parent": "GAM-6",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['04_FRONTEND_COOPERATION']"
+    },
+    {
+      "key": "GAM-140",
+      "summary": "API 사용 예시 추가",
+      "parent": "GAM-6",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['API', '사용', '예시']"
+    },
+    {
+      "key": "GAM-141",
+      "summary": "트러블슈팅 가이드 작성",
+      "parent": "GAM-6",
+      "implemented": true,
+      "reason": "코드 내 키워드 발견: ['트러블슈팅', 'troubleshoot']"
+    }
+  ],
+  "by_epic": {
+    "GAM-1": {
+      "total": 17,
+      "implemented": 14,
+      "tasks": [
+        {
+          "key": "GAM-27",
+          "summary": "단일 모듈 구조 확인 (ga-api-platform 루트)",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['settings.gradle.kts', 'build.gradle.kts']"
+        },
+        {
+          "key": "GAM-28",
+          "summary": "MockMatchingController.kt 생성",
+          "implemented": true,
+          "reason": "파일 발견: MockMatchingController.kt"
+        },
+        {
+          "key": "GAM-29",
+          "summary": "MatchingResponse DTO 정의",
+          "implemented": true,
+          "reason": "파일 발견: MatchingResponse.kt"
+        },
+        {
+          "key": "GAM-30",
+          "summary": "SchoolResponse DTO 정의",
+          "implemented": true,
+          "reason": "파일 발견: SchoolResponse.kt"
+        },
+        {
+          "key": "GAM-34",
+          "summary": "docs/api/ 엔드포인트별 Markdown (matching, programs, schools)",
+          "implemented": true,
+          "reason": "파일 발견: docs/api/matching.md"
+        },
+        {
+          "key": "GAM-35",
+          "summary": "docs/FRONTEND_HANDOFF.md 작성 (링크 공유 방식, Base URL, 일정)",
+          "implemented": true,
+          "reason": "파일 발견: docs/FRONTEND_HANDOFF.md"
+        },
+        {
+          "key": "GAM-36",
+          "summary": "docs/04_FRONTEND_COOPERATION.md 참조 또는 통합",
+          "implemented": true,
+          "reason": "파일 발견: docs/04_FRONTEND_COOPERATION.md"
+        },
+        {
+          "key": "GAM-37",
+          "summary": "README \"프론트엔드 협업\"에 FRONTEND_HANDOFF.md 링크 추가",
+          "implemented": true,
+          "reason": "파일 발견: README.md"
+        },
+        {
+          "key": "GAM-38",
+          "summary": "build.gradle.kts에 JPA, PostgreSQL, Flyway 의존성 추가",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['build.gradle.kts']"
+        },
+        {
+          "key": "GAM-39",
+          "summary": "application.yml 프로파일 및 Flyway 기본 설정",
+          "implemented": true,
+          "reason": "파일 발견: application.yml"
+        },
+        {
+          "key": "GAM-40",
+          "summary": "application-lightsail.yml, application-local.yml 작성",
+          "implemented": true,
+          "reason": "파일 발견: application-lightsail.yml"
+        },
+        {
+          "key": "GAM-78",
+          "summary": "WeightConfig.kt 설정 클래스",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['WeightConfig.kt']"
+        },
+        {
+          "key": "GAM-85",
+          "summary": "School.kt Entity 생성",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['School.kt']"
+        },
+        {
+          "key": "GAM-86",
+          "summary": "Program.kt Entity 생성",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['Program.kt']"
+        },
+        {
+          "key": "GAM-132",
+          "summary": "CORS 설정",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['CORS', 'WebConfig', 'cors']"
+        },
+        {
+          "key": "GAM-134",
+          "summary": "Actuator 설정",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['Actuator', 'actuator']"
+        },
+        {
+          "key": "GAM-136",
+          "summary": "로그 포맷 설정 (JSON)",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['log', 'json', 'logging']"
+        }
+      ]
+    },
+    "GAM-2": {
+      "total": 9,
+      "implemented": 4,
+      "tasks": [
+        {
+          "key": "GAM-52",
+          "summary": "UserRepository, AcademicProfileRepository, UserPreferenceRepository 인터페이스 생성",
+          "implemented": true,
+          "reason": "파일 발견: UserRepository.kt"
+        },
+        {
+          "key": "GAM-53",
+          "summary": "UserProfileService 구현",
+          "implemented": true,
+          "reason": "파일 발견: UserProfileService.kt"
+        },
+        {
+          "key": "GAM-54",
+          "summary": "UserProfileController 구현",
+          "implemented": true,
+          "reason": "파일 발견: UserProfileController.kt"
+        },
+        {
+          "key": "GAM-55",
+          "summary": "Request/Response DTO 생성",
+          "implemented": true,
+          "reason": "파일 발견: UserProfileRequest.kt"
+        },
+        {
+          "key": "GAM-87",
+          "summary": "SchoolRepository 생성",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['SchoolRepository.kt']"
+        },
+        {
+          "key": "GAM-88",
+          "summary": "ProgramRepository 생성",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['ProgramRepository.kt']"
+        },
+        {
+          "key": "GAM-94",
+          "summary": "MatchingResultRepository",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['MatchingResultRepository.kt']"
+        },
+        {
+          "key": "GAM-109",
+          "summary": "ApplicationRepository",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['ApplicationRepository.kt']"
+        },
+        {
+          "key": "GAM-115",
+          "summary": "DocumentRepository",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['DocumentRepository.kt']"
+        }
+      ]
+    },
+    "GAM-3": {
+      "total": 13,
+      "implemented": 12,
+      "tasks": [
+        {
+          "key": "GAM-72",
+          "summary": "학업 적합도 계산 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['ScoringService', '학업', '적합도']"
+        },
+        {
+          "key": "GAM-73",
+          "summary": "영어 적합도 계산 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['영어', '적합도', 'ScoringService']"
+        },
+        {
+          "key": "GAM-74",
+          "summary": "예산 적합도 계산 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['예산', '적합도']"
+        },
+        {
+          "key": "GAM-75",
+          "summary": "지역 선호 계산 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['지역', '선호']"
+        },
+        {
+          "key": "GAM-76",
+          "summary": "기간 적합도 계산 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['기간', '적합도']"
+        },
+        {
+          "key": "GAM-77",
+          "summary": "진로 연계성 계산 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['진로', '연계']"
+        },
+        {
+          "key": "GAM-79",
+          "summary": "GPA 정규화 유틸리티",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['GPA', '정규화']"
+        },
+        {
+          "key": "GAM-80",
+          "summary": "PathOptimizationService.kt 생성",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['PathOptimizationService.kt']"
+        },
+        {
+          "key": "GAM-81",
+          "summary": "경로 최적화 시나리오 구현",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['경로', '최적화']"
+        },
+        {
+          "key": "GAM-82",
+          "summary": "리스크 패널티 로직 구현",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['리스크', '패널티']"
+        },
+        {
+          "key": "GAM-83",
+          "summary": "추천 유형 분류 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['추천', '유형', '분류']"
+        },
+        {
+          "key": "GAM-84",
+          "summary": "최종 점수 계산 및 검증",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['최종', '점수', '검증']"
+        },
+        {
+          "key": "GAM-130",
+          "summary": "RateLimitingFilter 구현",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['RateLimitingFilter', 'RateLimit']"
+        }
+      ]
+    },
+    "GAM-4": {
+      "total": 18,
+      "implemented": 12,
+      "tasks": [
+        {
+          "key": "GAM-89",
+          "summary": "seed_schools.sql 작성 (20개 학교)",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['seed_schools', 'seed.*school']"
+        },
+        {
+          "key": "GAM-90",
+          "summary": "seed_programs.sql 작성 (40개 프로그램)",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['seed_programs', 'seed.*program']"
+        },
+        {
+          "key": "GAM-91",
+          "summary": "SchoolService 구현",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['SchoolService.kt']"
+        },
+        {
+          "key": "GAM-92",
+          "summary": "ProgramController 구현",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['ProgramController.kt']"
+        },
+        {
+          "key": "GAM-93",
+          "summary": "MatchingResult.kt Entity",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['MatchingResult.kt']"
+        },
+        {
+          "key": "GAM-95",
+          "summary": "MatchingController.kt",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['MatchingController.kt']"
+        },
+        {
+          "key": "GAM-96",
+          "summary": "전체 매칭 파이프라인 구현",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['매칭', '파이프라인', 'MatchingService']"
+        },
+        {
+          "key": "GAM-97",
+          "summary": "결과 저장 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['결과', '저장', 'MatchingResult']"
+        },
+        {
+          "key": "GAM-98",
+          "summary": "결과 조회 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['결과', '조회']"
+        },
+        {
+          "key": "GAM-99",
+          "summary": "성능 최적화 (캐싱, 인덱스)",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['캐싱', '인덱스', 'Cache']"
+        },
+        {
+          "key": "GAM-100",
+          "summary": "ExplanationService.kt 생성",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['ExplanationService.kt']"
+        },
+        {
+          "key": "GAM-101",
+          "summary": "설명 템플릿 정의",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['설명', '템플릿']"
+        },
+        {
+          "key": "GAM-102",
+          "summary": "점수 기여도 분석 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['점수', '기여도']"
+        },
+        {
+          "key": "GAM-103",
+          "summary": "긍정/부정 요소 추출",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['긍정', '부정', '요소']"
+        },
+        {
+          "key": "GAM-104",
+          "summary": "설명 문구 생성 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['설명', '문구', '생성']"
+        },
+        {
+          "key": "GAM-105",
+          "summary": "Mock/실제 스키마 비교 체크리스트 작성",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['체크리스트', '스키마']"
+        },
+        {
+          "key": "GAM-107",
+          "summary": "E2E 호출 시나리오 테스트",
+          "implemented": false,
+          "reason": "검증 매핑 없음"
+        },
+        {
+          "key": "GAM-133",
+          "summary": "보안 체크리스트 검증",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['보안', '체크리스트']"
+        }
+      ]
+    },
+    "GAM-6": {
+      "total": 9,
+      "implemented": 8,
+      "tasks": [
+        {
+          "key": "GAM-106",
+          "summary": "프론트 호출 성공 기준 문서화",
+          "implemented": false,
+          "reason": "검증 매핑 없음"
+        },
+        {
+          "key": "GAM-129",
+          "summary": "JwtAuthenticationFilter 적용",
+          "implemented": true,
+          "reason": "파일 발견: JwtAuthenticationFilter.kt"
+        },
+        {
+          "key": "GAM-131",
+          "summary": "InputValidator 구현",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['InputValidator', 'Validator']"
+        },
+        {
+          "key": "GAM-135",
+          "summary": "Prometheus 메트릭 추가",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['Prometheus', 'prometheus', 'micrometer']"
+        },
+        {
+          "key": "GAM-137",
+          "summary": "커스텀 메트릭 추가",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['메트릭', 'metric', 'custom']"
+        },
+        {
+          "key": "GAM-138",
+          "summary": "README.md 작성 (단일 모듈 구조, Docker 배포, .env 관리 등)",
+          "implemented": true,
+          "reason": "파일 발견: README.md"
+        },
+        {
+          "key": "GAM-139",
+          "summary": "04_FRONTEND_COOPERATION.md 업데이트",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['04_FRONTEND_COOPERATION']"
+        },
+        {
+          "key": "GAM-140",
+          "summary": "API 사용 예시 추가",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['API', '사용', '예시']"
+        },
+        {
+          "key": "GAM-141",
+          "summary": "트러블슈팅 가이드 작성",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['트러블슈팅', 'troubleshoot']"
+        }
+      ]
+    },
+    "GAM-5": {
+      "total": 19,
+      "implemented": 10,
+      "tasks": [
+        {
+          "key": "GAM-108",
+          "summary": "Application.kt Entity",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['Application.kt']"
+        },
+        {
+          "key": "GAM-110",
+          "summary": "ApplicationService",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['ApplicationService.kt']"
+        },
+        {
+          "key": "GAM-111",
+          "summary": "ApplicationController",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['ApplicationController.kt']"
+        },
+        {
+          "key": "GAM-112",
+          "summary": "ApplicationStatus Enum",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['ApplicationStatus']"
+        },
+        {
+          "key": "GAM-113",
+          "summary": "Progress 계산 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['Progress', '계산']"
+        },
+        {
+          "key": "GAM-114",
+          "summary": "Document.kt Entity",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['Document.kt']"
+        },
+        {
+          "key": "GAM-116",
+          "summary": "DocumentService",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['DocumentService.kt']"
+        },
+        {
+          "key": "GAM-117",
+          "summary": "FileStorageService (S3 or Local)",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['FileStorageService', 'S3', 'Local']"
+        },
+        {
+          "key": "GAM-118",
+          "summary": "DocumentController",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['DocumentController.kt']"
+        },
+        {
+          "key": "GAM-119",
+          "summary": "파일 검증 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['파일', '검증', 'validate']"
+        },
+        {
+          "key": "GAM-120",
+          "summary": "파일 삭제 로직",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['파일', '삭제', 'delete']"
+        },
+        {
+          "key": "GAM-121",
+          "summary": "DashboardController.kt",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['DashboardController.kt']"
+        },
+        {
+          "key": "GAM-122",
+          "summary": "DashboardService",
+          "implemented": false,
+          "reason": "다음 파일 없음: ['DashboardService.kt']"
+        },
+        {
+          "key": "GAM-123",
+          "summary": "집계 쿼리 작성",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['집계', '쿼리', 'dashboard']"
+        },
+        {
+          "key": "GAM-124",
+          "summary": "DashboardResponse DTO",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['DashboardResponse']"
+        },
+        {
+          "key": "GAM-125",
+          "summary": "E2E 테스트 작성",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['E2E', 'integration', 'test']"
+        },
+        {
+          "key": "GAM-126",
+          "summary": "성능 테스트 스크립트",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['성능', '테스트', 'performance']"
+        },
+        {
+          "key": "GAM-127",
+          "summary": "테스트 데이터 준비",
+          "implemented": true,
+          "reason": "코드 내 키워드 발견: ['테스트', '데이터']"
+        },
+        {
+          "key": "GAM-128",
+          "summary": "테스트 실행 및 결과 분석",
+          "implemented": false,
+          "reason": "검증 매핑 없음"
+        }
+      ]
+    }
+  }
+}

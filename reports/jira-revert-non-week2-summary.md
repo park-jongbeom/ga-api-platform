@@ -1,0 +1,51 @@
+# 2주차 외 완료 이슈 To Do 되돌림 요약
+
+- **2주차(GAM-2) 하위 유지**: 6개
+- **To Do로 되돌림**: 44개 성공, 0개 실패
+
+## 되돌린 이슈 (요약)
+
+- GAM-1: Mock API 및 API 문서(Markdown) 구축
+- GAM-7: GAM-11
+- GAM-8: GAM-12
+- GAM-9: GAM-13
+- GAM-11: GAM-22
+- GAM-12: GAM-23
+- GAM-13: GAM-31
+- GAM-15: GAM-33
+- GAM-16: GAM-41
+- GAM-17: GAM-42
+- GAM-18: GAM-43
+- GAM-19: GAM-44
+- GAM-24: GAM-61
+- GAM-25: GAM-62
+- GAM-26: GAM-63
+- GAM-27: 단일 모듈 구조 확인 (ga-api-platform 루트)
+- GAM-28: MockMatchingController.kt 생성
+- GAM-29: MatchingResponse DTO 정의
+- GAM-30: SchoolResponse DTO 정의
+- GAM-34: docs/api/ 엔드포인트별 Markdown (matching, programs, schools)
+- GAM-35: docs/FRONTEND_HANDOFF.md 작성 (링크 공유 방식, Base URL, 일정)
+- GAM-36: docs/04_FRONTEND_COOPERATION.md 참조 또는 통합
+- GAM-37: README "프론트엔드 협업"에 FRONTEND_HANDOFF.md 링크 추가
+- GAM-38: build.gradle.kts에 JPA, PostgreSQL, Flyway 의존성 추가
+- GAM-39: application.yml 프로파일 및 Flyway 기본 설정
+- GAM-40: application-lightsail.yml, application-local.yml 작성
+- GAM-45: 인덱스 생성 쿼리 작성
+- GAM-46: Flyway 설정 확인 (application.yml, 이미 GAM-13에서 설정됨)
+- GAM-47: 마이그레이션 테스트 (로컬 DB)
+- GAM-48: ERD 다이어그램 작성 (docs/erd.png)
+- GAM-49: User Entity 생성 (GAM-13 V1 마이그레이션의 users 테이블 매핑)
+- GAM-50: AcademicProfile Entity 생성 (academic_profiles 테이블 매핑)
+- GAM-51: UserPreference Entity 생성 (user_preferences 테이블 매핑)
+- GAM-56: Validation 로직 추가
+- GAM-57: UserProfileServiceTest.kt 작성
+- GAM-58: UserProfileControllerTest.kt 작성
+- GAM-59: MockK 설정 및 Mocking
+- GAM-60: 성공 시나리오 테스트
+- GAM-64: HardFilterService.kt 생성
+- GAM-65: 예산 초과 필터 구현
+- GAM-66: 비자 요건 필터 구현
+- GAM-67: 영어 점수 필터 구현
+- GAM-68: 입학 시기 필터 구현
+- GAM-69: 영어 점수 환산 유틸리티

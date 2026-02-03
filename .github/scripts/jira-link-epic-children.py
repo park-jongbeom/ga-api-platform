@@ -14,10 +14,11 @@ import time
 import requests
 from typing import Dict, List, Set
 
-# 백엔드 에픽 ID -> 하위 스토리/작업 목록 (백로그 키 기준)
+# 백엔드 에픽 ID -> 하위 스토리 목록 (JIRA_BACKLOG.md Epic/Story 구조 기준)
+# Epic 1: GAM-7, 8, 9 | Epic 2: GAM-10, 20, 21, 22, 23 | ...
 BACKEND_EPIC_CHILDREN: Dict[str, List[str]] = {
-    "GAM-1": ["GAM-11", "GAM-12", "GAM-13"],
-    "GAM-2": ["GAM-20", "GAM-21", "GAM-22", "GAM-23"],
+    "GAM-1": ["GAM-7", "GAM-8", "GAM-9"],
+    "GAM-2": ["GAM-10", "GAM-20", "GAM-21", "GAM-22", "GAM-23"],
     "GAM-3": ["GAM-31", "GAM-32", "GAM-33"],
     "GAM-4": ["GAM-41", "GAM-42", "GAM-43", "GAM-44"],
     "GAM-5": ["GAM-51", "GAM-52", "GAM-53", "GAM-54", "GAM-55"],

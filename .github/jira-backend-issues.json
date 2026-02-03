@@ -1,0 +1,849 @@
+[
+  {
+    "key": "GAM-1",
+    "summary": "Mock API 및 API 문서(Markdown) 구축",
+    "type": "에픽",
+    "status": "해야 할 일",
+    "parent": null
+  },
+  {
+    "key": "GAM-2",
+    "summary": "사용자 프로필 및 유학 목표 관리",
+    "type": "에픽",
+    "status": "진행 중",
+    "parent": null
+  },
+  {
+    "key": "GAM-3",
+    "summary": "Rule-based AI 매칭 알고리즘 구현",
+    "type": "에픽",
+    "status": "해야 할 일",
+    "parent": null
+  },
+  {
+    "key": "GAM-4",
+    "summary": "학교/프로그램 관리 및 매칭 API 완성",
+    "type": "에픽",
+    "status": "해야 할 일",
+    "parent": null
+  },
+  {
+    "key": "GAM-5",
+    "summary": "지원 현황 관리 및 문서 업로드",
+    "type": "에픽",
+    "status": "해야 할 일",
+    "parent": null
+  },
+  {
+    "key": "GAM-6",
+    "summary": "보안 강화 및 모니터링 (배포는 CI/CD 자동화)",
+    "type": "에픽",
+    "status": "해야 할 일",
+    "parent": null
+  },
+  {
+    "key": "GAM-27",
+    "summary": "단일 모듈 구조 확인 (ga-api-platform 루트)",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-28",
+    "summary": "MockMatchingController.kt 생성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-29",
+    "summary": "MatchingResponse DTO 정의",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-30",
+    "summary": "SchoolResponse DTO 정의",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-31",
+    "summary": "ProgramResponse DTO 정의",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-32",
+    "summary": "Mock 데이터 생성 (3가지 시나리오)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-33",
+    "summary": "docs/api/ API.md (공통 형식, API 목록)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-34",
+    "summary": "docs/api/ 엔드포인트별 Markdown (matching, programs, schools)",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-35",
+    "summary": "docs/FRONTEND_HANDOFF.md 작성 (링크 공유 방식, Base URL, 일정)",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-36",
+    "summary": "docs/04_FRONTEND_COOPERATION.md 참조 또는 통합",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-37",
+    "summary": "README \"프론트엔드 협업\"에 FRONTEND_HANDOFF.md 링크 추가",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-38",
+    "summary": "build.gradle.kts에 JPA, PostgreSQL, Flyway 의존성 추가",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-39",
+    "summary": "application.yml 프로파일 및 Flyway 기본 설정",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-40",
+    "summary": "application-lightsail.yml, application-local.yml 작성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-41",
+    "summary": "V1__create_schema_from_doc.sql 작성 및 db/migration 배치",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-42",
+    "summary": "JIRA 백로그(GAM-13) 설명·AC·Tasks·DoD 반영",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-43",
+    "summary": "V2__create_matching_tables.sql 작성 (GAM-13의 V1 이후)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-44",
+    "summary": "테이블 스키마 정의 (컬럼, 타입, 제약조건)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-45",
+    "summary": "인덱스 생성 쿼리 작성",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-46",
+    "summary": "Flyway 설정 확인 (application.yml, 이미 GAM-13에서 설정됨)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-47",
+    "summary": "마이그레이션 테스트 (로컬 DB)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-48",
+    "summary": "ERD 다이어그램 작성 (docs/erd.png)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-49",
+    "summary": "User Entity 생성 (GAM-13 V1 마이그레이션의 users 테이블 매핑)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-50",
+    "summary": "AcademicProfile Entity 생성 (academic_profiles 테이블 매핑)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-51",
+    "summary": "UserPreference Entity 생성 (user_preferences 테이블 매핑)",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-52",
+    "summary": "UserRepository, AcademicProfileRepository, UserPreferenceRepository 인터페이스 생성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-53",
+    "summary": "UserProfileService 구현",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-54",
+    "summary": "UserProfileController 구현",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-55",
+    "summary": "Request/Response DTO 생성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-56",
+    "summary": "Validation 로직 추가",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-57",
+    "summary": "UserProfileServiceTest.kt 작성",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-58",
+    "summary": "UserProfileControllerTest.kt 작성",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-59",
+    "summary": "MockK 설정 및 Mocking",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-60",
+    "summary": "성공 시나리오 테스트",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-61",
+    "summary": "실패 시나리오 테스트",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-62",
+    "summary": "테스트 커버리지 측정",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-63",
+    "summary": "MatchingEngineService.kt 생성",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-64",
+    "summary": "HardFilterService.kt 생성",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-65",
+    "summary": "예산 초과 필터 구현",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-66",
+    "summary": "비자 요건 필터 구현",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-67",
+    "summary": "영어 점수 필터 구현",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-68",
+    "summary": "입학 시기 필터 구현",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-69",
+    "summary": "영어 점수 환산 유틸리티",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-70",
+    "summary": "FilterResult 모델 정의",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-71",
+    "summary": "ScoringService.kt 생성",
+    "type": "작업",
+    "status": "해야 할 일",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-72",
+    "summary": "학업 적합도 계산 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-73",
+    "summary": "영어 적합도 계산 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-74",
+    "summary": "예산 적합도 계산 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-75",
+    "summary": "지역 선호 계산 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-76",
+    "summary": "기간 적합도 계산 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-77",
+    "summary": "진로 연계성 계산 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-78",
+    "summary": "WeightConfig.kt 설정 클래스",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-79",
+    "summary": "GPA 정규화 유틸리티",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-80",
+    "summary": "PathOptimizationService.kt 생성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-81",
+    "summary": "경로 최적화 시나리오 구현",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-82",
+    "summary": "리스크 패널티 로직 구현",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-83",
+    "summary": "추천 유형 분류 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-84",
+    "summary": "최종 점수 계산 및 검증",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-85",
+    "summary": "School.kt Entity 생성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-86",
+    "summary": "Program.kt Entity 생성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-87",
+    "summary": "SchoolRepository 생성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-88",
+    "summary": "ProgramRepository 생성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-89",
+    "summary": "seed_schools.sql 작성 (20개 학교)",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-90",
+    "summary": "seed_programs.sql 작성 (40개 프로그램)",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-91",
+    "summary": "SchoolService 구현",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-92",
+    "summary": "ProgramController 구현",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-93",
+    "summary": "MatchingResult.kt Entity",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-94",
+    "summary": "MatchingResultRepository",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-95",
+    "summary": "MatchingController.kt",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-96",
+    "summary": "전체 매칭 파이프라인 구현",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-97",
+    "summary": "결과 저장 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-98",
+    "summary": "결과 조회 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-99",
+    "summary": "성능 최적화 (캐싱, 인덱스)",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-100",
+    "summary": "ExplanationService.kt 생성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-101",
+    "summary": "설명 템플릿 정의",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-102",
+    "summary": "점수 기여도 분석 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-103",
+    "summary": "긍정/부정 요소 추출",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-104",
+    "summary": "설명 문구 생성 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-105",
+    "summary": "Mock/실제 스키마 비교 체크리스트 작성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-106",
+    "summary": "프론트 호출 성공 기준 문서화",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-6"
+  },
+  {
+    "key": "GAM-107",
+    "summary": "E2E 호출 시나리오 테스트",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-108",
+    "summary": "Application.kt Entity",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-109",
+    "summary": "ApplicationRepository",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-110",
+    "summary": "ApplicationService",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-111",
+    "summary": "ApplicationController",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-112",
+    "summary": "ApplicationStatus Enum",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-113",
+    "summary": "Progress 계산 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-114",
+    "summary": "Document.kt Entity",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-115",
+    "summary": "DocumentRepository",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-2"
+  },
+  {
+    "key": "GAM-116",
+    "summary": "DocumentService",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-117",
+    "summary": "FileStorageService (S3 or Local)",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-118",
+    "summary": "DocumentController",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-119",
+    "summary": "파일 검증 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-120",
+    "summary": "파일 삭제 로직",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-121",
+    "summary": "DashboardController.kt",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-122",
+    "summary": "DashboardService",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-123",
+    "summary": "집계 쿼리 작성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-124",
+    "summary": "DashboardResponse DTO",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-125",
+    "summary": "E2E 테스트 작성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-126",
+    "summary": "성능 테스트 스크립트",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-127",
+    "summary": "테스트 데이터 준비",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-128",
+    "summary": "테스트 실행 및 결과 분석",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-5"
+  },
+  {
+    "key": "GAM-129",
+    "summary": "JwtAuthenticationFilter 적용",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-6"
+  },
+  {
+    "key": "GAM-130",
+    "summary": "RateLimitingFilter 구현",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-3"
+  },
+  {
+    "key": "GAM-131",
+    "summary": "InputValidator 구현",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-6"
+  },
+  {
+    "key": "GAM-132",
+    "summary": "CORS 설정",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-133",
+    "summary": "보안 체크리스트 검증",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-4"
+  },
+  {
+    "key": "GAM-134",
+    "summary": "Actuator 설정",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-135",
+    "summary": "Prometheus 메트릭 추가",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-6"
+  },
+  {
+    "key": "GAM-136",
+    "summary": "로그 포맷 설정 (JSON)",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-1"
+  },
+  {
+    "key": "GAM-137",
+    "summary": "커스텀 메트릭 추가",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-6"
+  },
+  {
+    "key": "GAM-138",
+    "summary": "README.md 작성 (단일 모듈 구조, Docker 배포, .env 관리 등)",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-6"
+  },
+  {
+    "key": "GAM-139",
+    "summary": "04_FRONTEND_COOPERATION.md 업데이트",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-6"
+  },
+  {
+    "key": "GAM-140",
+    "summary": "API 사용 예시 추가",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-6"
+  },
+  {
+    "key": "GAM-141",
+    "summary": "트러블슈팅 가이드 작성",
+    "type": "작업",
+    "status": "완료",
+    "parent": "GAM-6"
+  }
+]

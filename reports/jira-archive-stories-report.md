@@ -1,0 +1,28 @@
+# Story 보관/삭제 결과
+
+- 삭제: 0개
+- 보관(라벨+완료): 0개
+- 실패: 20개
+
+## 실패
+
+- GAM-7 GAM-11
+- GAM-8 GAM-12
+- GAM-9 GAM-13
+- GAM-10 GAM-21
+- GAM-11 GAM-22
+- GAM-12 GAM-23
+- GAM-13 GAM-31
+- GAM-14 GAM-32
+- GAM-15 GAM-33
+- GAM-16 GAM-41
+- GAM-17 GAM-42
+- GAM-18 GAM-43
+- GAM-19 GAM-44
+- GAM-20 GAM-51
+- GAM-21 GAM-52
+- GAM-22 GAM-53
+- GAM-23 GAM-54
+- GAM-24 GAM-61
+- GAM-25 GAM-62
+- GAM-26 GAM-63

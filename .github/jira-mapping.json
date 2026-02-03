@@ -1,11 +1,13 @@
 {
-  "_comment_jiraToBacklog": "JIRA 실제 이슈 키 → 백로그 문서 키. 동일 스토리일 때 JIRA 키와 백로그 키가 다를 경우 사용.",
+  "_deprecated": "2026-02-02부터 백엔드 백로그 키 = JIRA 키로 통일. _jiraToBacklog는 히스토리 참고용.",
+  "_comment_jiraToBacklog": "JIRA 실제 이슈 키 → 백로그 문서 키. 동일 스토리일 때 JIRA 키와 백로그 키가 다를 경우 사용. (deprecated: 백엔드는 이제 백로그=JIRA 키)",
   "_jiraToBacklog": {
     "GAM-7": "GAM-11",
     "GAM-8": "GAM-12",
     "GAM-9": "GAM-13",
     "GAM-10": "GAM-21"
   },
+  "_legacy_mappings": "백엔드 역매핑: GAM-11→GAM-7, GAM-12→GAM-8, GAM-13→GAM-9, GAM-21→GAM-10, GAM-22-3→GAM-51. .github/backlog-to-jira-mapping.json 참고.",
   "GAMF-1": "GAM-142",
   "GAMF-2": "GAM-143",
   "GAMF-3": "GAM-144",

@@ -1,0 +1,474 @@
+{
+  "task_to_epic": {
+    "GAM-27": "GAM-1",
+    "GAM-28": "GAM-1",
+    "GAM-29": "GAM-1",
+    "GAM-30": "GAM-1",
+    "GAM-31": "GAM-1",
+    "GAM-32": "GAM-1",
+    "GAM-33": "GAM-1",
+    "GAM-34": "GAM-1",
+    "GAM-35": "GAM-1",
+    "GAM-36": "GAM-1",
+    "GAM-37": "GAM-1",
+    "GAM-38": "GAM-1",
+    "GAM-39": "GAM-1",
+    "GAM-40": "GAM-1",
+    "GAM-41": "GAM-1",
+    "GAM-13-5": "GAM-1",
+    "GAM-20-1": "GAM-5",
+    "GAM-20-2": "GAM-5",
+    "GAM-20-3": "GAM-5",
+    "GAM-20-4": "GAM-5",
+    "GAM-20-5": "GAM-5",
+    "GAM-21-1": "GAM-5",
+    "GAM-44": "GAM-2",
+    "GAM-45": "GAM-2",
+    "GAM-21-4": "GAM-5",
+    "GAM-47": "GAM-2",
+    "GAM-48": "GAM-2",
+    "GAM-22-1": "GAM-5",
+    "GAM-50": "GAM-2",
+    "GAM-20": "GAM-2",
+    "GAM-52": "GAM-2",
+    "GAM-53": "GAM-2",
+    "GAM-54": "GAM-2",
+    "GAM-55": "GAM-2",
+    "GAM-56": "GAM-2",
+    "GAM-57": "GAM-2",
+    "GAM-58": "GAM-2",
+    "GAM-59": "GAM-2",
+    "GAM-60": "GAM-2",
+    "GAM-61": "GAM-2",
+    "GAM-62": "GAM-2",
+    "GAM-63": "GAM-3",
+    "GAM-64": "GAM-3",
+    "GAM-65": "GAM-3",
+    "GAM-66": "GAM-3",
+    "GAM-67": "GAM-3",
+    "GAM-68": "GAM-3",
+    "GAM-69": "GAM-3",
+    "GAM-70": "GAM-3",
+    "GAM-71": "GAM-3",
+    "GAM-32-2": "GAM-3",
+    "GAM-32-3": "GAM-3",
+    "GAM-32-4": "GAM-3",
+    "GAM-32-5": "GAM-3",
+    "GAM-32-6": "GAM-3",
+    "GAM-32-7": "GAM-3",
+    "GAM-32-8": "GAM-3",
+    "GAM-32-9": "GAM-3",
+    "GAM-15-1": "GAM-3",
+    "GAM-15-2": "GAM-3",
+    "GAM-15-3": "GAM-3",
+    "GAM-15-4": "GAM-3",
+    "GAM-15-5": "GAM-3",
+    "GAM-16-1": "GAM-4",
+    "GAM-16-2": "GAM-4",
+    "GAM-16-3": "GAM-4",
+    "GAM-16-4": "GAM-4",
+    "GAM-16-5": "GAM-4",
+    "GAM-16-6": "GAM-4",
+    "GAM-16-7": "GAM-4",
+    "GAM-16-8": "GAM-4",
+    "GAM-17-1": "GAM-4",
+    "GAM-17-2": "GAM-4",
+    "GAM-17-3": "GAM-4",
+    "GAM-17-4": "GAM-4",
+    "GAM-17-5": "GAM-4",
+    "GAM-17-6": "GAM-4",
+    "GAM-17-7": "GAM-4",
+    "GAM-18-1": "GAM-4",
+    "GAM-18-2": "GAM-4",
+    "GAM-18-3": "GAM-4",
+    "GAM-18-4": "GAM-4",
+    "GAM-18-5": "GAM-4",
+    "GAM-19-1": "GAM-4",
+    "GAM-19-2": "GAM-4",
+    "GAM-19-3": "GAM-4",
+    "GAM-20-6": "GAM-5",
+    "GAM-21-2": "GAM-5",
+    "GAM-21-3": "GAM-5",
+    "GAM-21-5": "GAM-5",
+    "GAM-21-6": "GAM-5",
+    "GAM-21-7": "GAM-5",
+    "GAM-22-2": "GAM-5",
+    "GAM-22-3": "GAM-5",
+    "GAM-22-4": "GAM-5",
+    "GAM-55-1": "GAM-5",
+    "GAM-55-2": "GAM-5",
+    "GAM-55-3": "GAM-5",
+    "GAM-55-4": "GAM-5",
+    "GAM-23-1": "GAM-5",
+    "GAM-23-2": "GAM-5",
+    "GAM-23-3": "GAM-5",
+    "GAM-23-4": "GAM-5",
+    "GAM-24-1": "GAM-6",
+    "GAM-24-2": "GAM-6",
+    "GAM-24-3": "GAM-6",
+    "GAM-24-4": "GAM-6",
+    "GAM-24-5": "GAM-6",
+    "GAM-25-1": "GAM-6",
+    "GAM-25-2": "GAM-6",
+    "GAM-25-3": "GAM-6",
+    "GAM-25-4": "GAM-6",
+    "GAM-26-1": "GAM-6",
+    "GAM-26-2": "GAM-6",
+    "GAM-26-3": "GAM-6",
+    "GAM-26-4": "GAM-6",
+    "GAM-46": "GAM-1",
+    "GAM-49": "GAM-1",
+    "GAM-78": "GAM-1",
+    "GAM-85": "GAM-1",
+    "GAM-86": "GAM-1",
+    "GAM-132": "GAM-1",
+    "GAM-134": "GAM-1",
+    "GAM-136": "GAM-1",
+    "GAM-87": "GAM-2",
+    "GAM-88": "GAM-2",
+    "GAM-94": "GAM-2",
+    "GAM-109": "GAM-2",
+    "GAM-115": "GAM-2",
+    "GAM-72": "GAM-3",
+    "GAM-73": "GAM-3",
+    "GAM-74": "GAM-3",
+    "GAM-75": "GAM-3",
+    "GAM-76": "GAM-3",
+    "GAM-77": "GAM-3",
+    "GAM-79": "GAM-3",
+    "GAM-80": "GAM-3",
+    "GAM-81": "GAM-3",
+    "GAM-82": "GAM-3",
+    "GAM-83": "GAM-3",
+    "GAM-84": "GAM-3",
+    "GAM-130": "GAM-3",
+    "GAM-89": "GAM-4",
+    "GAM-90": "GAM-4",
+    "GAM-93": "GAM-4",
+    "GAM-96": "GAM-4",
+    "GAM-97": "GAM-4",
+    "GAM-98": "GAM-4",
+    "GAM-99": "GAM-4",
+    "GAM-100": "GAM-4",
+    "GAM-101": "GAM-4",
+    "GAM-102": "GAM-4",
+    "GAM-103": "GAM-4",
+    "GAM-105": "GAM-4",
+    "GAM-107": "GAM-4",
+    "GAM-133": "GAM-4",
+    "GAM-108": "GAM-5",
+    "GAM-110": "GAM-5",
+    "GAM-111": "GAM-5",
+    "GAM-112": "GAM-5",
+    "GAM-113": "GAM-5",
+    "GAM-114": "GAM-5",
+    "GAM-116": "GAM-5",
+    "GAM-117": "GAM-5",
+    "GAM-118": "GAM-5",
+    "GAM-119": "GAM-5",
+    "GAM-120": "GAM-5",
+    "GAM-121": "GAM-5",
+    "GAM-122": "GAM-5",
+    "GAM-123": "GAM-5",
+    "GAM-124": "GAM-5",
+    "GAM-125": "GAM-5",
+    "GAM-126": "GAM-5",
+    "GAM-127": "GAM-5",
+    "GAM-128": "GAM-5",
+    "GAM-106": "GAM-6",
+    "GAM-129": "GAM-6",
+    "GAM-131": "GAM-6",
+    "GAM-135": "GAM-6",
+    "GAM-137": "GAM-6",
+    "GAM-138": "GAM-6",
+    "GAM-139": "GAM-6",
+    "GAM-140": "GAM-6",
+    "GAM-141": "GAM-6",
+    "GAM-91": "GAM-4",
+    "GAM-92": "GAM-4",
+    "GAM-95": "GAM-4",
+    "GAM-104": "GAM-4"
+  },
+  "sections": [
+    {
+      "epic_key": "GAM-1",
+      "story_key": "GAM-7",
+      "story_title": "Mock API 명세 구현",
+      "task_keys": [
+        "GAM-27",
+        "GAM-28",
+        "GAM-29",
+        "GAM-30",
+        "GAM-31",
+        "GAM-32"
+      ]
+    },
+    {
+      "epic_key": "GAM-1",
+      "story_key": "GAM-8",
+      "story_title": "API 문서(Markdown) & 프론트엔드 협업 가이드",
+      "task_keys": [
+        "GAM-33",
+        "GAM-34",
+        "GAM-35",
+        "GAM-36",
+        "GAM-37"
+      ]
+    },
+    {
+      "epic_key": "GAM-1",
+      "story_key": "GAM-9",
+      "story_title": "DB 인프라 구축 (단일 모듈 프로젝트)",
+      "task_keys": [
+        "GAM-38",
+        "GAM-39",
+        "GAM-40",
+        "GAM-41",
+        "GAM-13-5"
+      ]
+    },
+    {
+      "epic_key": "GAM-2",
+      "story_key": "GAM-20",
+      "story_title": "Auth API (회원가입/로그인)",
+      "task_keys": [
+        "GAM-20-1",
+        "GAM-20-2",
+        "GAM-20-3",
+        "GAM-20-4",
+        "GAM-20-5"
+      ]
+    },
+    {
+      "epic_key": "GAM-2",
+      "story_key": "GAM-10",
+      "story_title": "DB 스키마 설계 & 마이그레이션",
+      "task_keys": [
+        "GAM-21-1",
+        "GAM-44",
+        "GAM-45",
+        "GAM-21-4",
+        "GAM-47",
+        "GAM-48"
+      ]
+    },
+    {
+      "epic_key": "GAM-2",
+      "story_key": "GAM-11",
+      "story_title": "User Profile API 구현",
+      "task_keys": [
+        "GAM-22-1",
+        "GAM-50",
+        "GAM-20",
+        "GAM-52",
+        "GAM-53",
+        "GAM-54",
+        "GAM-55",
+        "GAM-56"
+      ]
+    },
+    {
+      "epic_key": "GAM-2",
+      "story_key": "GAM-12",
+      "story_title": "단위 테스트 & 통합 테스트",
+      "task_keys": [
+        "GAM-57",
+        "GAM-58",
+        "GAM-59",
+        "GAM-60",
+        "GAM-61",
+        "GAM-62"
+      ]
+    },
+    {
+      "epic_key": "GAM-3",
+      "story_key": "GAM-13",
+      "story_title": "매칭 엔진 Hard Filter 구현",
+      "task_keys": [
+        "GAM-63",
+        "GAM-64",
+        "GAM-65",
+        "GAM-66",
+        "GAM-67",
+        "GAM-68",
+        "GAM-69",
+        "GAM-70"
+      ]
+    },
+    {
+      "epic_key": "GAM-3",
+      "story_key": "GAM-14",
+      "story_title": "Base Score 계산 (6대 지표)",
+      "task_keys": [
+        "GAM-71",
+        "GAM-32-2",
+        "GAM-32-3",
+        "GAM-32-4",
+        "GAM-32-5",
+        "GAM-32-6",
+        "GAM-32-7",
+        "GAM-32-8",
+        "GAM-32-9"
+      ]
+    },
+    {
+      "epic_key": "GAM-3",
+      "story_key": "GAM-15",
+      "story_title": "경로 최적화 & 리스크 패널티",
+      "task_keys": [
+        "GAM-15-1",
+        "GAM-15-2",
+        "GAM-15-3",
+        "GAM-15-4",
+        "GAM-15-5"
+      ]
+    },
+    {
+      "epic_key": "GAM-4",
+      "story_key": "GAM-16",
+      "story_title": "School & Program Master Data",
+      "task_keys": [
+        "GAM-16-1",
+        "GAM-16-2",
+        "GAM-16-3",
+        "GAM-16-4",
+        "GAM-16-5",
+        "GAM-16-6",
+        "GAM-16-7",
+        "GAM-16-8"
+      ]
+    },
+    {
+      "epic_key": "GAM-4",
+      "story_key": "GAM-17",
+      "story_title": "매칭 실행 API 구현",
+      "task_keys": [
+        "GAM-17-1",
+        "GAM-17-2",
+        "GAM-17-3",
+        "GAM-17-4",
+        "GAM-17-5",
+        "GAM-17-6",
+        "GAM-17-7"
+      ]
+    },
+    {
+      "epic_key": "GAM-4",
+      "story_key": "GAM-18",
+      "story_title": "Explainable AI 설명 생성",
+      "task_keys": [
+        "GAM-18-1",
+        "GAM-18-2",
+        "GAM-18-3",
+        "GAM-18-4",
+        "GAM-18-5"
+      ]
+    },
+    {
+      "epic_key": "GAM-4",
+      "story_key": "GAM-19",
+      "story_title": "E2E 통합 시나리오 검증",
+      "task_keys": [
+        "GAM-19-1",
+        "GAM-19-2",
+        "GAM-19-3"
+      ]
+    },
+    {
+      "epic_key": "GAM-5",
+      "story_key": "GAM-20",
+      "story_title": "Application API 구현",
+      "task_keys": [
+        "GAM-20-1",
+        "GAM-20-2",
+        "GAM-20-3",
+        "GAM-20-4",
+        "GAM-20-5",
+        "GAM-20-6"
+      ]
+    },
+    {
+      "epic_key": "GAM-5",
+      "story_key": "GAM-21",
+      "story_title": "Document 업로드",
+      "task_keys": [
+        "GAM-21-1",
+        "GAM-21-2",
+        "GAM-21-3",
+        "GAM-21-4",
+        "GAM-21-5",
+        "GAM-21-6",
+        "GAM-21-7"
+      ]
+    },
+    {
+      "epic_key": "GAM-5",
+      "story_key": "GAM-22",
+      "story_title": "Dashboard API",
+      "task_keys": [
+        "GAM-22-1",
+        "GAM-22-2",
+        "GAM-22-3",
+        "GAM-22-4"
+      ]
+    },
+    {
+      "epic_key": "GAM-5",
+      "story_key": "GAM-55",
+      "story_title": "Bookmark API",
+      "task_keys": [
+        "GAM-55-1",
+        "GAM-55-2",
+        "GAM-55-3",
+        "GAM-55-4"
+      ]
+    },
+    {
+      "epic_key": "GAM-5",
+      "story_key": "GAM-23",
+      "story_title": "통합 테스트",
+      "task_keys": [
+        "GAM-23-1",
+        "GAM-23-2",
+        "GAM-23-3",
+        "GAM-23-4"
+      ]
+    },
+    {
+      "epic_key": "GAM-6",
+      "story_key": "GAM-24",
+      "story_title": "보안 강화",
+      "task_keys": [
+        "GAM-24-1",
+        "GAM-24-2",
+        "GAM-24-3",
+        "GAM-24-4",
+        "GAM-24-5"
+      ]
+    },
+    {
+      "epic_key": "GAM-6",
+      "story_key": "GAM-25",
+      "story_title": "모니터링 & 로깅",
+      "task_keys": [
+        "GAM-25-1",
+        "GAM-25-2",
+        "GAM-25-3",
+        "GAM-25-4"
+      ]
+    },
+    {
+      "epic_key": "GAM-6",
+      "story_key": "GAM-26",
+      "story_title": "최종 문서화",
+      "task_keys": [
+        "GAM-26-1",
+        "GAM-26-2",
+        "GAM-26-3",
+        "GAM-26-4"
+      ]
+    }
+  ],
+  "task_count": 116,
+  "section_count": 22
+}

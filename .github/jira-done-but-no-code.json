@@ -1,0 +1,286 @@
+{
+  "done_but_no_code": [
+    {
+      "jira_key": "GAM-1",
+      "summary": "Mock API 및 API 문서(Markdown) 구축",
+      "type": "에픽",
+      "backlog_key": null,
+      "reason": "no_backlog_mapping"
+    },
+    {
+      "jira_key": "GAM-2",
+      "summary": "사용자 프로필 및 유학 목표 관리",
+      "type": "에픽",
+      "backlog_key": null,
+      "reason": "no_backlog_mapping"
+    },
+    {
+      "jira_key": "GAM-7",
+      "summary": "GAM-11",
+      "type": "스토리",
+      "backlog_key": null,
+      "reason": "no_backlog_mapping"
+    },
+    {
+      "jira_key": "GAM-8",
+      "summary": "GAM-12",
+      "type": "스토리",
+      "backlog_key": null,
+      "reason": "no_backlog_mapping"
+    },
+    {
+      "jira_key": "GAM-9",
+      "summary": "GAM-13",
+      "type": "스토리",
+      "backlog_key": null,
+      "reason": "no_backlog_mapping"
+    },
+    {
+      "jira_key": "GAM-10",
+      "summary": "GAM-21",
+      "type": "스토리",
+      "backlog_key": null,
+      "reason": "no_backlog_mapping"
+    },
+    {
+      "jira_key": "GAM-12",
+      "summary": "GAM-23",
+      "type": "스토리",
+      "backlog_key": "GAM-23",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-15",
+      "summary": "GAM-33",
+      "type": "스토리",
+      "backlog_key": "GAM-33",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-16",
+      "summary": "GAM-41",
+      "type": "스토리",
+      "backlog_key": "GAM-41",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-17",
+      "summary": "GAM-42",
+      "type": "스토리",
+      "backlog_key": "GAM-42",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-18",
+      "summary": "GAM-43",
+      "type": "스토리",
+      "backlog_key": "GAM-43",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-19",
+      "summary": "GAM-44",
+      "type": "스토리",
+      "backlog_key": "GAM-44",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-24",
+      "summary": "GAM-61",
+      "type": "스토리",
+      "backlog_key": "GAM-61",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-25",
+      "summary": "GAM-62",
+      "type": "스토리",
+      "backlog_key": "GAM-62",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-26",
+      "summary": "GAM-63",
+      "type": "스토리",
+      "backlog_key": "GAM-63",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-27",
+      "summary": "단일 모듈 구조 확인 (ga-api-platform 루트)",
+      "type": "작업",
+      "backlog_key": "GAM-11-1",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-34",
+      "summary": "docs/api/ 엔드포인트별 Markdown (matching, programs, schools)",
+      "type": "작업",
+      "backlog_key": "GAM-12-2",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-35",
+      "summary": "docs/FRONTEND_HANDOFF.md 작성 (링크 공유 방식, Base URL, 일정)",
+      "type": "작업",
+      "backlog_key": "GAM-12-3",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-36",
+      "summary": "docs/04_FRONTEND_COOPERATION.md 참조 또는 통합",
+      "type": "작업",
+      "backlog_key": "GAM-12-4",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-37",
+      "summary": "README \"프론트엔드 협업\"에 FRONTEND_HANDOFF.md 링크 추가",
+      "type": "작업",
+      "backlog_key": "GAM-12-5",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-38",
+      "summary": "build.gradle.kts에 JPA, PostgreSQL, Flyway 의존성 추가",
+      "type": "작업",
+      "backlog_key": "GAM-13-1",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-39",
+      "summary": "application.yml 프로파일 및 Flyway 기본 설정",
+      "type": "작업",
+      "backlog_key": "GAM-13-2",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-40",
+      "summary": "application-lightsail.yml, application-local.yml 작성",
+      "type": "작업",
+      "backlog_key": "GAM-13-3",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-45",
+      "summary": "인덱스 생성 쿼리 작성",
+      "type": "작업",
+      "backlog_key": "GAM-21-3",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-46",
+      "summary": "Flyway 설정 확인 (application.yml, 이미 GAM-13에서 설정됨)",
+      "type": "작업",
+      "backlog_key": null,
+      "reason": "no_backlog_mapping"
+    },
+    {
+      "jira_key": "GAM-47",
+      "summary": "마이그레이션 테스트 (로컬 DB)",
+      "type": "작업",
+      "backlog_key": "GAM-21-5",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-48",
+      "summary": "ERD 다이어그램 작성 (docs/erd.png)",
+      "type": "작업",
+      "backlog_key": "GAM-21-6",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-49",
+      "summary": "User Entity 생성 (GAM-13 V1 마이그레이션의 users 테이블 매핑)",
+      "type": "작업",
+      "backlog_key": null,
+      "reason": "no_backlog_mapping"
+    },
+    {
+      "jira_key": "GAM-51",
+      "summary": "UserPreference Entity 생성 (user_preferences 테이블 매핑)",
+      "type": "작업",
+      "backlog_key": "GAM-51",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-56",
+      "summary": "Validation 로직 추가",
+      "type": "작업",
+      "backlog_key": "GAM-22-8",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-57",
+      "summary": "UserProfileServiceTest.kt 작성",
+      "type": "작업",
+      "backlog_key": "GAM-23-1",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-58",
+      "summary": "UserProfileControllerTest.kt 작성",
+      "type": "작업",
+      "backlog_key": "GAM-23-2",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-59",
+      "summary": "MockK 설정 및 Mocking",
+      "type": "작업",
+      "backlog_key": "GAM-23-3",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-60",
+      "summary": "성공 시나리오 테스트",
+      "type": "작업",
+      "backlog_key": "GAM-23-4",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-64",
+      "summary": "HardFilterService.kt 생성",
+      "type": "작업",
+      "backlog_key": "GAM-31-2",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-65",
+      "summary": "예산 초과 필터 구현",
+      "type": "작업",
+      "backlog_key": "GAM-31-3",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-66",
+      "summary": "비자 요건 필터 구현",
+      "type": "작업",
+      "backlog_key": "GAM-31-4",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-67",
+      "summary": "영어 점수 필터 구현",
+      "type": "작업",
+      "backlog_key": "GAM-31-5",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-68",
+      "summary": "입학 시기 필터 구현",
+      "type": "작업",
+      "backlog_key": "GAM-31-6",
+      "reason": "code_not_verified"
+    },
+    {
+      "jira_key": "GAM-69",
+      "summary": "영어 점수 환산 유틸리티",
+      "type": "작업",
+      "backlog_key": "GAM-31-7",
+      "reason": "code_not_verified"
+    }
+  ],
+  "total_done": 50,
+  "total_issues": 71
+}

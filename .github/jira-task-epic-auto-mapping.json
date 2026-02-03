@@ -1,0 +1,379 @@
+{
+  "task_to_epic": {
+    "GAM-46": "GAM-1",
+    "GAM-49": "GAM-1",
+    "GAM-78": "GAM-1",
+    "GAM-85": "GAM-1",
+    "GAM-86": "GAM-1",
+    "GAM-132": "GAM-1",
+    "GAM-134": "GAM-1",
+    "GAM-136": "GAM-1",
+    "GAM-87": "GAM-2",
+    "GAM-88": "GAM-2",
+    "GAM-94": "GAM-2",
+    "GAM-109": "GAM-2",
+    "GAM-115": "GAM-2",
+    "GAM-72": "GAM-3",
+    "GAM-73": "GAM-3",
+    "GAM-74": "GAM-3",
+    "GAM-75": "GAM-3",
+    "GAM-76": "GAM-3",
+    "GAM-77": "GAM-3",
+    "GAM-79": "GAM-3",
+    "GAM-80": "GAM-3",
+    "GAM-81": "GAM-3",
+    "GAM-82": "GAM-3",
+    "GAM-83": "GAM-3",
+    "GAM-84": "GAM-3",
+    "GAM-130": "GAM-3",
+    "GAM-89": "GAM-4",
+    "GAM-90": "GAM-4",
+    "GAM-93": "GAM-4",
+    "GAM-96": "GAM-4",
+    "GAM-97": "GAM-4",
+    "GAM-98": "GAM-4",
+    "GAM-99": "GAM-4",
+    "GAM-100": "GAM-4",
+    "GAM-101": "GAM-4",
+    "GAM-102": "GAM-4",
+    "GAM-103": "GAM-4",
+    "GAM-105": "GAM-4",
+    "GAM-107": "GAM-4",
+    "GAM-133": "GAM-4",
+    "GAM-108": "GAM-5",
+    "GAM-110": "GAM-5",
+    "GAM-111": "GAM-5",
+    "GAM-112": "GAM-5",
+    "GAM-113": "GAM-5",
+    "GAM-114": "GAM-5",
+    "GAM-116": "GAM-5",
+    "GAM-117": "GAM-5",
+    "GAM-118": "GAM-5",
+    "GAM-119": "GAM-5",
+    "GAM-120": "GAM-5",
+    "GAM-121": "GAM-5",
+    "GAM-122": "GAM-5",
+    "GAM-123": "GAM-5",
+    "GAM-124": "GAM-5",
+    "GAM-125": "GAM-5",
+    "GAM-126": "GAM-5",
+    "GAM-127": "GAM-5",
+    "GAM-128": "GAM-5",
+    "GAM-106": "GAM-6",
+    "GAM-129": "GAM-6",
+    "GAM-131": "GAM-6",
+    "GAM-135": "GAM-6",
+    "GAM-137": "GAM-6",
+    "GAM-138": "GAM-6",
+    "GAM-139": "GAM-6",
+    "GAM-140": "GAM-6",
+    "GAM-141": "GAM-6"
+  },
+  "classified": {
+    "GAM-1": [
+      {
+        "key": "GAM-46",
+        "summary": "Flyway 설정 확인 (application.yml, 이미 GAM-13에서 설정됨)"
+      },
+      {
+        "key": "GAM-49",
+        "summary": "User Entity 생성 (GAM-13 V1 마이그레이션의 users 테이블 매핑)"
+      },
+      {
+        "key": "GAM-78",
+        "summary": "WeightConfig.kt 설정 클래스"
+      },
+      {
+        "key": "GAM-85",
+        "summary": "School.kt Entity 생성"
+      },
+      {
+        "key": "GAM-86",
+        "summary": "Program.kt Entity 생성"
+      },
+      {
+        "key": "GAM-132",
+        "summary": "CORS 설정"
+      },
+      {
+        "key": "GAM-134",
+        "summary": "Actuator 설정"
+      },
+      {
+        "key": "GAM-136",
+        "summary": "로그 포맷 설정 (JSON)"
+      }
+    ],
+    "GAM-2": [
+      {
+        "key": "GAM-87",
+        "summary": "SchoolRepository 생성"
+      },
+      {
+        "key": "GAM-88",
+        "summary": "ProgramRepository 생성"
+      },
+      {
+        "key": "GAM-94",
+        "summary": "MatchingResultRepository"
+      },
+      {
+        "key": "GAM-109",
+        "summary": "ApplicationRepository"
+      },
+      {
+        "key": "GAM-115",
+        "summary": "DocumentRepository"
+      }
+    ],
+    "GAM-3": [
+      {
+        "key": "GAM-72",
+        "summary": "학업 적합도 계산 로직"
+      },
+      {
+        "key": "GAM-73",
+        "summary": "영어 적합도 계산 로직"
+      },
+      {
+        "key": "GAM-74",
+        "summary": "예산 적합도 계산 로직"
+      },
+      {
+        "key": "GAM-75",
+        "summary": "지역 선호 계산 로직"
+      },
+      {
+        "key": "GAM-76",
+        "summary": "기간 적합도 계산 로직"
+      },
+      {
+        "key": "GAM-77",
+        "summary": "진로 연계성 계산 로직"
+      },
+      {
+        "key": "GAM-79",
+        "summary": "GPA 정규화 유틸리티"
+      },
+      {
+        "key": "GAM-80",
+        "summary": "PathOptimizationService.kt 생성"
+      },
+      {
+        "key": "GAM-81",
+        "summary": "경로 최적화 시나리오 구현"
+      },
+      {
+        "key": "GAM-82",
+        "summary": "리스크 패널티 로직 구현"
+      },
+      {
+        "key": "GAM-83",
+        "summary": "추천 유형 분류 로직"
+      },
+      {
+        "key": "GAM-84",
+        "summary": "최종 점수 계산 및 검증"
+      },
+      {
+        "key": "GAM-130",
+        "summary": "RateLimitingFilter 구현"
+      }
+    ],
+    "GAM-4": [
+      {
+        "key": "GAM-89",
+        "summary": "seed_schools.sql 작성 (20개 학교)"
+      },
+      {
+        "key": "GAM-90",
+        "summary": "seed_programs.sql 작성 (40개 프로그램)"
+      },
+      {
+        "key": "GAM-93",
+        "summary": "MatchingResult.kt Entity"
+      },
+      {
+        "key": "GAM-96",
+        "summary": "전체 매칭 파이프라인 구현"
+      },
+      {
+        "key": "GAM-97",
+        "summary": "결과 저장 로직"
+      },
+      {
+        "key": "GAM-98",
+        "summary": "결과 조회 로직"
+      },
+      {
+        "key": "GAM-99",
+        "summary": "성능 최적화 (캐싱, 인덱스)"
+      },
+      {
+        "key": "GAM-100",
+        "summary": "ExplanationService.kt 생성"
+      },
+      {
+        "key": "GAM-101",
+        "summary": "설명 템플릿 정의"
+      },
+      {
+        "key": "GAM-102",
+        "summary": "점수 기여도 분석 로직"
+      },
+      {
+        "key": "GAM-103",
+        "summary": "긍정/부정 요소 추출"
+      },
+      {
+        "key": "GAM-105",
+        "summary": "Mock/실제 스키마 비교 체크리스트 작성"
+      },
+      {
+        "key": "GAM-107",
+        "summary": "E2E 호출 시나리오 테스트"
+      },
+      {
+        "key": "GAM-133",
+        "summary": "보안 체크리스트 검증"
+      }
+    ],
+    "GAM-5": [
+      {
+        "key": "GAM-108",
+        "summary": "Application.kt Entity"
+      },
+      {
+        "key": "GAM-110",
+        "summary": "ApplicationService"
+      },
+      {
+        "key": "GAM-111",
+        "summary": "ApplicationController"
+      },
+      {
+        "key": "GAM-112",
+        "summary": "ApplicationStatus Enum"
+      },
+      {
+        "key": "GAM-113",
+        "summary": "Progress 계산 로직"
+      },
+      {
+        "key": "GAM-114",
+        "summary": "Document.kt Entity"
+      },
+      {
+        "key": "GAM-116",
+        "summary": "DocumentService"
+      },
+      {
+        "key": "GAM-117",
+        "summary": "FileStorageService (S3 or Local)"
+      },
+      {
+        "key": "GAM-118",
+        "summary": "DocumentController"
+      },
+      {
+        "key": "GAM-119",
+        "summary": "파일 검증 로직"
+      },
+      {
+        "key": "GAM-120",
+        "summary": "파일 삭제 로직"
+      },
+      {
+        "key": "GAM-121",
+        "summary": "DashboardController.kt"
+      },
+      {
+        "key": "GAM-122",
+        "summary": "DashboardService"
+      },
+      {
+        "key": "GAM-123",
+        "summary": "집계 쿼리 작성"
+      },
+      {
+        "key": "GAM-124",
+        "summary": "DashboardResponse DTO"
+      },
+      {
+        "key": "GAM-125",
+        "summary": "E2E 테스트 작성"
+      },
+      {
+        "key": "GAM-126",
+        "summary": "성능 테스트 스크립트"
+      },
+      {
+        "key": "GAM-127",
+        "summary": "테스트 데이터 준비"
+      },
+      {
+        "key": "GAM-128",
+        "summary": "테스트 실행 및 결과 분석"
+      }
+    ],
+    "GAM-6": [
+      {
+        "key": "GAM-106",
+        "summary": "프론트 호출 성공 기준 문서화"
+      },
+      {
+        "key": "GAM-129",
+        "summary": "JwtAuthenticationFilter 적용"
+      },
+      {
+        "key": "GAM-131",
+        "summary": "InputValidator 구현"
+      },
+      {
+        "key": "GAM-135",
+        "summary": "Prometheus 메트릭 추가"
+      },
+      {
+        "key": "GAM-137",
+        "summary": "커스텀 메트릭 추가"
+      },
+      {
+        "key": "GAM-138",
+        "summary": "README.md 작성 (단일 모듈 구조, Docker 배포, .env 관리 등)"
+      },
+      {
+        "key": "GAM-139",
+        "summary": "04_FRONTEND_COOPERATION.md 업데이트"
+      },
+      {
+        "key": "GAM-140",
+        "summary": "API 사용 예시 추가"
+      },
+      {
+        "key": "GAM-141",
+        "summary": "트러블슈팅 가이드 작성"
+      }
+    ],
+    "UNKNOWN": [
+      {
+        "key": "GAM-91",
+        "summary": "SchoolService 구현"
+      },
+      {
+        "key": "GAM-92",
+        "summary": "ProgramController 구현"
+      },
+      {
+        "key": "GAM-95",
+        "summary": "MatchingController.kt"
+      },
+      {
+        "key": "GAM-104",
+        "summary": "설명 문구 생성 로직"
+      }
+    ]
+  },
+  "total": 72,
+  "classified_count": 68,
+  "unknown_count": 4
+}

@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Profile
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
@@ -32,7 +31,7 @@ class MatchingController(
     @PostMapping("/run")
     @PreAuthorize("isAuthenticated()")
     fun runMatching(
-        @AuthenticationPrincipal userDetails: UserDetails,
+        @AuthenticationPrincipal(expression = "principal") principal: String?,
         @RequestBody request: MatchingRunRequest
     ): ResponseEntity<ApiResponse<MatchingResponse>> {
         val userId = UUID.fromString(request.userId)
@@ -48,7 +47,7 @@ class MatchingController(
     @GetMapping("/result")
     @PreAuthorize("isAuthenticated()")
     fun getLatestMatchingResult(
-        @AuthenticationPrincipal userDetails: UserDetails
+        @AuthenticationPrincipal(expression = "principal") principal: String?
     ): ResponseEntity<ApiResponse<String>> {
         return ResponseEntity.ok(
             ApiResponse(

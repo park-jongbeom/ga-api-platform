@@ -4,6 +4,11 @@
 
 ## 최근 업데이트 (2026-02-03)
 
+- **RAG 기반 AI 매칭 엔진**: GAM-3 완료 - pgvector, Gemini AI, Rule-based 하이브리드 매칭 시스템 구현 ✅
+  - Vector DB (pgvector) + 벡터 검색 (Top 20)
+  - Hard Filter (4가지), Base Score (6대 지표), Path Optimization, Risk Penalty
+  - Explainable AI (설명 생성)
+  - `POST /api/v1/matching/run` (실제 매칭, local/lightsail 프로파일)
 - **CORS**: 로컬 개발용 Origin 추가 (`http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:3000`, `http://127.0.0.1:3000`)
 - **엔티티**: School, Program 엔티티 추가 (V3 마이그레이션 schools/programs 테이블 매핑). AcademicProfile에 major, gpaScale, graduationDate, institution 반영
 - **설정**: WeightConfig (매칭 가중치) 빈 등록
@@ -11,9 +16,9 @@
 - **Response DTO**: ProfileResponse, EducationResponse, PreferenceResponse, CompleteUserProfileResponse 추가
 - **Validation**: EducationRequest/PreferenceRequest 검증 강화 (GPA·예산 범위 등)
 - **Repository**: SchoolRepository, ProgramRepository 추가
-- **테스트**: 성공/실패 시나리오 및 JaCoCo 커버리지 측정
-- **문서**: [docs/erd.md](erd.md) (Mermaid ERD) 추가
-- **작업 현황**: 전체 115개 작업 중 **43개 완료** (백로그 기준). 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
+- **테스트**: 성공/실패 시나리오 및 JaCoCo 커버리지 측정. 전체 28개 테스트 통과
+- **문서**: [docs/erd.md](erd.md) (Mermaid ERD), [docs/RAG_ARCHITECTURE.md](RAG_ARCHITECTURE.md) (RAG 아키텍처) 추가
+- **작업 현황**: 전체 115개 작업 중 **64개 완료** (백로그 기준). 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
 - **로컬 연동**: [docs/LOCAL_TESTING.md](LOCAL_TESTING.md)에 React/Vite 로컬 연동 가이드 추가
 
 ---
@@ -46,6 +51,10 @@
 
 **참고**: Auth API·User Profile API는 DB가 연결된 환경(local/lightsail 프로파일)에서만 사용 가능합니다. 배포 시 해당 프로파일이 적용되어 있으면 사용할 수 있습니다.
 
+### RAG 기반 매칭 API (Week 3, local/lightsail 프로파일) ✅ 구현 완료
+
+**참고**: RAG 기반 실제 매칭 API는 DB가 연결된 환경(local/lightsail 프로파일)에서만 사용 가능합니다. Mock API(`default` 프로파일)와 동일한 엔드포인트를 사용하지만, 실제 벡터 검색 + Rule-based 알고리즘으로 매칭을 수행합니다.
+
 | 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
 |--------|------|------|-----------|------|
 | POST | `/api/v1/auth/signup` | 회원가입 | [auth.md](api/auth.md) | ✅ |
@@ -56,6 +65,25 @@
 | POST | `/api/v1/user/preference` | 유학 목표 설정 | [user-profile.md](api/user-profile.md) | ✅ |
 
 User Profile API는 **JWT 인증이 필요**합니다. 로그인 후 받은 토큰을 `Authorization: Bearer <token>` 헤더에 포함하여 호출하세요.
+
+| 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
+|--------|------|------|-----------|------|
+| POST | `/api/v1/matching/run` | RAG 기반 실제 매칭 실행 (JWT 필요, local/lightsail만) | [matching.md](api/matching.md) | ✅ |
+
+**성능**:
+- 벡터 검색 (Top 20): ~500ms
+- Rule-based 계산: ~1초
+- 전체 매칭 시간: ~2초
+
+**매칭 알고리즘**:
+1. 사용자 프로필 기반 벡터 검색 (pgvector, Gemini embedding)
+2. Hard Filter (예산, 비자, 영어 점수, 입학 시기)
+3. Base Score (6대 지표: 학업 20%, 영어 15%, 예산 15%, 지역 10%, 기간 10%, 진로 30%)
+4. Path Optimization (GPA 낮음+예산 제한→CC, 영어 없음→Vocational 등)
+5. Risk Penalty (경쟁률, 임계 점수, 의사 불명확 등)
+6. Explainable AI (Gemini 기반 설명 생성)
+
+상세: [docs/RAG_ARCHITECTURE.md](RAG_ARCHITECTURE.md)
 
 ### 테스트 계정 (개발/연동용)
 
@@ -128,12 +156,12 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 |------|------|-----------|---------------|
 | Week 1 | GAM-1 | 23/23 | Mock API 4개 ✅ |
 | Week 2 | GAM-2 | 18/21 | Auth 2개 ✅, User Profile 4개 ✅ |
-| Week 3 | GAM-3 | 0/22 | - |
+| Week 3 | GAM-3 | 21/22 | RAG 매칭 API 1개 ✅ |
 | Week 4 | GAM-4 | 0/21 | - |
 | Week 5 | GAM-5 | 2/19 | - |
 | Week 6 | GAM-6 | 0/9 | - |
 
-- 전체: **43/115** (백로그 문서 Epic별 Tasks 기준)
+- 전체: **64/115** (백로그 문서 Epic별 Tasks 기준)
 - 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
 
 상세 일정은 전달받은 백로그/일정 링크를 참고하세요.

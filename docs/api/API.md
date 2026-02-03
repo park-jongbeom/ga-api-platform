@@ -67,7 +67,7 @@ interface MatchingResult {
 | [프로필 저장](user-profile.md#프로필-기본-정보-저장수정) | PUT | `/api/v1/user/profile` | MBTI, 태그, 자기소개 (JWT 필요) |
 | [학력 정보](user-profile.md#학력-정보-입력) | POST | `/api/v1/user/education` | 학교, GPA, 영어 점수 (JWT 필요) |
 | [유학 목표](user-profile.md#유학-목표-설정) | POST | `/api/v1/user/preference` | 목표 프로그램, 예산 (JWT 필요) |
-| [매칭 실행](matching.md#매칭-실행) | POST | `/api/v1/matching/run` | 사용자 ID로 Mock 매칭 실행 |
-| [최신 매칭 결과 조회](matching.md#최신-매칭-결과-조회) | GET | `/api/v1/matching/result` | 가장 최근 매칭 결과 조회 |
+| [매칭 실행](matching.md#매칭-실행) | POST | `/api/v1/matching/run` | default는 Mock, local/lightsail은 RAG 기반 매칭 (JWT 필요) |
+| [최신 매칭 결과 조회](matching.md#최신-매칭-결과-조회) | GET | `/api/v1/matching/result` | default는 Mock 정상 응답, local/lightsail은 현재 미구현(NOT_IMPLEMENTED, Week 4 예정) |
 | [프로그램 목록 조회](programs.md#프로그램-목록-조회) | GET | `/api/v1/programs` | 타입/지역별 프로그램 목록 |
 | [학교 상세 조회](schools.md#학교-상세-조회) | GET | `/api/v1/schools/{schoolId}` | 학교 ID로 상세 정보 조회 |

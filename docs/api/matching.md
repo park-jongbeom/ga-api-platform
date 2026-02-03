@@ -140,12 +140,16 @@ const json = await res.json();
 
 가장 최근에 실행된 매칭 결과를 반환합니다.
 
+**프로파일별 동작**:
+- **`default` 프로파일 (Mock)**: 정상 응답을 반환합니다.
+- **`local`/`lightsail` 프로파일**: 현재 **미구현**입니다. 이 엔드포인트를 호출하면 `success: false`, `code: "NOT_IMPLEMENTED"`, `message: "매칭 이력 조회는 Week 4에 구현됩니다. /api/v1/matching/run을 사용하세요."` 를 반환합니다. 실제 매칭 결과는 `POST /api/v1/matching/run` 응답으로 받으세요.
+
 ### 요청
 
 - **Method**: `GET`
 - **Path**: `/api/v1/matching/result`
 
-### 성공 응답 (200)
+### 성공 응답 (200, default 프로파일만)
 
 동일한 `ApiResponse<MatchingResponse>` 형식. `data`에 매칭 결과 객체가 포함됩니다.
 

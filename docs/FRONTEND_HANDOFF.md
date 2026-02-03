@@ -43,19 +43,14 @@
 
 | 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
 |--------|------|------|-----------|------|
-| POST | `/api/v1/matching/run` | 매칭 실행 (body: `{"user_id":"..."}`) | [matching.md](api/matching.md) | ✅ |
-| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 | [matching.md](api/matching.md) | ✅ |
+| POST | `/api/v1/matching/run` | 매칭 실행 (Mock, 인증 불필요) | [matching.md](api/matching.md) | ✅ |
+| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 (Mock) | [matching.md](api/matching.md) | ✅ |
 | GET | `/api/v1/programs?type=...` | 프로그램 목록 (type: university, community_college, vocational) | [programs.md](api/programs.md) | ✅ |
 | GET | `/api/v1/schools/{schoolId}` | 학교 상세 조회 | [schools.md](api/schools.md) | ✅ |
 
 ### Auth & User Profile (Week 2, local/lightsail 프로파일) ✅ 구현 완료
 
 **참고**: Auth API·User Profile API는 DB가 연결된 환경(local/lightsail 프로파일)에서만 사용 가능합니다. 배포 시 해당 프로파일이 적용되어 있으면 사용할 수 있습니다.
-
-### RAG 기반 매칭 API (Week 3, local/lightsail 프로파일) ✅ 구현 완료
-
-**참고**: RAG 기반 실제 매칭 API는 DB가 연결된 환경(local/lightsail 프로파일)에서만 사용 가능합니다. Mock API(`default` 프로파일)와 동일한 엔드포인트를 사용하지만, 실제 벡터 검색 + Rule-based 알고리즘으로 매칭을 수행합니다.
-**Fallback**: DB에 학교/임베딩 데이터(`school_embeddings`)가 없으면 프로필·선호도만으로 Gemini가 생성한 추천을 동일한 형식으로 반환합니다. `data.message`에 안내 문구가 포함되며, 결과의 `school.id`/`program.id`는 `fallback-1`, `fallback-2` 등의 플레이스홀더입니다.
 
 | 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
 |--------|------|------|-----------|------|
@@ -66,11 +61,17 @@
 | POST | `/api/v1/user/education` | 학력 정보 입력 | [user-profile.md](api/user-profile.md) | ✅ |
 | POST | `/api/v1/user/preference` | 유학 목표 설정 | [user-profile.md](api/user-profile.md) | ✅ |
 
-User Profile API는 **JWT 인증이 필요**합니다. 로그인 후 받은 토큰을 `Authorization: Bearer <token>` 헤더에 포함하여 호출하세요.
+### RAG 기반 매칭 API (Week 3, local/lightsail 프로파일) ✅ 구현 완료
+
+**참고**: RAG 기반 실제 매칭 API는 DB가 연결된 환경(local/lightsail 프로파일)에서만 사용 가능합니다. Mock API(`default` 프로파일)와 동일한 엔드포인트를 사용하지만, 실제 벡터 검색 + Rule-based 알고리즘으로 매칭을 수행합니다.
+**Fallback**: DB에 학교/임베딩 데이터(`school_embeddings`)가 없으면 프로필·선호도만으로 Gemini가 생성한 추천을 동일한 형식으로 반환합니다. `data.message`에 안내 문구가 포함되며, 결과의 `school.id`/`program.id`는 `fallback-1`, `fallback-2` 등의 플레이스홀더입니다.
 
 | 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
 |--------|------|------|-----------|------|
-| POST | `/api/v1/matching/run` | RAG 기반 실제 매칭 실행 (JWT 필요, local/lightsail만) | [matching.md](api/matching.md) | ✅ |
+| POST | `/api/v1/matching/run` | 매칭 실행 (RAG 기반, JWT 필요) | [matching.md](api/matching.md) | ✅ |
+| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 (local/lightsail에서는 **미구현**, Week 4 예정. 현재는 NOT_IMPLEMENTED 반환) | [matching.md](api/matching.md) | ⏳ Week 4 |
+
+User Profile API는 **JWT 인증이 필요**합니다. 로그인 후 받은 토큰을 `Authorization: Bearer <token>` 헤더에 포함하여 호출하세요.
 
 **성능**:
 - 벡터 검색 (Top 20): ~500ms

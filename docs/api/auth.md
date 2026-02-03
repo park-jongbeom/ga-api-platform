@@ -30,7 +30,7 @@
     "user": {
       "id": "uuid",
       "email": "user@example.com",
-      "fullName": "user"
+      "full_name": "user"
     }
   }
 }

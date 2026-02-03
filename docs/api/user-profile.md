@@ -24,25 +24,25 @@
       "bio": "안녕하세요."
     },
     "education": {
-      "schoolName": "테스트고등학교",
-      "schoolLocation": "서울",
+      "school_name": "테스트고등학교",
+      "school_location": "서울",
       "gpa": 3.5,
-      "gpaScale": 4.0,
-      "englishTestType": "TOEFL",
-      "englishScore": 95,
-      "degreeType": "고등학교",
+      "gpa_scale": 4.0,
+      "english_test_type": "TOEFL",
+      "english_score": 95,
+      "degree_type": "고등학교",
       "degree": "고등학교",
       "major": "문과",
-      "graduationDate": "2024-02-01",
+      "graduation_date": "2024-02-01",
       "institution": "테스트고"
     },
     "preference": {
-      "targetProgram": "community_college",
-      "targetMajor": "CS",
-      "targetLocation": "CA",
-      "budgetUsd": 50000,
-      "careerGoal": "소프트웨어 엔지니어",
-      "preferredTrack": "2+2"
+      "target_program": "community_college",
+      "target_major": "CS",
+      "target_location": "CA",
+      "budget_usd": 50000,
+      "career_goal": "소프트웨어 엔지니어",
+      "preferred_track": "2+2"
     }
   }
 }

@@ -57,10 +57,10 @@ Auth·User Profile API 연동 시 바로 로그인해서 토큰을 받을 수 �
 | 항목 | 값 |
 |------|-----|
 | **이메일** | `test@example.com` |
-| **비밀번호** | `test1234` |
+| **비밀번호** | `test1234Z` |
 | **이름** | 테스트 사용자 |
 
-- 로그인: `POST /api/v1/auth/login` body `{"email":"test@example.com","password":"test1234"}`
+- 로그인: `POST /api/v1/auth/login` body `{"email":"test@example.com","password":"test1234Z"}`
 - 받은 토큰으로 `PUT /api/v1/user/profile`, `POST /api/v1/user/education`, `POST /api/v1/user/preference` 등 호출 시 사용하세요.
 
 ---

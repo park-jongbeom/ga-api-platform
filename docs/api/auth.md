@@ -97,12 +97,12 @@ Authorization: Bearer <token>
 # 회원가입
 curl -X POST http://localhost:8080/api/v1/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}'
+  -d '{"email":"test@example.com","password":"test1234Z"}'
 
 # 로그인
 curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}'
+  -d '{"email":"test@example.com","password":"test1234Z"}'
 
 # 인증 필요 API (token을 위 응답에서 복사)
 curl -X PUT http://localhost:8080/api/v1/user/profile \

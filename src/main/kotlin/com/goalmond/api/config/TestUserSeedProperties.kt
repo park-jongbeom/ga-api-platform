@@ -8,6 +8,6 @@ import org.springframework.context.annotation.Profile
 data class TestUserSeedProperties(
     val enabled: Boolean = true,
     val email: String = "test@example.com",
-    val password: String = "test1234",
+    val password: String = "test1234Z",
     val fullName: String = "테스트 사용자"
 )

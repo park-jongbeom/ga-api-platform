@@ -119,7 +119,7 @@
 # 1. 로그인하여 토큰 발급
 TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}' | jq -r '.data.token')
+  -d '{"email":"test@example.com","password":"test1234Z"}' | jq -r '.data.token')
 
 # 2. 프로필 저장
 curl -X PUT http://localhost:8080/api/v1/user/profile \

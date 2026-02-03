@@ -36,7 +36,7 @@ class AuthAndUserProfileIntegrationTest {
 
     /** 시드된 테스트 계정 (TestUserSeeder). application-local.yml / app.seed-test-user */
     private val seededTestEmail = "test@example.com"
-    private val seededTestPassword = "test1234"
+    private val seededTestPassword = "test1234Z"
 
     @Test
     @DisplayName("시드된 테스트 계정으로 로그인 후 프로필 API 호출")

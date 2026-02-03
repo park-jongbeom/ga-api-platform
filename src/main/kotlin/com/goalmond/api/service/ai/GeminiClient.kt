@@ -74,13 +74,14 @@ class GeminiClient(
      */
     fun embedContent(text: String): List<Double> {
         return executeWithRetry("embedContent") {
+            // Google REST API는 JSON 본문에 camelCase 사용 (outputDimensionality)
             val request = mapOf(
                 "content" to mapOf(
                     "parts" to listOf(
                         mapOf("text" to text)
                     )
                 ),
-                "output_dimensionality" to 768  // 768차원으로 축소
+                "outputDimensionality" to 768  // 768차원 (gemini-embedding-001 지원)
             )
             
             val response = restClient.post()
@@ -124,8 +125,9 @@ class GeminiClient(
             }
         }
         
+        val causeMsg = lastException?.message ?: lastException?.javaClass?.simpleName ?: "unknown"
         throw GeminiApiException(
-            "Gemini API $operation failed after $MAX_RETRIES attempts",
+            "Gemini API $operation failed after $MAX_RETRIES attempts: $causeMsg",
             lastException
         )
     }

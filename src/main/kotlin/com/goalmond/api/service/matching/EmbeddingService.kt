@@ -6,18 +6,27 @@ import com.goalmond.api.repository.SchoolRepository
 import com.goalmond.api.service.ai.GeminiClient
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
+import org.springframework.ai.document.Document
+import org.springframework.ai.vectorstore.VectorStore
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 /**
- * School 임베딩 서비스 (GAM-3, Phase 2).
+ * School 임베딩 서비스 (GAM-3, Phase 2 + RAG 확장).
  * 
  * School 데이터를 텍스트로 변환하여 Gemini API로 임베딩한 후 pgvector에 저장합니다.
+ * Spring AI VectorStore를 활용하여 문서 임베딩 기능 추가.
  */
 @Service
 class EmbeddingService(
     private val geminiClient: GeminiClient,
     private val schoolRepository: SchoolRepository,
-    private val schoolEmbeddingRepository: SchoolEmbeddingRepository
+    private val schoolEmbeddingRepository: SchoolEmbeddingRepository,
+    @Qualifier("schoolDocumentVectorStore")
+    private val schoolDocumentVectorStore: VectorStore,
+    @Qualifier("programDocumentVectorStore")
+    private val programDocumentVectorStore: VectorStore
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     
@@ -119,4 +128,140 @@ class EmbeddingService(
             else -> type
         }
     }
+    
+    // ====== RAG 문서 임베딩 메서드 (Spring AI VectorStore 활용) ======
+    
+    /**
+     * 학교 문서를 임베딩하여 VectorStore에 저장.
+     * 
+     * Spring AI VectorStore가 자동으로 임베딩 생성 및 저장을 처리합니다.
+     * 
+     * @param schoolId 학교 ID
+     * @param docType 문서 타입 (review, admission_guide, statistics, pros_cons)
+     * @param title 문서 제목
+     * @param content 문서 내용
+     * @param metadata 추가 메타데이터
+     * @return 성공 여부
+     */
+    fun embedSchoolDocument(
+        schoolId: UUID,
+        docType: String,
+        title: String,
+        content: String,
+        metadata: Map<String, Any> = emptyMap()
+    ): Boolean {
+        return try {
+            // Spring AI Document 생성
+            val document = Document(
+                content,
+                mapOf(
+                    "school_id" to schoolId.toString(),
+                    "document_type" to docType,
+                    "title" to title
+                ) + metadata
+            )
+            
+            // VectorStore에 추가 (자동 임베딩 + 저장)
+            schoolDocumentVectorStore.add(listOf(document))
+            
+            logger.info("School document embedded: $title (schoolId=$schoolId, type=$docType)")
+            true
+        } catch (e: Exception) {
+            logger.error("Failed to embed school document: $title", e)
+            false
+        }
+    }
+    
+    /**
+     * 프로그램 문서를 임베딩하여 VectorStore에 저장.
+     * 
+     * @param programId 프로그램 ID
+     * @param docType 문서 타입 (curriculum, career_outcome, student_review)
+     * @param title 문서 제목
+     * @param content 문서 내용
+     * @param metadata 추가 메타데이터
+     * @return 성공 여부
+     */
+    fun embedProgramDocument(
+        programId: UUID,
+        docType: String,
+        title: String,
+        content: String,
+        metadata: Map<String, Any> = emptyMap()
+    ): Boolean {
+        return try {
+            val document = Document(
+                content,
+                mapOf(
+                    "program_id" to programId.toString(),
+                    "document_type" to docType,
+                    "title" to title
+                ) + metadata
+            )
+            
+            programDocumentVectorStore.add(listOf(document))
+            
+            logger.info("Program document embedded: $title (programId=$programId, type=$docType)")
+            true
+        } catch (e: Exception) {
+            logger.error("Failed to embed program document: $title", e)
+            false
+        }
+    }
+    
+    /**
+     * 배치 학교 문서 임베딩.
+     * 
+     * @param documents 문서 목록 (schoolId, docType, title, content, metadata)
+     * @return 성공 개수
+     */
+    fun embedSchoolDocumentsBatch(
+        documents: List<SchoolDocumentInput>
+    ): Int {
+        var successCount = 0
+        var failureCount = 0
+        
+        documents.forEachIndexed { index, doc ->
+            if (embedSchoolDocument(doc.schoolId, doc.docType, doc.title, doc.content, doc.metadata)) {
+                successCount++
+            } else {
+                failureCount++
+            }
+            
+            // 진행 상황 로깅
+            if ((index + 1) % 10 == 0) {
+                logger.info("Progress: ${index + 1}/${documents.size} documents processed")
+            }
+            
+            // Rate limiting (60 req/min)
+            if (index < documents.size - 1) {
+                Thread.sleep(1000)
+            }
+        }
+        
+        logger.info("Batch embedding completed: $successCount succeeded, $failureCount failed")
+        return successCount
+    }
 }
+
+/**
+ * 학교 문서 입력 데이터.
+ */
+data class SchoolDocumentInput(
+    val schoolId: UUID,
+    val docType: String,
+    val title: String,
+    val content: String,
+    val metadata: Map<String, Any> = emptyMap()
+)
+
+/**
+ * 프로그램 문서 입력 데이터.
+ */
+data class ProgramDocumentInput(
+    val programId: UUID,
+    val docType: String,
+    val title: String,
+    val content: String,
+    val metadata: Map<String, Any> = emptyMap()
+)

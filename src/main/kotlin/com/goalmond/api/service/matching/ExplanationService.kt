@@ -4,23 +4,25 @@ import com.goalmond.api.domain.entity.AcademicProfile
 import com.goalmond.api.domain.entity.Program
 import com.goalmond.api.domain.entity.School
 import com.goalmond.api.domain.entity.UserPreference
-import com.goalmond.api.service.ai.GeminiClient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 /**
- * 매칭 설명 생성 서비스 (GAM-3, Phase 7).
+ * 매칭 설명 생성 서비스 (GAM-3, Phase 7 + RAG 통합).
  * 
- * Gemini AI를 활용하여 각 추천 학교에 대한 설명을 생성합니다.
+ * Spring AI RAGService를 활용하여 문서 기반 설명을 생성합니다.
+ * RAG 실패 시 템플릿 기반 설명으로 Fallback합니다.
  */
 @Service
 class ExplanationService(
-    private val geminiClient: GeminiClient
+    private val ragService: RAGService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     
     /**
      * 매칭 설명 생성.
+     * 
+     * Spring AI RAG를 사용하여 관련 문서를 검색하고 근거 있는 설명을 생성합니다.
      * 
      * @return 2-3문장의 설명
      */
@@ -32,56 +34,18 @@ class ExplanationService(
         scores: ScoreBreakdown
     ): String {
         return try {
-            val prompt = buildPrompt(profile, preference, program, school, scores)
-            geminiClient.generateContent(prompt)
+            // Spring AI RAG 사용 (문서 검색 + 생성)
+            ragService.generateExplanationWithRAG(profile, preference, program, school, scores)
         } catch (e: Exception) {
-            logger.warn("Gemini explanation failed, using template", e)
+            logger.warn("RAG explanation failed for ${school.name}, using template fallback", e)
             generateTemplateExplanation(program, school, scores)
         }
     }
     
     /**
-     * Gemini 프롬프트 생성.
-     */
-    private fun buildPrompt(
-        profile: AcademicProfile,
-        preference: UserPreference,
-        program: Program,
-        school: School,
-        scores: ScoreBreakdown
-    ): String {
-        return """
-당신은 유학 매칭 전문가입니다. 다음 정보를 바탕으로 학생에게 이 학교를 추천하는 이유를 2-3문장으로 설명해주세요.
-
-학생 정보:
-- GPA: ${profile.gpa} / ${profile.gpaScale}
-- 영어 점수: ${profile.englishScore} (${profile.englishTestType})
-- 예산: $${preference.budgetUsd}/년
-- 목표 전공: ${preference.targetMajor}
-- 커리어 목표: ${preference.careerGoal}
-
-학교 정보:
-- 이름: ${school.name}
-- 유형: ${program.type}
-- 학비: $${program.tuition ?: school.tuition}/년
-- 지역: ${school.city}, ${school.state}
-- 편입률: ${school.transferRate}%
-- 합격률: ${school.acceptanceRate}%
-
-매칭 점수:
-- 총점: ${String.format("%.1f", scores.total())}점
-- 학업: ${String.format("%.1f", scores.academic)}점
-- 영어: ${String.format("%.1f", scores.english)}점
-- 예산: ${String.format("%.1f", scores.budget)}점
-- 진로: ${String.format("%.1f", scores.career)}점
-- 지역: ${String.format("%.1f", scores.location)}점
-
-설명은 친근하고 구체적으로, "이 학교는..."으로 시작해주세요. 2-3문장 이내로 작성하세요.
-        """.trimIndent()
-    }
-    
-    /**
      * Fallback: 템플릿 기반 설명 생성.
+     * 
+     * RAG 실패 시 또는 문서가 없을 때 사용합니다.
      */
     private fun generateTemplateExplanation(
         program: Program,

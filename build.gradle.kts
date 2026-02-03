@@ -9,8 +9,12 @@ plugins {
 group = "com.goalmond"
 version = "1.0.0-SNAPSHOT"
 
+// Spring AI 버전 설정
+extra["springAiVersion"] = "1.0.0-M4"
+
 repositories {
     mavenCentral()
+    maven { url = uri("https://repo.spring.io/milestone") }  // Spring AI Milestone
 }
 
 java {
@@ -83,6 +87,11 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    
+    // Spring AI (무료 Gemini API용 - Vertex AI 제외)
+    implementation(platform("org.springframework.ai:spring-ai-bom:${property("springAiVersion")}"))
+    implementation("org.springframework.ai:spring-ai-core")
+    implementation("org.springframework.ai:spring-ai-pgvector-store")
     
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test") {

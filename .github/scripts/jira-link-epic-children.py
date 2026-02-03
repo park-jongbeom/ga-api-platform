@@ -25,6 +25,38 @@ BACKEND_EPIC_CHILDREN: Dict[str, List[str]] = {
     "GAM-6": ["GAM-61", "GAM-62", "GAM-63"],
 }
 
+# 프론트엔드 에픽 ID -> 하위 스토리 목록 (FRONT_JIRA_BACKLOG.md, jira-mapping.json 기준)
+# GAMF-1 -> GAM-142, GAMF-11~18 -> GAM-145~152 | GAMF-2 -> GAM-143, GAMF-21~28 -> GAM-153~160 | ...
+FRONTEND_EPIC_CHILDREN: Dict[str, List[str]] = {
+    "GAM-142": ["GAM-145", "GAM-146", "GAM-147", "GAM-148", "GAM-149", "GAM-150", "GAM-151", "GAM-152"],
+    "GAM-143": ["GAM-153", "GAM-154", "GAM-155", "GAM-156", "GAM-157", "GAM-158", "GAM-159", "GAM-160"],
+    "GAM-144": ["GAM-161", "GAM-162", "GAM-163", "GAM-164"],
+}
+
+# 프론트엔드 Task(JIRA 키) -> 부모 Story(JIRA 키) (GAMF-XX-N -> GAMF-XX 매핑에서 추출)
+FRONTEND_TASK_TO_STORY: Dict[str, str] = {
+    **{f"GAM-{i}": "GAM-145" for i in range(165, 169)},
+    **{f"GAM-{i}": "GAM-146" for i in range(169, 173)},
+    **{f"GAM-{i}": "GAM-147" for i in range(173, 176)},
+    **{f"GAM-{i}": "GAM-148" for i in range(176, 180)},
+    **{f"GAM-{i}": "GAM-149" for i in range(180, 184)},
+    **{f"GAM-{i}": "GAM-150" for i in range(184, 188)},
+    **{f"GAM-{i}": "GAM-151" for i in range(188, 191)},
+    **{f"GAM-{i}": "GAM-152" for i in range(191, 194)},
+    **{f"GAM-{i}": "GAM-153" for i in range(194, 197)},
+    **{f"GAM-{i}": "GAM-154" for i in range(197, 200)},
+    **{f"GAM-{i}": "GAM-155" for i in range(200, 203)},
+    **{f"GAM-{i}": "GAM-156" for i in range(203, 206)},
+    **{f"GAM-{i}": "GAM-157" for i in range(206, 210)},
+    **{f"GAM-{i}": "GAM-158" for i in range(210, 212)},
+    **{f"GAM-{i}": "GAM-159" for i in range(212, 214)},
+    **{f"GAM-{i}": "GAM-160" for i in range(214, 216)},
+    **{f"GAM-{i}": "GAM-161" for i in range(216, 219)},
+    **{f"GAM-{i}": "GAM-162" for i in range(219, 224)},
+    **{f"GAM-{i}": "GAM-163" for i in range(224, 226)},
+    **{f"GAM-{i}": "GAM-164" for i in range(226, 229)},
+}
+
 # Epic Link로 자주 쓰이는 custom field ID (프로젝트별로 다를 수 있음)
 EPIC_LINK_FIELD_IDS = ["customfield_10011", "customfield_10014", "customfield_10015", "customfield_10016"]
 
@@ -205,10 +237,11 @@ def main():
         "Accept": "application/json",
     }
 
+    all_epics: Dict[str, List[str]] = {**BACKEND_EPIC_CHILDREN, **FRONTEND_EPIC_CHILDREN}
     epics_to_process = (
-        {args.epic: BACKEND_EPIC_CHILDREN[args.epic]}
-        if args.epic and args.epic in BACKEND_EPIC_CHILDREN
-        else BACKEND_EPIC_CHILDREN
+        {args.epic: all_epics[args.epic]}
+        if args.epic and args.epic in all_epics
+        else all_epics
     )
 
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -259,6 +292,33 @@ def main():
             else:
                 print(f"  ✗ {child_key} -> {epic_key} 연동 실패 (수동 연결 필요)")
                 fail += 1
+            time.sleep(0.35)
+
+    # 프론트엔드 Task -> Story 부모 연결
+    if FRONTEND_TASK_TO_STORY and not args.epic:
+        print("\n[프론트엔드 Task -> Story 부모 연결]")
+        for task_key, story_key in sorted(FRONTEND_TASK_TO_STORY.items()):
+            time.sleep(0.2)
+            current = get_current_epic_link(jira_url, headers, task_key)
+            if current == story_key:
+                print(f"  ⊘ {task_key} 이미 {story_key} 연결됨")
+                skip += 1
+                continue
+            linked = link_via_epic_link_field(jira_url, headers, task_key, story_key)
+            if linked:
+                print(f"  ✓ {task_key} -> {story_key} (Parent)")
+                ok += 1
+                time.sleep(0.3)
+            else:
+                for link_name in candidate_link_types:
+                    if link_via_issue_link(jira_url, headers, task_key, story_key, link_name):
+                        print(f"  ✓ {task_key} -> {story_key} (Issue Link: {link_name})")
+                        ok += 1
+                        time.sleep(0.3)
+                        break
+                else:
+                    print(f"  ✗ {task_key} -> {story_key} 연동 실패")
+                    fail += 1
             time.sleep(0.35)
 
     print(f"\n완료: 성공 {ok}개, 스킵 {skip}개, 실패 {fail}개.")

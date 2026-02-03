@@ -215,7 +215,7 @@ def main():
         sys.executable,
         str(generate_script),
         "--config", str(project_root / ".github" / "jira-config.json"),
-        "--canonical-only",
+        # --canonical-only 제거하여 프론트엔드 포함
         "--output", str(report_file),
         "--date", report_date,
     ]

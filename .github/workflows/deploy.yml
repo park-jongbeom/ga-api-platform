@@ -83,14 +83,28 @@ jobs:
           
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: GEMINI_API_KEY
           script: |
             # 디렉토리 생성 (없는 경우)
             mkdir -p /home/${{ secrets.SERVER_USER }}/ga-api-platform
             cd /home/${{ secrets.SERVER_USER }}/ga-api-platform
+            
+            # 서버 .env에 GEMINI_API_KEY 반영 (GitHub Secrets → 컨테이너 전달용)
+            if [ -n "$GEMINI_API_KEY" ]; then
+              touch .env
+              grep -v '^GEMINI_API_KEY=' .env > .env.tmp || true
+              echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env.tmp
+              mv .env.tmp .env
+              echo "GEMINI_API_KEY updated in .env"
+            else
+              echo "Warning: GEMINI_API_KEY secret not set; .env unchanged. Set GitHub Actions secret GEMINI_API_KEY for matching API."
+            fi
             
             # Docker Compose 명령어 확인 (docker-compose 우선 사용)
             if command -v docker-compose &> /dev/null; then

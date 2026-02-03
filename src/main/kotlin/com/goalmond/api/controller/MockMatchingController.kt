@@ -5,6 +5,7 @@ import com.goalmond.api.domain.dto.MatchingResponse
 import com.goalmond.api.domain.dto.ProgramListResponse
 import com.goalmond.api.domain.dto.ProgramResponse
 import com.goalmond.api.domain.dto.SchoolResponse
+import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,8 +19,14 @@ import java.time.Instant
 import java.util.UUID
 import kotlin.random.Random
 
+/**
+ * Mock 매칭 API Controller.
+ * default 프로파일에서만 활성화 (DB 없이 테스트용).
+ * local/lightsail 프로파일에서는 MatchingController 사용.
+ */
 @RestController
 @RequestMapping("/api/v1")
+@Profile("default", "mock")
 class MockMatchingController {
 
     private var lastMatchingResult: MatchingResponse? = null

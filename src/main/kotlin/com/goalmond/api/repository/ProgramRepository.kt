@@ -9,4 +9,5 @@ import java.util.UUID
 interface ProgramRepository : JpaRepository<Program, UUID> {
     fun findBySchoolId(schoolId: UUID): List<Program>
     fun findByType(type: String): List<Program>
+    fun findBySchoolIdIn(schoolIds: List<UUID>): List<Program>
 }

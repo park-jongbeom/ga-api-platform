@@ -1,4 +1,0 @@
-# 테스트용 설정
-app:
-  jwt:
-    secret: test-secret-for-unit-testing-only-32chars

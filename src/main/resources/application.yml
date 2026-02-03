@@ -21,3 +21,21 @@ spring:
     property-naming-strategy: SNAKE_CASE
   jpa:
     open-in-view: false
+
+app:
+  matching:
+    weights:
+      academic: 0.20
+      english: 0.15
+      budget: 0.15
+      location: 0.10
+      duration: 0.10
+      career: 0.30
+    vector-search:
+      top-k: 20
+  ai:
+    gemini:
+      api-key: ${GEMINI_API_KEY}
+      model: ${GEMINI_MODEL:gemini-2.0-flash}
+      embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
+      api-url: https://generativelanguage.googleapis.com/v1beta

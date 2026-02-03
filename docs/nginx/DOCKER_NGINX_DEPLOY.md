@@ -44,24 +44,32 @@ ga-nginx가 80, 443을 리스닝하고, 같은 Docker 네트워크의 `ga-matchi
 
 로컬 개발 환경(`http://localhost:5173`, `http://127.0.0.1:5173` 등)에서 배포된 API(`https://go-almond.ddnsfree.com`)로 요청 시 CORS 에러가 나면, nginx 설정을 최신으로 반영해야 합니다.
 
-### 방법 1: 스크립트로 nginx 재로드 (권장)
+### 방법 1: nginx만 재시작 (가장 단순)
 
-서버에서 프로젝트 루트로 이동한 뒤:
+서버에서 설정 파일을 갱신한 뒤 ga-nginx 컨테이너만 재시작하면 됩니다.
 
 ```bash
 git pull origin main   # 최신 go-almond.swagger.conf 반영
-bash docs/nginx/apply-cors-nginx.sh
+docker restart ga-nginx
 ```
 
-스크립트가 설정 문법 검증 후 `nginx -s reload`로 CORS 설정을 적용합니다.
+설정만 다시 읽게 하려면 재시작 대신 재로드만 해도 됩니다.
 
-### 방법 2: Docker 스택 재기동
+```bash
+docker exec ga-nginx nginx -s reload
+```
+
+### 방법 2: Docker 스택 전체 재기동
 
 ```bash
 git pull origin main
 docker-compose down
 docker-compose up -d
 ```
+
+### (선택) 스크립트로 검증 후 재로드
+
+문법 검증과 CORS 헤더 확인까지 하고 싶을 때만: `bash docs/nginx/apply-cors-nginx.sh`
 
 ### 동작 확인
 

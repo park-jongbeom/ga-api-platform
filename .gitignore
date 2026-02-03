@@ -34,6 +34,9 @@ Thumbs.db
 .env.local
 .env.*.local
 
+# SSH/Keys (PEM 등 저장소에 올리지 않음)
+docs/*.pem
+
 # Generated
 **/generated/
 **/build/generated/

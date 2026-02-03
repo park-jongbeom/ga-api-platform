@@ -2,6 +2,7 @@ package com.goalmond.api.repository
 
 import com.goalmond.api.domain.entity.School
 import com.goalmond.api.domain.entity.SchoolEmbedding
+import com.goalmond.api.repository.ProgramRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,21 +40,36 @@ class SchoolEmbeddingRepositoryTest {
     private lateinit var schoolRepository: SchoolRepository
     
     @Autowired
+    private lateinit var programRepository: ProgramRepository
+    
+    @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
     
     @Autowired
     private lateinit var entityManager: EntityManager
     
     private lateinit var testSchool: School
+    private val testPrefix = "[TEST_EMBED] "
     
     @BeforeEach
     fun setUp() {
-        schoolEmbeddingRepository.deleteAll()
-        schoolRepository.deleteAll()
+        // 테스트 데이터 정리 (실제 DB 사용하므로 안전한 범위만 삭제)
+        val testSchools = schoolRepository.findByNameStartingWith(testPrefix)
+        testSchools.forEach { school ->
+            programRepository.findBySchoolId(school.id!!).let { programs ->
+                if (programs.isNotEmpty()) {
+                    programRepository.deleteAll(programs)
+                }
+            }
+            schoolEmbeddingRepository.findBySchoolId(school.id!!)?.let {
+                schoolEmbeddingRepository.delete(it)
+            }
+            schoolRepository.delete(school)
+        }
         
         // 테스트용 School 생성
         testSchool = School(
-            name = "Irvine Valley College",
+            name = "${testPrefix}Irvine Valley College",
             type = "community_college",
             state = "CA",
             city = "Irvine",
@@ -186,7 +202,7 @@ class SchoolEmbeddingRepositoryTest {
         assertThat(second?.embeddingText).isEqualTo("Second embedding")
         
         // 전체 개수는 여전히 1개
-        assertThat(schoolEmbeddingRepository.count()).isEqualTo(1)
+        assertThat(schoolEmbeddingRepository.countBySchoolId(testSchool.id!!)).isEqualTo(1L)
     }
     
     @Test
@@ -210,7 +226,7 @@ class SchoolEmbeddingRepositoryTest {
     // Helper 함수
     private fun createAndSaveSchool(name: String, vectorPrefix: List<Double>): School {
         val school = School(
-            name = name,
+            name = "$testPrefix$name",
             type = "community_college",
             state = "CA",
             city = "Test City",

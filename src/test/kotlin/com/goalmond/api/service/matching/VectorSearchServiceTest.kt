@@ -8,11 +8,13 @@ import com.goalmond.api.repository.AcademicProfileRepository
 import com.goalmond.api.repository.SchoolRepository
 import com.goalmond.api.repository.UserPreferenceRepository
 import com.goalmond.api.repository.UserRepository
+import com.goalmond.api.support.FakeGeminiTestConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import java.math.BigDecimal
 import kotlin.system.measureTimeMillis
@@ -29,6 +31,7 @@ import kotlin.system.measureTimeMillis
  */
 @SpringBootTest
 @ActiveProfiles("local")
+@Import(FakeGeminiTestConfig::class)
 class VectorSearchServiceTest {
     
     @Autowired
@@ -52,6 +55,7 @@ class VectorSearchServiceTest {
     private lateinit var testUser: User
     private lateinit var testProfile: AcademicProfile
     private lateinit var testPreference: UserPreference
+    private val testPrefix = "[TEST_VECTOR] "
     
     @BeforeEach
     fun setUp() {
@@ -86,9 +90,9 @@ class VectorSearchServiceTest {
         testPreference = userPreferenceRepository.save(testPreference)
         
         // 테스트 학교 임베딩 확인 (최소 5개 이상 있어야 함)
-        val schoolCount = schoolRepository.count()
-        if (schoolCount < 5) {
-            logger.warn("Not enough schools for testing (found: $schoolCount). Creating test schools...")
+        val testSchools = schoolRepository.findByNameStartingWith(testPrefix)
+        if (testSchools.size < 5) {
+            logger.warn("Not enough test schools for vector search. Creating test schools...")
             createTestSchools()
         }
     }
@@ -183,7 +187,7 @@ class VectorSearchServiceTest {
     private fun createTestSchools() {
         val schools = listOf(
             School(
-                name = "Test School CS 1",
+                name = "${testPrefix}CS 1",
                 type = "community_college",
                 state = "CA",
                 city = "Irvine",
@@ -191,7 +195,7 @@ class VectorSearchServiceTest {
                 description = "Computer Science focused community college in California"
             ),
             School(
-                name = "Test School Business 1",
+                name = "${testPrefix}Business 1",
                 type = "university",
                 state = "CA",
                 city = "Los Angeles",
@@ -199,7 +203,7 @@ class VectorSearchServiceTest {
                 description = "Business Administration university program"
             ),
             School(
-                name = "Test School Engineering 1",
+                name = "${testPrefix}Engineering 1",
                 type = "university",
                 state = "TX",
                 city = "Austin",
@@ -207,7 +211,7 @@ class VectorSearchServiceTest {
                 description = "Engineering programs with strong tech industry connections"
             ),
             School(
-                name = "Test School Arts 1",
+                name = "${testPrefix}Arts 1",
                 type = "university",
                 state = "NY",
                 city = "New York",
@@ -215,7 +219,7 @@ class VectorSearchServiceTest {
                 description = "Liberal arts college with diverse humanities programs"
             ),
             School(
-                name = "Test School Vocational 1",
+                name = "${testPrefix}Vocational 1",
                 type = "vocational",
                 state = "CA",
                 city = "San Francisco",

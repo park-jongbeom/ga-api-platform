@@ -9,6 +9,7 @@
   - Hard Filter (4가지), Base Score (6대 지표), Path Optimization, Risk Penalty
   - Explainable AI (설명 생성)
   - `POST /api/v1/matching/run` (실제 매칭, local/lightsail 프로파일)
+- **Fallback 매칭**: DB에 학교/임베딩 데이터가 없을 때 AI 추천으로 결과 생성 ✅
 - **CORS**: 로컬 개발용 Origin 추가 (`http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:3000`, `http://127.0.0.1:3000`)
 - **엔티티**: School, Program 엔티티 추가 (V3 마이그레이션 schools/programs 테이블 매핑). AcademicProfile에 major, gpaScale, graduationDate, institution 반영
 - **설정**: WeightConfig (매칭 가중치) 빈 등록
@@ -54,6 +55,7 @@
 ### RAG 기반 매칭 API (Week 3, local/lightsail 프로파일) ✅ 구현 완료
 
 **참고**: RAG 기반 실제 매칭 API는 DB가 연결된 환경(local/lightsail 프로파일)에서만 사용 가능합니다. Mock API(`default` 프로파일)와 동일한 엔드포인트를 사용하지만, 실제 벡터 검색 + Rule-based 알고리즘으로 매칭을 수행합니다.
+**Fallback**: DB에 학교/임베딩 데이터(`school_embeddings`)가 없으면 프로필·선호도만으로 Gemini가 생성한 추천을 동일한 형식으로 반환합니다. `data.message`에 안내 문구가 포함되며, 결과의 `school.id`/`program.id`는 `fallback-1`, `fallback-2` 등의 플레이스홀더입니다.
 
 | 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
 |--------|------|------|-----------|------|
@@ -106,7 +108,7 @@ Auth·User Profile API 연동 시 바로 로그인해서 토큰을 받을 수 �
 |--------|------|------|----------|
 | POST | `/api/v1/bookmarks` | 보관하기 | Week 5 |
 | DELETE | `/api/v1/bookmarks/{id}` | 보관 해제 | Week 5 |
-| (매칭 API 실제 연동) | `/api/v1/matching/...` | 매칭 실행·결과 (실제 DB) | Week 4 |
+| (추가 예정) | `/api/v1/applications/...` | 지원 현황 관리 | Week 5 |
 
 ---
 

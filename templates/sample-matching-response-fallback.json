@@ -1,0 +1,224 @@
+{
+  "success": true,
+  "data": {
+    "matching_id": "fallback-test-12345",
+    "user_id": "test-user-uuid",
+    "total_matches": 5,
+    "execution_time_ms": 1174,
+    "results": [
+      {
+        "rank": 1,
+        "school": {
+          "id": "fallback-1",
+          "name": "Santa Monica College",
+          "type": "community_college",
+          "state": "CA",
+          "city": "Santa Monica",
+          "tuition": 12000,
+          "image_url": ""
+        },
+        "program": {
+          "id": "fallback-1-p",
+          "name": "Computer Science Transfer Program",
+          "degree": "Associate",
+          "duration": "2년",
+          "opt_available": true
+        },
+        "total_score": 70.0,
+        "score_breakdown": {
+          "academic": 75,
+          "english": 75,
+          "budget": 75,
+          "location": 75,
+          "duration": 75,
+          "career": 75
+        },
+        "recommendation_type": "strategy",
+        "explanation": "예산 효율적이며 캘리포니아 지역의 4년제 대학 편입 경로를 제공합니다.",
+        "pros": [
+          "저렴한 학비",
+          "UC 편입 협약",
+          "지역 우수"
+        ],
+        "cons": [
+          "2년제 학위"
+        ]
+      },
+      {
+        "rank": 2,
+        "school": {
+          "id": "fallback-2",
+          "name": "De Anza College",
+          "type": "community_college",
+          "state": "CA",
+          "city": "Cupertino",
+          "tuition": 12500,
+          "image_url": ""
+        },
+        "program": {
+          "id": "fallback-2-p",
+          "name": "CS Transfer Track",
+          "degree": "Associate",
+          "duration": "2년",
+          "opt_available": true
+        },
+        "total_score": 70.0,
+        "score_breakdown": {
+          "academic": 75,
+          "english": 75,
+          "budget": 75,
+          "location": 75,
+          "duration": 75,
+          "career": 75
+        },
+        "recommendation_type": "strategy",
+        "explanation": "실리콘밸리 인접으로 커리어 연계성이 높고 편입 성과가 좋습니다.",
+        "pros": [
+          "실리콘밸리 인접",
+          "편입 성과 우수"
+        ],
+        "cons": [
+          "경쟁률 상승 가능"
+        ]
+      },
+      {
+        "rank": 3,
+        "school": {
+          "id": "fallback-3",
+          "name": "Foothill College",
+          "type": "community_college",
+          "state": "CA",
+          "city": "Los Altos Hills",
+          "tuition": 11800,
+          "image_url": ""
+        },
+        "program": {
+          "id": "fallback-3-p",
+          "name": "Engineering Transfer Pathway",
+          "degree": "Associate",
+          "duration": "2년",
+          "opt_available": true
+        },
+        "total_score": 70.0,
+        "score_breakdown": {
+          "academic": 75,
+          "english": 75,
+          "budget": 75,
+          "location": 75,
+          "duration": 75,
+          "career": 75
+        },
+        "recommendation_type": "strategy",
+        "explanation": "학비 부담을 낮추면서도 UC 계열 편입 경로를 확보할 수 있습니다.",
+        "pros": [
+          "학비 부담 낮음",
+          "UC 편입 루트 확보"
+        ],
+        "cons": [
+          "2년 추가 소요"
+        ]
+      },
+      {
+        "rank": 4,
+        "school": {
+          "id": "fallback-4",
+          "name": "Diablo Valley College",
+          "type": "community_college",
+          "state": "CA",
+          "city": "Pleasant Hill",
+          "tuition": 11500,
+          "image_url": ""
+        },
+        "program": {
+          "id": "fallback-4-p",
+          "name": "STEM Transfer Program",
+          "degree": "Associate",
+          "duration": "2년",
+          "opt_available": true
+        },
+        "total_score": 70.0,
+        "score_breakdown": {
+          "academic": 75,
+          "english": 75,
+          "budget": 75,
+          "location": 75,
+          "duration": 75,
+          "career": 75
+        },
+        "recommendation_type": "strategy",
+        "explanation": "예산 안정성과 편입 성공률을 함께 고려한 전략적 추천입니다.",
+        "pros": [
+          "예산 안정성",
+          "편입 성공률 우수"
+        ],
+        "cons": [
+          "캠퍼스 접근성 제한"
+        ]
+      },
+      {
+        "rank": 5,
+        "school": {
+          "id": "fallback-5",
+          "name": "Orange Coast College",
+          "type": "community_college",
+          "state": "CA",
+          "city": "Costa Mesa",
+          "tuition": 11000,
+          "image_url": ""
+        },
+        "program": {
+          "id": "fallback-5-p",
+          "name": "Computer Studies Transfer",
+          "degree": "Associate",
+          "duration": "2년",
+          "opt_available": true
+        },
+        "total_score": 70.0,
+        "score_breakdown": {
+          "academic": 75,
+          "english": 75,
+          "budget": 75,
+          "location": 75,
+          "duration": 75,
+          "career": 75
+        },
+        "recommendation_type": "strategy",
+        "explanation": "캘리포니아 내 안정적인 편입 루트를 제공하는 비용 효율적 선택입니다.",
+        "pros": [
+          "비용 효율적",
+          "편입 루트 확보"
+        ],
+        "cons": [
+          "대학원 진학 시 추가 준비 필요"
+        ]
+      }
+    ],
+    "created_at": "2026-02-03T10:49:17Z",
+    "message": "DB에 데이터가 없어 API 정보만으로 생성한 추천입니다. 실제 DB 데이터와 무관할 수 있습니다.",
+    "next_steps": [
+      {
+        "step": 1,
+        "title": "Document Audit",
+        "description": "Upload your GPA and test scores for final review."
+      },
+      {
+        "step": 2,
+        "title": "SOP Workshop",
+        "description": "Schedule session with our specialized editors."
+      },
+      {
+        "step": 3,
+        "title": "Portal Access",
+        "description": "Go Almond will open your common app dashboard."
+      },
+      {
+        "step": 4,
+        "title": "Visa Prep",
+        "description": "Start I-20 documentation and interview training."
+      }
+    ]
+  },
+  "code": null,
+  "message": null,
+  "timestamp": "2026-02-03T10:49:17Z"
+}

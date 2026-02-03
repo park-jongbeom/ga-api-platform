@@ -18,6 +18,8 @@ API 프로젝트를 함께 사용하는 경우에는 [API.md](API.md) 등 로컬
 | [schools.md](schools.md) | 학교 상세 조회 |
 
 각 상세 문서에는 요청/응답 예시, TypeScript 인터페이스, cURL/JavaScript Fetch 예시가 포함되어 있습니다.
+샘플 응답 JSON은 `templates/sample-matching-response-normal.json`, `templates/sample-matching-response-fallback.json`을 참고하세요.
+Fallback 테스트 절차는 `templates/TEST_FALLBACK_MATCHING.md`에 정리되어 있습니다.
 
 ## Base URL
 

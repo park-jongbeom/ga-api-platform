@@ -63,6 +63,13 @@ interface MatchingRunRequest {
 
 (실제 `results` 배열에는 [공통 타입 (TypeScript)](API.md#공통-타입-typescript)의 `MatchingResult` 항목이 포함됩니다.)
 
+샘플 응답 예시:
+- 정상 응답: `templates/sample-matching-response-normal.json`
+- Fallback 응답: `templates/sample-matching-response-fallback.json`
+
+**Fallback (DB 데이터 없을 때)**: DB에 학교/임베딩 데이터(`school_embeddings`)가 없으면 벡터 검색 후보가 0건이 되며, 이때 **프로필·선호도만으로 Gemini가 생성한 추천**을 동일한 `MatchingResponse` 형식으로 반환합니다. `data.message`에 "DB에 데이터가 없어 API 정보만으로 생성한 추천입니다. 실제 DB 데이터와 무관할 수 있습니다."가 설정되므로, 클라이언트에서 이 문구를 노출해 사용자에게 안내할 수 있습니다. `results` 내 항목의 `school.id` / `program.id`는 `fallback-1`, `fallback-2` 등 플레이스홀더입니다.
+Fallback 테스트 절차는 `templates/TEST_FALLBACK_MATCHING.md`를 참고하세요.
+
 ### 에러 응답
 
 | 상태 | code | 설명 |

@@ -1,13 +1,16 @@
 package com.goalmond.api.service.matching
 
 import com.goalmond.api.domain.entity.School
+import com.goalmond.api.repository.ProgramRepository
 import com.goalmond.api.repository.SchoolEmbeddingRepository
 import com.goalmond.api.repository.SchoolRepository
+import com.goalmond.api.support.FakeGeminiTestConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import kotlin.system.measureTimeMillis
 
@@ -23,6 +26,7 @@ import kotlin.system.measureTimeMillis
  */
 @SpringBootTest
 @ActiveProfiles("local")
+@Import(FakeGeminiTestConfig::class)
 class EmbeddingServiceTest {
     
     @Autowired
@@ -34,12 +38,21 @@ class EmbeddingServiceTest {
     @Autowired
     private lateinit var schoolEmbeddingRepository: SchoolEmbeddingRepository
     
+    @Autowired
+    private lateinit var programRepository: ProgramRepository
+    
+    private val testPrefix = "[TEST_EMBED] "
+    
     @BeforeEach
     fun setUp() {
-        // 테스트 데이터 정리 (실제 DB 사용하므로 조심스럽게)
-        // 테스트 학교만 삭제 (이름이 "Test School"로 시작하는 것들)
-        val testSchools = schoolRepository.findAll().filter { it.name.startsWith("Test School") }
+        // 테스트 데이터 정리 (실제 DB 사용하므로 안전한 범위만 삭제)
+        val testSchools = schoolRepository.findByNameStartingWith(testPrefix)
         testSchools.forEach { school ->
+            programRepository.findBySchoolId(school.id!!).let { programs ->
+                if (programs.isNotEmpty()) {
+                    programRepository.deleteAll(programs)
+                }
+            }
             schoolEmbeddingRepository.findBySchoolId(school.id!!)?.let {
                 schoolEmbeddingRepository.delete(it)
             }
@@ -51,7 +64,7 @@ class EmbeddingServiceTest {
     fun `School을 임베딩 텍스트로 변환`() {
         // Given
         val school = School(
-            name = "Irvine Valley College",
+            name = "${testPrefix}Irvine Valley College",
             type = "community_college",
             state = "CA",
             city = "Irvine",
@@ -84,7 +97,7 @@ class EmbeddingServiceTest {
     fun `School 임베딩 저장 성공`() {
         // Given
         val school = School(
-            name = "Test School for Embedding",
+            name = "${testPrefix}School for Embedding",
             type = "community_college",
             state = "CA",
             city = "Test City",
@@ -102,7 +115,7 @@ class EmbeddingServiceTest {
         val embedding = schoolEmbeddingRepository.findBySchoolId(saved.id!!)
         assertThat(embedding).isNotNull
         assertThat(embedding?.schoolId).isEqualTo(saved.id)
-        assertThat(embedding?.embeddingText).contains("Test School for Embedding")
+        assertThat(embedding?.embeddingText).contains("${testPrefix}School for Embedding")
         
         // 768차원 벡터 검증
         val vector = embedding?.getEmbeddingVector()
@@ -115,7 +128,7 @@ class EmbeddingServiceTest {
     fun `동일한 School을 재임베딩하면 UPSERT로 업데이트됨`() {
         // Given
         val school = School(
-            name = "Test School for UPSERT",
+            name = "${testPrefix}School for UPSERT",
             type = "university",
             state = "CA",
             city = "Los Angeles",
@@ -140,7 +153,7 @@ class EmbeddingServiceTest {
         // Then
         assertThat(firstText).isNotEqualTo(secondText) // 텍스트 변경됨
         assertThat(secondText).contains("Updated description")
-        assertThat(schoolEmbeddingRepository.count()).isEqualTo(1L) // 여전히 1개
+        assertThat(schoolEmbeddingRepository.countBySchoolId(saved.id!!)).isEqualTo(1L)
     }
     
     @Test
@@ -148,7 +161,7 @@ class EmbeddingServiceTest {
         // Given: 5개 테스트 학교 생성
         val schools = (1..5).map { index ->
             School(
-                name = "Test School Batch $index",
+                name = "${testPrefix}School Batch $index",
                 type = "community_college",
                 state = "CA",
                 city = "Test City $index",
@@ -158,10 +171,12 @@ class EmbeddingServiceTest {
         }
         schools.forEach { schoolRepository.save(it) }
         
-        // When: 배치 임베딩 (시간 측정)
+        // When: 테스트 학교만 임베딩 (시간 측정)
         val duration = measureTimeMillis {
-            val successCount = embeddingService.embedAllSchools()
-            assertThat(successCount).isGreaterThanOrEqualTo(5)
+            val successCount = schools.count { school ->
+                embeddingService.embedSchool(school)
+            }
+            assertThat(successCount).isEqualTo(5)
         }
         
         // Then: 시간 검증 (5개 학교 * 1초 대기 = 최소 4초, 최대 15초)

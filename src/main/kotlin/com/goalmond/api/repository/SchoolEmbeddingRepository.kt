@@ -19,6 +19,7 @@ interface SchoolEmbeddingRepository : JpaRepository<SchoolEmbedding, UUID> {
      * school_id로 임베딩 조회
      */
     fun findBySchoolId(schoolId: UUID): SchoolEmbedding?
+    fun countBySchoolId(schoolId: UUID): Long
     
     /**
      * 코사인 유사도 기반 벡터 검색 (Top K).

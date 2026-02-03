@@ -9,4 +9,5 @@ import java.util.UUID
 interface SchoolRepository : JpaRepository<School, UUID> {
     fun findByType(type: String): List<School>
     fun findByState(state: String): List<School>
+    fun findByNameStartingWith(prefix: String): List<School>
 }

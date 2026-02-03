@@ -8,7 +8,9 @@ data class MatchingResponse(
     val totalMatches: Int,
     val executionTimeMs: Int,
     val results: List<MatchingResult>,
-    val createdAt: Instant
+    val createdAt: Instant,
+    /** DB 데이터 없을 때 Fallback(AI 추천) 사용 시 안내 문구. null이면 RAG/DB 기반 결과. */
+    val message: String? = null
 ) {
     data class MatchingResult(
         val rank: Int,

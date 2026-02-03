@@ -56,6 +56,7 @@ interface MatchingResult {
 ```
 
 (JSON 응답은 snake_case이므로 위 필드명은 API 응답 키와 동일하게 사용하세요.)
+샘플 응답 JSON은 `templates/sample-matching-response-normal.json`, `templates/sample-matching-response-fallback.json`을 참고하세요.
 
 ## API 목록
 

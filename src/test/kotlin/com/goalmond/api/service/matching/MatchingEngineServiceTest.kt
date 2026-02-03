@@ -10,11 +10,13 @@ import com.goalmond.api.repository.ProgramRepository
 import com.goalmond.api.repository.SchoolRepository
 import com.goalmond.api.repository.UserPreferenceRepository
 import com.goalmond.api.repository.UserRepository
+import com.goalmond.api.support.FakeGeminiTestConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import java.math.BigDecimal
 import kotlin.system.measureTimeMillis
@@ -30,6 +32,7 @@ import kotlin.system.measureTimeMillis
  */
 @SpringBootTest
 @ActiveProfiles("local")
+@Import(FakeGeminiTestConfig::class)
 class MatchingEngineServiceTest {
     
     @Autowired
@@ -54,6 +57,7 @@ class MatchingEngineServiceTest {
     private lateinit var embeddingService: EmbeddingService
     
     private lateinit var testUser: User
+    private val testPrefix = "[TEST_MATCH] "
     
     @BeforeEach
     fun setUp() {
@@ -92,12 +96,12 @@ class MatchingEngineServiceTest {
     }
     
     private fun ensureTestData() {
-        val schoolCount = schoolRepository.count()
-        if (schoolCount < 3) {
+        val existingTests = schoolRepository.findByNameStartingWith(testPrefix)
+        if (existingTests.size < 2) {
             logger.info("Creating test schools and programs...")
             
             val school1 = schoolRepository.save(School(
-                name = "Test CC for Matching 1",
+                name = "${testPrefix}CC 1",
                 type = "community_college",
                 state = "CA",
                 city = "Irvine",
@@ -122,7 +126,7 @@ class MatchingEngineServiceTest {
             Thread.sleep(1000)
             
             val school2 = schoolRepository.save(School(
-                name = "Test University for Matching 1",
+                name = "${testPrefix}University 1",
                 type = "university",
                 state = "CA",
                 city = "Los Angeles",

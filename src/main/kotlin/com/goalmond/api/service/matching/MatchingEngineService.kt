@@ -35,7 +35,8 @@ class MatchingEngineService(
     private val scoringService: ScoringService,
     private val pathOptimizationService: PathOptimizationService,
     private val riskPenaltyService: RiskPenaltyService,
-    private val explanationService: ExplanationService
+    private val explanationService: ExplanationService,
+    private val fallbackMatchingService: FallbackMatchingService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     
@@ -64,6 +65,22 @@ class MatchingEngineService(
             // Step 2: RAG 벡터 검색 (Top 20)
             val candidateSchools = vectorSearchService.searchSimilarSchools(user, profile, preference)
             logger.info("벡터 검색 완료: ${candidateSchools.size}개 후보군")
+            
+            // Fallback: DB에 학교/임베딩 데이터가 없으면 프로필·선호도만으로 Gemini 추천 생성
+            if (candidateSchools.isEmpty()) {
+                logger.info("후보군 없음 → Fallback(AI 추천) 실행")
+                val fallbackResults = fallbackMatchingService.generateFallbackResults(profile, preference)
+                val fallbackTime = System.currentTimeMillis() - startTime
+                return MatchingResponse(
+                    matchingId = UUID.randomUUID().toString(),
+                    userId = userId.toString(),
+                    totalMatches = fallbackResults.size,
+                    executionTimeMs = fallbackTime.toInt(),
+                    results = fallbackResults,
+                    createdAt = Instant.now(),
+                    message = "DB에 데이터가 없어 API 정보만으로 생성한 추천입니다. 실제 DB 데이터와 무관할 수 있습니다."
+                )
+            }
             
             // Step 3: School에 연결된 Program 조회
             val schoolIds = candidateSchools.mapNotNull { it.id }

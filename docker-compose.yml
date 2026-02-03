@@ -1,21 +1,17 @@
 # 환경 정보 단일 관리: 서버의 .env 한 파일만 사용 (env.example 참고하여 생성, .env는 Git 제외)
+# 예외: SPRING_PROFILES_ACTIVE는 .env 수동 설정 없이 여기서 고정 (Docker 배포 시 Auth API 등 lightsail 필수)
 services:
   ga-matching-api:
     image: patrick5471/ga-matching-api:latest
     container_name: ga-matching-api
     env_file:
       - .env
-    # 프로파일·DB 등 모든 런타임 값은 .env 단일 파일에서만 관리 (env.example 참고)
+    environment:
+      - SPRING_PROFILES_ACTIVE=lightsail
+    # DB 등 나머지 런타임 값은 .env 단일 파일에서 관리 (env.example 참고)
     ports:
       - "8080:8080"
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 4G
-        reservations:
-          cpus: "1.0"
-          memory: 2G
+    # 운영 배포: CPU/메모리 제한 미설정. 로컬에서 제한 적용 시 docker-compose.local.yml 사용
     logging:
       driver: "json-file"
       options:
@@ -37,14 +33,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
-        reservations:
-          cpus: "0.5"
-          memory: 256M
+    # 운영 배포: CPU/메모리 제한 미설정. 로컬에서 제한 적용 시 docker-compose.local.yml 사용
     logging:
       driver: "json-file"
       options:

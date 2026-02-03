@@ -31,7 +31,7 @@ class MatchingController(
     @PostMapping("/run")
     @PreAuthorize("isAuthenticated()")
     fun runMatching(
-        @AuthenticationPrincipal(expression = "principal") principal: String?,
+        @AuthenticationPrincipal principal: String?,
         @RequestBody request: MatchingRunRequest
     ): ResponseEntity<ApiResponse<MatchingResponse>> {
         val userId = UUID.fromString(request.userId)
@@ -47,7 +47,7 @@ class MatchingController(
     @GetMapping("/result")
     @PreAuthorize("isAuthenticated()")
     fun getLatestMatchingResult(
-        @AuthenticationPrincipal(expression = "principal") principal: String?
+        @AuthenticationPrincipal principal: String?
     ): ResponseEntity<ApiResponse<String>> {
         return ResponseEntity.ok(
             ApiResponse(

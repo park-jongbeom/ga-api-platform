@@ -169,3 +169,15 @@ curl -s http://localhost:8080/api/v1/matching/result
 const res = await fetch('http://localhost:8080/api/v1/matching/result');
 const json = await res.json();
 ```
+
+---
+
+## 검증
+
+매칭 실행 API가 정상 동작하는지(HTTP 200, `success=true`, `data.results` 존재) 한 번에 검증하려면 **검증 스크립트**를 사용합니다.
+
+- **스크립트**: 프로젝트 루트 `scripts/verify-matching-api.sh` (필요: `curl`, `jq`)
+- **사용 예**: `BASE_URL=http://localhost:8080 ./scripts/verify-matching-api.sh` (로컬), `BASE_URL=https://도메인 ./scripts/verify-matching-api.sh` (배포)
+- **성공**: exit 0. **실패**: exit 1.
+
+검증 목표·성공 기준·실패 시 확인 순서: [docs/DEPLOY_AND_API_TEST_GUIDE.md](../DEPLOY_AND_API_TEST_GUIDE.md) 상단 「매칭 실행 API 검증 목표」 참고.

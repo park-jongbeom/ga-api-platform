@@ -92,6 +92,10 @@ dependencies {
     implementation(platform("org.springframework.ai:spring-ai-bom:${property("springAiVersion")}"))
     implementation("org.springframework.ai:spring-ai-core")
     implementation("org.springframework.ai:spring-ai-pgvector-store")
+
+    // Google GenAI 공식 Java SDK (Gemini API - generateContent, embedContent 등)
+    // 공식 문서 Maven 예시 → Gradle: implementation("com.google.genai:google-genai:버전")
+    implementation("com.google.genai:google-genai:1.37.0")
     
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test") {

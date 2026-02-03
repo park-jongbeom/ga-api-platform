@@ -186,7 +186,12 @@ docker-compose logs -f ga-matching-api
 
 # 헬스 체크 (서버에서)
 curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/v1/programs?type=community_college
+
+# 매칭 실행 API 검증 (RAG 기반, local/lightsail 프로파일)
+BASE_URL=http://localhost:8080 ./scripts/verify-matching-api.sh
 ```
+
+매칭 API 검증 목표·성공 기준은 [docs/DEPLOY_AND_API_TEST_GUIDE.md](docs/DEPLOY_AND_API_TEST_GUIDE.md) 상단을 참고하세요.
 
 ## API 사용 예시
 

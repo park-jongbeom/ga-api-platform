@@ -74,8 +74,10 @@ class GeminiClient(
      */
     fun embedContent(text: String): List<Double> {
         return executeWithRetry("embedContent") {
-            // Google REST API는 JSON 본문에 camelCase 사용 (outputDimensionality)
+            // 공식 스펙: model(본문), content.parts, outputDimensionality(camelCase)
+            val modelInBody = "models/${geminiProperties.embeddingModel}"
             val request = mapOf(
+                "model" to modelInBody,
                 "content" to mapOf(
                     "parts" to listOf(
                         mapOf("text" to text)
@@ -90,10 +92,12 @@ class GeminiClient(
                 .body(request)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError) { _, resp ->
-                    throw GeminiApiException("Client error: ${resp.statusCode}")
+                    val body = String(resp.body.readAllBytes(), Charsets.UTF_8)
+                    throw GeminiApiException("Client error: ${resp.statusCode} - $body")
                 }
                 .onStatus(HttpStatusCode::is5xxServerError) { _, resp ->
-                    throw GeminiApiException("Server error: ${resp.statusCode}")
+                    val body = String(resp.body.readAllBytes(), Charsets.UTF_8)
+                    throw GeminiApiException("Server error: ${resp.statusCode} - $body")
                 }
                 .body(Map::class.java) as Map<*, *>
             

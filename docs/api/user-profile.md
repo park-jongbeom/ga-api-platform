@@ -6,6 +6,56 @@
 
 ---
 
+## 프로필·학력·유학목표 통합 조회
+
+**GET** `/api/v1/user/profile`
+
+프로필 기본 정보, 학력 정보, 유학 목표를 한 번에 조회합니다. 미저장 시 해당 섹션은 `null`입니다.
+
+### Response (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "profile": {
+      "mbti": "INTJ",
+      "tags": "체계적,논리적",
+      "bio": "안녕하세요."
+    },
+    "education": {
+      "schoolName": "테스트고등학교",
+      "schoolLocation": "서울",
+      "gpa": 3.5,
+      "gpaScale": 4.0,
+      "englishTestType": "TOEFL",
+      "englishScore": 95,
+      "degreeType": "고등학교",
+      "degree": "고등학교",
+      "major": "문과",
+      "graduationDate": "2024-02-01",
+      "institution": "테스트고"
+    },
+    "preference": {
+      "targetProgram": "community_college",
+      "targetMajor": "CS",
+      "targetLocation": "CA",
+      "budgetUsd": 50000,
+      "careerGoal": "소프트웨어 엔지니어",
+      "preferredTrack": "2+2"
+    }
+  }
+}
+```
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| data.profile | object \| null | MBTI, tags, bio (미저장 시 null) |
+| data.education | object \| null | 학력 정보 (미저장 시 null) |
+| data.preference | object \| null | 유학 목표 (미저장 시 null) |
+
+---
+
 ## 프로필 기본 정보 저장/수정
 
 **PUT** `/api/v1/user/profile`
@@ -48,10 +98,14 @@
   "schoolName": "테스트고등학교",
   "schoolLocation": "서울",
   "gpa": 3.5,
+  "gpaScale": 4.0,
   "englishTestType": "TOEFL",
   "englishScore": 95,
   "degreeType": "고등학교",
-  "degree": "고등학교"
+  "degree": "고등학교",
+  "major": "문과",
+  "graduationDate": "2024-02-01",
+  "institution": "테스트고"
 }
 ```
 
@@ -59,11 +113,15 @@
 |------|------|------|------|
 | schoolName | string | O | 학교명 (1~255자) |
 | schoolLocation | string | - | 학교 지역 |
-| gpa | number | - | GPA (0~4) |
+| gpa | number | - | GPA (0~5, gpaScale 기준) |
+| gpaScale | number | - | GPA 스케일 (1~5, 기본 4.0) |
 | englishTestType | string | - | 영어 시험 유형 (TOEFL, IELTS 등) |
 | englishScore | number | - | 영어 점수 (0~120) |
 | degreeType | string | - | 학위 유형 |
 | degree | string | - | 학위 (기본: 고등학교) |
+| major | string | - | 전공 (최대 100자) |
+| graduationDate | string | - | 졸업일 (YYYY-MM-DD) |
+| institution | string | - | 기관명 (최대 255자) |
 
 ### Response (200)
 
@@ -98,7 +156,7 @@
 | targetProgram | string | - | 목표 프로그램 (community_college, university 등) |
 | targetMajor | string | - | 희망 전공 |
 | targetLocation | string | - | 선호 지역 |
-| budgetUsd | number | - | 예산 (USD) |
+| budgetUsd | number | - | 예산 (USD, 0~500000) |
 | careerGoal | string | - | 커리어 목표 |
 | preferredTrack | string | - | 선호 트랙 (2+2 등) |
 
@@ -121,19 +179,23 @@ TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"test1234Z"}' | jq -r '.data.token')
 
-# 2. 프로필 저장
+# 2. 프로필 조회
+curl -s http://localhost:8080/api/v1/user/profile \
+  -H "Authorization: Bearer $TOKEN"
+
+# 3. 프로필 저장
 curl -X PUT http://localhost:8080/api/v1/user/profile \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"mbti":"INTJ","tags":"체계적","bio":"안녕하세요"}'
 
-# 3. 학력 정보 저장
+# 4. 학력 정보 저장
 curl -X POST http://localhost:8080/api/v1/user/education \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"schoolName":"테스트고","schoolLocation":"서울","gpa":3.5,"degree":"고등학교"}'
 
-# 4. 유학 목표 저장
+# 5. 유학 목표 저장
 curl -X POST http://localhost:8080/api/v1/user/preference \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \

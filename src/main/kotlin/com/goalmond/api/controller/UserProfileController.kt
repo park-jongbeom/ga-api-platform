@@ -1,6 +1,7 @@
 package com.goalmond.api.controller
 
 import com.goalmond.api.domain.dto.ApiResponse
+import com.goalmond.api.domain.dto.CompleteUserProfileResponse
 import com.goalmond.api.domain.dto.EducationRequest
 import com.goalmond.api.domain.dto.PreferenceRequest
 import com.goalmond.api.domain.dto.ProfileUpdateRequest
@@ -21,6 +22,12 @@ class UserProfileController(private val userProfileService: UserProfileService) 
         val principal = SecurityContextHolder.getContext().authentication?.principal as? String
             ?: throw IllegalStateException("인증되지 않았습니다")
         return UUID.fromString(principal)
+    }
+
+    @GetMapping("/profile")
+    fun getUserProfile(): ResponseEntity<ApiResponse<CompleteUserProfileResponse>> {
+        val data = userProfileService.getUserProfile(currentUserId())
+        return ResponseEntity.ok(ApiResponse(success = true, data = data))
     }
 
     @PutMapping("/profile")

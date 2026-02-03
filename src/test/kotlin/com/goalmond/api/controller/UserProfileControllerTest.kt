@@ -1,6 +1,7 @@
 package com.goalmond.api.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.goalmond.api.domain.dto.CompleteUserProfileResponse
 import com.goalmond.api.domain.dto.EducationRequest
 import com.goalmond.api.domain.dto.PreferenceRequest
 import com.goalmond.api.domain.dto.ProfileUpdateRequest
@@ -16,12 +17,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.math.BigDecimal
 
 @WebMvcTest(UserProfileController::class)
@@ -52,6 +55,19 @@ class UserProfileControllerTest {
     @AfterEach
     fun tearDown() {
         SecurityContextHolder.clearContext()
+    }
+
+    @Test
+    fun `GET profile - 인증된 사용자 프로필 조회 성공`() {
+        val response = CompleteUserProfileResponse(null, null, null)
+        whenever(userProfileService.getUserProfile(any())).thenReturn(response)
+
+        mockMvc.perform(get("/api/v1/user/profile"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.success").value(true))
+            .andExpect(jsonPath("$.data").exists())
+
+        verify(userProfileService).getUserProfile(any())
     }
 
     @Test
@@ -106,5 +122,48 @@ class UserProfileControllerTest {
             .andExpect(jsonPath("$.success").value(true))
 
         verify(userProfileService).savePreference(any(), any())
+    }
+
+    @Test
+    fun `PUT profile - Validation 실패 시 400 반환`() {
+        val request = ProfileUpdateRequest(mbti = "A".repeat(21), tags = null, bio = null)
+
+        mockMvc.perform(
+            put("/api/v1/user/profile")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `POST education - 필수 필드 누락 시 400 반환`() {
+        val request = mapOf<String, Any?>(
+            "schoolLocation" to "서울",
+            "degree" to "고등학교"
+        )
+
+        mockMvc.perform(
+            post("/api/v1/user/education")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `POST preference - 예산 음수 시 400 반환`() {
+        val request = PreferenceRequest(
+            targetProgram = "cc",
+            targetMajor = "CS",
+            budgetUsd = -1
+        )
+
+        mockMvc.perform(
+            post("/api/v1/user/preference")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andExpect(status().isBadRequest)
     }
 }

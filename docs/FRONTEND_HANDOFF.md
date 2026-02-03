@@ -5,9 +5,15 @@
 ## 최근 업데이트 (2026-02-03)
 
 - **CORS**: 로컬 개발용 Origin 추가 (`http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:3000`, `http://127.0.0.1:3000`)
-- **엔티티**: School, Program 엔티티 추가 (V3 마이그레이션 schools/programs 테이블 매핑)
+- **엔티티**: School, Program 엔티티 추가 (V3 마이그레이션 schools/programs 테이블 매핑). AcademicProfile에 major, gpaScale, graduationDate, institution 반영
 - **설정**: WeightConfig (매칭 가중치) 빈 등록
-- **작업 현황**: 전체 115개 작업 중 **30개 완료** (백로그 기준, 코드 검증 반영). 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
+- **User Profile API**: `GET /api/v1/user/profile` 프로필·학력·유학목표 통합 조회 API 추가
+- **Response DTO**: ProfileResponse, EducationResponse, PreferenceResponse, CompleteUserProfileResponse 추가
+- **Validation**: EducationRequest/PreferenceRequest 검증 강화 (GPA·예산 범위 등)
+- **Repository**: SchoolRepository, ProgramRepository 추가
+- **테스트**: 성공/실패 시나리오 및 JaCoCo 커버리지 측정
+- **문서**: [docs/erd.md](erd.md) (Mermaid ERD) 추가
+- **작업 현황**: 전체 115개 작업 중 **43개 완료** (백로그 기준). 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
 - **로컬 연동**: [docs/LOCAL_TESTING.md](LOCAL_TESTING.md)에 React/Vite 로컬 연동 가이드 추가
 
 ---
@@ -44,6 +50,7 @@
 |--------|------|------|-----------|------|
 | POST | `/api/v1/auth/signup` | 회원가입 | [auth.md](api/auth.md) | ✅ |
 | POST | `/api/v1/auth/login` | 로그인 (JWT 발급) | [auth.md](api/auth.md) | ✅ |
+| GET | `/api/v1/user/profile` | 프로필·학력·유학목표 통합 조회 | [user-profile.md](api/user-profile.md) | ✅ |
 | PUT | `/api/v1/user/profile` | 프로필 기본 정보 (MBTI, 태그, 자기소개) | [user-profile.md](api/user-profile.md) | ✅ |
 | POST | `/api/v1/user/education` | 학력 정보 입력 | [user-profile.md](api/user-profile.md) | ✅ |
 | POST | `/api/v1/user/preference` | 유학 목표 설정 | [user-profile.md](api/user-profile.md) | ✅ |
@@ -61,7 +68,7 @@ Auth·User Profile API 연동 시 바로 로그인해서 토큰을 받을 수 �
 | **이름** | 테스트 사용자 |
 
 - 로그인: `POST /api/v1/auth/login` body `{"email":"test@example.com","password":"test1234Z"}`
-- 받은 토큰으로 `PUT /api/v1/user/profile`, `POST /api/v1/user/education`, `POST /api/v1/user/preference` 등 호출 시 사용하세요.
+- 받은 토큰으로 `GET /api/v1/user/profile`, `PUT /api/v1/user/profile`, `POST /api/v1/user/education`, `POST /api/v1/user/preference` 등 호출 시 사용하세요.
 
 ---
 
@@ -120,13 +127,13 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 | 주차 | Epic | 완료/전체 | 사용 가능 API |
 |------|------|-----------|---------------|
 | Week 1 | GAM-1 | 23/23 | Mock API 4개 ✅ |
-| Week 2 | GAM-2 | 5/21 | Auth 2개 ✅, User Profile 3개 ✅ |
+| Week 2 | GAM-2 | 18/21 | Auth 2개 ✅, User Profile 4개 ✅ |
 | Week 3 | GAM-3 | 0/22 | - |
 | Week 4 | GAM-4 | 0/21 | - |
 | Week 5 | GAM-5 | 2/19 | - |
 | Week 6 | GAM-6 | 0/9 | - |
 
-- 전체: **30/115** (백로그 문서 Epic별 Tasks 기준. 코드 검증 기준으로 미구현 항목은 미완료 처리)
+- 전체: **43/115** (백로그 문서 Epic별 Tasks 기준)
 - 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
 
 상세 일정은 전달받은 백로그/일정 링크를 참고하세요.

@@ -1,6 +1,7 @@
 #!/bin/bash
-# push 전 로컬에서 JIRA 진행 보고서 생성 후 스테이징(및 선택적 커밋)
+# push 전 로컬에서 (1) JIRA_BACKLOG.md 완료 [x] → JIRA 작업/에픽 Done 반영, (2) JIRA 진행 보고서 생성 후 스테이징(및 선택적 커밋)
 # 사용: export JIRA_URL=... JIRA_EMAIL=... JIRA_API_TOKEN=... 후 ./reports/jira-report-local.sh [--commit]
+# 동기화만 시뮬레이션: JIRA_DRY_RUN=1 ./reports/jira-report-local.sh
 
 set -e
 
@@ -58,7 +59,16 @@ LATEST_FILE="${REPORTS_DIR}/report-latest.md"
 
 mkdir -p "$REPORTS_DIR"
 
-# 보고서 옵션은 .github/jira-config.json 에서 로드 (로컬/커밋/CI 공통)
+# 1) JIRA_BACKLOG.md 완료 [x] 항목 → 실제 JIRA 작업/에픽 Done 전환
+echo "[1/2] JIRA 동기화: 백로그 완료 항목 → JIRA Done 반영 ..." >&2
+if [ -n "${JIRA_DRY_RUN:-}" ]; then
+  python3 "$SCRIPT_DIR/jira-sync-backlog-to-jira.py" --dry-run || true
+else
+  python3 "$SCRIPT_DIR/jira-sync-backlog-to-jira.py" || true
+fi
+
+# 2) 보고서 생성 (백엔드 + 프론트엔드 포함, 옵션은 .github/jira-config.json)
+echo "[2/2] JIRA 진행 보고서 생성 (백엔드·프론트엔드 포함) ..." >&2
 python3 "$SCRIPT_DIR/jira-generate-report.py" \
   --canonical-only \
   --output "$REPORT_FILE" \

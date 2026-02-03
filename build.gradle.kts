@@ -3,6 +3,7 @@ plugins {
     kotlin("plugin.spring") version "1.9.24"
     id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.5"
+    jacoco
 }
 
 group = "com.goalmond"
@@ -27,7 +28,36 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
 }
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+    classDirectories.setFrom(
+        sourceSets.main.get().output.classesDirs.files.map { dir ->
+            fileTree(dir) {
+                exclude(
+                    "**/domain/dto/**",
+                    "**/domain/entity/**",
+                    "**/ApiApplication.class",
+                    "**/config/TestUser*.class"
+                )
+            }
+        }
+    )
+}
+
+// 목표: 비즈니스 로직(service, controller, config) 테스트 커버리지 80% 이상.
+// 리포트: ./gradlew test jacocoTestReport → build/reports/jacoco/test/html/index.html
+// DTO/Entity/Application 제외 후 측정.
 
 dependencies {
     // Spring Boot Web

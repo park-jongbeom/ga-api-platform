@@ -141,6 +141,21 @@ def load_jira_to_backlog_mapping(mapping_file: str) -> Dict[str, str]:
     return out
 
 
+def load_frontend_jira_to_backlog(mapping_file: str) -> Dict[str, str]:
+    """매핑 파일에서 GAMF-* → GAM-xxx 항목을 역매핑: JIRA 키 → 백로그 키(GAMF-*)."""
+    out: Dict[str, str] = {}
+    if not os.path.exists(mapping_file):
+        return out
+    with open(mapping_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    for backlog_key, jira_key in data.items():
+        if backlog_key.startswith("_") or not isinstance(backlog_key, str) or not isinstance(jira_key, str):
+            continue
+        if backlog_key.startswith("GAMF-"):
+            out[jira_key] = backlog_key
+    return out
+
+
 def resolve_jira_to_backlog(
     issues: List[dict],
     backlog_key_titles: List[Tuple[str, str]],
@@ -314,12 +329,12 @@ def build_report_markdown(
         f"| 남은 작업 | {to_do_count} |",
         f"",
     ]
-    if is_frontend:
-        lines.extend([
-            f"| 백엔드 | {len(done_backend) + len(in_progress_backend) + len(to_do_backend)} |",
-            f"| 프론트엔드 | {len(done_frontend) + len(in_progress_frontend) + len(to_do_frontend)} |",
-            f"",
-        ])
+    # 백엔드/프론트 구분 행 항상 표시
+    lines.extend([
+        f"| 백엔드 | {len(done_backend) + len(in_progress_backend) + len(to_do_backend)} |",
+        f"| 프론트엔드 | {len(done_frontend) + len(in_progress_frontend) + len(to_do_frontend)} |",
+        f"",
+    ])
     lines.extend([
         f"**진행률**: `{bar}` **{progress_pct}%**",
         f"",
@@ -328,7 +343,7 @@ def build_report_markdown(
         f"## 전체 일정 (Epic 타임라인)",
         f"",
     ])
-    if is_frontend and (epic_backend or epic_frontend):
+    if is_frontend:
         lines.append(f"### 백엔드")
         lines.append(f"")
         lines.extend(epic_backend if epic_backend else ["- (없음)"])
@@ -455,13 +470,24 @@ def main():
     jira_to_backlog, matched_jira_keys = resolve_jira_to_backlog(
         issues, backlog_key_titles, jira_to_backlog_map
     )
+    # 프론트엔드: 매핑(GAMF-* → GAM-xxx) 역매핑으로 JIRA 키 → 백로그 키 병합
+    frontend_j2b = load_frontend_jira_to_backlog(args.mapping_file)
+    if frontend_j2b:
+        jira_to_backlog = {**jira_to_backlog, **frontend_j2b}
+        print(f"프론트엔드 JIRA→백로그 매칭: {len(frontend_j2b)}개 (GAMF-* 키)", file=sys.stderr)
     if jira_to_backlog:
-        print(f"JIRA→백로그 매칭: {len(jira_to_backlog)}개 (키/이름 기준)", file=sys.stderr)
+        print(f"JIRA→백로그 매칭 합계: {len(jira_to_backlog)}개", file=sys.stderr)
+
+    frontend_keys = load_frontend_jira_keys(args.mapping_file)
+    if frontend_keys:
+        print(f"백엔드/프론트 구분: 프론트엔드 {len(frontend_keys)}개", file=sys.stderr)
 
     if args.canonical_only:
         before = len(issues)
-        issues = [i for i in issues if (i.get("key") or "") in matched_jira_keys]
-        print(f"정규 이슈만 포함: {before}개 → {len(issues)}개 (백로그 매칭된 이슈만)", file=sys.stderr)
+        # 백로그 매칭된 이슈 + 프론트엔드 매핑된 이슈(GAM-142 등) 모두 포함
+        canonical_keys = matched_jira_keys | frontend_keys
+        issues = [i for i in issues if (i.get("key") or "") in canonical_keys]
+        print(f"정규 이슈만 포함: {before}개 → {len(issues)}개 (백엔드 백로그 매칭 + 프론트엔드)", file=sys.stderr)
 
     display_titles = load_display_titles_from_backlogs(
         args.backend_backlog,
@@ -470,10 +496,6 @@ def main():
     )
     if display_titles:
         print(f"백로그 표시 제목 로드: {len(display_titles)}개", file=sys.stderr)
-
-    frontend_keys = load_frontend_jira_keys(args.mapping_file)
-    if frontend_keys:
-        print(f"백엔드/프론트 구분: 프론트엔드 {len(frontend_keys)}개", file=sys.stderr)
 
     markdown = build_report_markdown(
         issues,

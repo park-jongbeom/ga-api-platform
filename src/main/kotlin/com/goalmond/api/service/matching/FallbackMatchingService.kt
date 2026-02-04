@@ -65,12 +65,13 @@ class FallbackMatchingService(
         preference: UserPreference
     ): List<MatchingResponse.MatchingResult> {
         val prompt = buildPrompt(profile, preference)
-        logger.info("Fallback 매칭 시작: major=${preference.targetMajor}, budget=${preference.budgetUsd}")
+        logger.info("Fallback 매칭 시작: major=${preference.targetMajor}, budget=${preference.budgetUsd}, location=${preference.targetLocation}")
         logger.debug("Gemini 프롬프트:\n$prompt")
         
         return try {
             val raw = geminiClient.generateContent(prompt)
-            logger.debug("Gemini 응답 (${raw.length}자):\n${raw.take(500)}...")
+            logger.info("Gemini API 호출 성공 (응답 길이: ${raw.length}자)")
+            logger.debug("Gemini 응답:\n${raw.take(1000)}...")
             
             val results = parseAndMap(raw)
             if (results.isEmpty()) {
@@ -81,7 +82,7 @@ class FallbackMatchingService(
                 results
             }
         } catch (e: GeminiApiException) {
-            logger.error("Gemini API 호출 실패: ${e.message}, 기본 추천 사용", e)
+            logger.error("Gemini API 호출 실패: ${e.message} (cause: ${e.cause?.message}), 기본 추천 사용", e)
             generateDefaultRecommendations(profile, preference)
         } catch (e: Exception) {
             logger.error("Fallback 매칭 실패: ${e.message}, 기본 추천 사용", e)
@@ -112,6 +113,12 @@ class FallbackMatchingService(
         
         return """
 당신은 미국 유학 매칭 전문가입니다. 다음 학생에게 최적의 학교와 프로그램을 추천해주세요.
+
+**중요: 아래 조건을 반드시 준수하세요:**
+1. 연간 예산 $${budgetUsd} USD를 절대 초과하지 않는 학교만 추천하세요.
+2. 희망 지역 "$targetLocation"의 학교를 우선 추천하세요.
+3. 희망 전공 "$targetMajor"와 관련된 프로그램만 추천하세요.
+4. 5개 학교는 모두 달라야 하며, 다양한 선택지를 제공하세요.
 
 [학생 프로필]
 - 학교: ${profile.schoolName ?: "N/A"}
@@ -377,111 +384,51 @@ class FallbackMatchingService(
     
     /**
      * Gemini API 실패 또는 파싱 실패 시 사용하는 기본 추천 생성.
-     * 
-     * 사용자 프로필 기반으로 일반적인 추천을 생성:
-     * - 예산에 맞는 Community College 3개
-     * - 전략적 선택 2개 (편입 경로)
+     *
+     * 사용자 입력(예산, 지역, 프로그램 유형) 기반 필터링 및 정렬 후 5개 반환.
      */
-    @Suppress("UNUSED_PARAMETER") // profile은 향후 확장(GPA 기반 추천 등)을 위해 유지
     internal fun generateDefaultRecommendations(
         profile: AcademicProfile,
         preference: UserPreference
     ): List<MatchingResponse.MatchingResult> {
-        logger.info("기본 추천 생성: major=${preference.targetMajor}, budget=${preference.budgetUsd}")
-        
         val targetMajor = preference.targetMajor ?: "일반"
         val budget = preference.budgetUsd ?: 30000
+        val targetLocation = preference.targetLocation?.trim() ?: ""
+        val targetProgram = preference.targetProgram ?: "community_college"
+        logger.info("기본 추천 생성: major=$targetMajor, budget=$budget, location=$targetLocation, programType=$targetProgram")
         
-        // 기본 추천 템플릿 (실제 존재하는 학교 기반, 한글 표기)
-        val templates = listOf(
-            DefaultSchoolTemplate(
-                name = "Santa Monica College",
-                type = "community_college",
-                state = "CA",
-                city = "Santa Monica",
-                tuition = 9000,
-                programName = "$targetMajor 편입 프로그램",
-                degree = "AA",
-                duration = "2년",
-                recommendationType = "safe",
-                explanation = "예산 내에서 높은 편입률을 자랑하는 커뮤니티 칼리지입니다. UCLA, USC 등 명문대 편입 실적이 우수합니다.",
-                pros = listOf("높은 UC 편입률", "저렴한 학비", "다양한 전공 제공", "LA 위치"),
-                cons = listOf("경쟁이 치열할 수 있음", "기숙사 미제공"),
-                featureBadges = listOf("높은 편입률", "저렴한 학비"),
-                totalScore = 85.0
-            ),
-            DefaultSchoolTemplate(
-                name = "De Anza College",
-                type = "community_college",
-                state = "CA",
-                city = "Cupertino",
-                tuition = 9500,
-                programName = "$targetMajor 편입 프로그램",
-                degree = "AS",
-                duration = "2년",
-                recommendationType = "challenge",
-                explanation = "실리콘밸리 중심에 위치한 우수한 커뮤니티 칼리지입니다. 테크 기업 인턴십 기회가 풍부합니다.",
-                pros = listOf("실리콘밸리 위치", "테크 기업 연계", "우수한 STEM 프로그램"),
-                cons = listOf("생활비가 높음", "주거 경쟁 치열"),
-                featureBadges = listOf("실리콘밸리 위치", "STEM 집중"),
-                totalScore = 78.0
-            ),
-            DefaultSchoolTemplate(
-                name = "Diablo Valley College",
-                type = "community_college",
-                state = "CA",
-                city = "Pleasant Hill",
-                tuition = 8500,
-                programName = "$targetMajor 전공 과정",
-                degree = "AA",
-                duration = "2년",
-                recommendationType = "safe",
-                explanation = "UC Berkeley 편입률이 높은 커뮤니티 칼리지입니다. 예산 대비 뛰어난 교육 품질을 제공합니다.",
-                pros = listOf("UC Berkeley 편입률 1위", "합리적인 학비", "소규모 수업"),
-                cons = listOf("대중교통 불편", "도심 외곽 위치"),
-                featureBadges = listOf("UC 편입 1위", "소규모 수업"),
-                totalScore = 82.0
-            ),
-            DefaultSchoolTemplate(
-                name = "Orange Coast College",
-                type = "community_college",
-                state = "CA",
-                city = "Costa Mesa",
-                tuition = 9200,
-                programName = "$targetMajor 프로그램",
-                degree = "AS",
-                duration = "2년",
-                recommendationType = "strategy",
-                explanation = "오렌지카운티의 대표적인 커뮤니티 칼리지입니다. 다양한 전공과 실무 중심 교육을 제공합니다.",
-                pros = listOf("다양한 전공 선택", "좋은 날씨", "해변 근처"),
-                cons = listOf("교통 혼잡", "주거비 다소 높음"),
-                featureBadges = listOf("다양한 전공", "OPT STEM 인정"),
-                totalScore = 75.0
-            ),
-            DefaultSchoolTemplate(
-                name = "Foothill College",
-                type = "community_college",
-                state = "CA",
-                city = "Los Altos Hills",
-                tuition = 9800,
-                programName = "$targetMajor 편입 트랙",
-                degree = "AA",
-                duration = "2년",
-                recommendationType = "strategy",
-                explanation = "실리콘밸리 남부에 위치한 우수한 커뮤니티 칼리지입니다. 온라인 수업 옵션이 다양합니다.",
-                pros = listOf("유연한 수업 일정", "온라인 수업 다양", "아름다운 캠퍼스"),
-                cons = listOf("생활비 높음", "대중교통 제한적"),
-                featureBadges = listOf("온라인 수업", "아름다운 캠퍼스"),
-                totalScore = 73.0
-            )
-        )
+        // 1. 예산 필터링 (학비가 예산의 70% 이하, 생활비 고려)
+        var filtered = getAllDefaultTemplates(targetMajor).filter { it.tuition <= budget * 0.7 }
+        if (filtered.isEmpty()) filtered = getAllDefaultTemplates(targetMajor)
         
-        // 예산에 맞게 필터링 (학비가 예산의 50% 이하인 학교만)
-        val filteredTemplates = templates.filter { it.tuition <= budget * 0.5 }
-            .ifEmpty { templates } // 필터 결과가 없으면 전체 사용
+        // 2. 프로그램 유형 필터링
+        val byType = filtered.filter { it.type == targetProgram }
+        if (byType.isNotEmpty()) filtered = byType
         
-        return filteredTemplates.take(MAX_RECOMMENDATIONS).mapIndexed { index, template ->
+        // 3. 지역 우선순위 정렬 (지역 일치 시 상단)
+        val locationUpper = targetLocation.uppercase()
+        val prioritized = filtered.sortedByDescending { template ->
+            var score = 0.0
+            if (locationUpper.isNotBlank()) {
+                if (template.state.uppercase().contains(locationUpper) ||
+                    template.city.uppercase().contains(locationUpper) ||
+                    locationUpper.contains(template.state.uppercase()) ||
+                    "CALIFORNIA".contains(locationUpper) && template.state == "CA" ||
+                    "NEW YORK".contains(locationUpper) && template.state == "NY" ||
+                    "TEXAS".contains(locationUpper) && template.state == "TX") {
+                    score += 100.0
+                }
+            }
+            score += (budget - template.tuition) / 1000.0.coerceAtLeast(1.0)
+            score
+        }
+        
+        val selected = prioritized.distinctBy { it.name }.take(MAX_RECOMMENDATIONS)
+        val programNamesByMajor = getProgramNamesForMajor(targetMajor)
+        
+        return selected.mapIndexed { index, template ->
             val rank = index + 1
+            val programName = programNamesByMajor.getOrElse(index) { "$targetMajor 전공 과정" }
             MatchingResponse.MatchingResult(
                 rank = rank,
                 school = MatchingResponse.SchoolSummary(
@@ -500,7 +447,7 @@ class FallbackMatchingService(
                 ),
                 program = MatchingResponse.ProgramSummary(
                     id = "fallback-$rank-p",
-                    name = template.programName,
+                    name = programName,
                     degree = template.degree,
                     duration = template.duration,
                     optAvailable = true
@@ -515,6 +462,239 @@ class FallbackMatchingService(
                 cons = template.cons
             )
         }
+    }
+    
+    /**
+     * 전공에 따른 프로그램명 목록 (다양화).
+     */
+    private fun getProgramNamesForMajor(targetMajor: String): List<String> {
+        val lower = targetMajor.lowercase()
+        return when {
+            lower.contains("컴퓨터") || lower.contains("소프트웨어") || lower.contains("computer") || lower.contains("software") ->
+                listOf("컴퓨터공학 편입 프로그램", "소프트웨어 개발 집중 과정", "컴퓨터 과학 Associate Degree", "IT 및 컴퓨터 응용", "CS 편입 트랙")
+            lower.contains("경영") || lower.contains("비즈니스") || lower.contains("business") ->
+                listOf("경영학 편입 프로그램", "비즈니스 관리 과정", "경영 및 회계 Associate", "경제학 편입", "MBA 준비 과정")
+            lower.contains("기계") || lower.contains("공학") || lower.contains("engineering") ->
+                listOf("기계공학 전공 과정", "엔지니어링 편입 프로그램", "STEM Associate", "산업 기술 과정", "공학 기초 과정")
+            else -> listOf("$targetMajor 편입 프로그램", "$targetMajor 전공 과정", "$targetMajor 집중 과정", "$targetMajor Associate", "$targetMajor 과정")
+        }
+    }
+    
+    /**
+     * 기본 추천용 전체 템플릿 (지역·유형별 다양화).
+     */
+    private fun getAllDefaultTemplates(targetMajor: String): List<DefaultSchoolTemplate> {
+        val baseProgramName = "$targetMajor 편입 프로그램"
+        return listOf(
+            DefaultSchoolTemplate(
+                name = "Santa Monica College",
+                type = "community_college",
+                state = "CA",
+                city = "Santa Monica",
+                tuition = 9000,
+                programName = baseProgramName,
+                degree = "AA",
+                duration = "2년",
+                recommendationType = "safe",
+                explanation = "예산 내에서 높은 편입률을 자랑하는 커뮤니티 칼리지입니다. UCLA, USC 등 명문대 편입 실적이 우수합니다.",
+                pros = listOf("높은 UC 편입률", "저렴한 학비", "다양한 전공 제공", "LA 위치"),
+                cons = listOf("경쟁이 치열할 수 있음", "기숙사 미제공"),
+                featureBadges = listOf("높은 편입률", "저렴한 학비"),
+                totalScore = 85.0
+            ),
+            DefaultSchoolTemplate(
+                name = "De Anza College",
+                type = "community_college",
+                state = "CA",
+                city = "Cupertino",
+                tuition = 9500,
+                programName = baseProgramName,
+                degree = "AS",
+                duration = "2년",
+                recommendationType = "challenge",
+                explanation = "실리콘밸리 중심에 위치한 우수한 커뮤니티 칼리지입니다. 테크 기업 인턴십 기회가 풍부합니다.",
+                pros = listOf("실리콘밸리 위치", "테크 기업 연계", "우수한 STEM 프로그램"),
+                cons = listOf("생활비가 높음", "주거 경쟁 치열"),
+                featureBadges = listOf("실리콘밸리 위치", "STEM 집중"),
+                totalScore = 78.0
+            ),
+            DefaultSchoolTemplate(
+                name = "Diablo Valley College",
+                type = "community_college",
+                state = "CA",
+                city = "Pleasant Hill",
+                tuition = 8500,
+                programName = baseProgramName,
+                degree = "AA",
+                duration = "2년",
+                recommendationType = "safe",
+                explanation = "UC Berkeley 편입률이 높은 커뮤니티 칼리지입니다. 예산 대비 뛰어난 교육 품질을 제공합니다.",
+                pros = listOf("UC Berkeley 편입률 1위", "합리적인 학비", "소규모 수업"),
+                cons = listOf("대중교통 불편", "도심 외곽 위치"),
+                featureBadges = listOf("UC 편입 1위", "소규모 수업"),
+                totalScore = 82.0
+            ),
+            DefaultSchoolTemplate(
+                name = "Orange Coast College",
+                type = "community_college",
+                state = "CA",
+                city = "Costa Mesa",
+                tuition = 9200,
+                programName = baseProgramName,
+                degree = "AS",
+                duration = "2년",
+                recommendationType = "strategy",
+                explanation = "오렌지카운티의 대표적인 커뮤니티 칼리지입니다. 다양한 전공과 실무 중심 교육을 제공합니다.",
+                pros = listOf("다양한 전공 선택", "좋은 날씨", "해변 근처"),
+                cons = listOf("교통 혼잡", "주거비 다소 높음"),
+                featureBadges = listOf("다양한 전공", "OPT STEM 인정"),
+                totalScore = 75.0
+            ),
+            DefaultSchoolTemplate(
+                name = "Foothill College",
+                type = "community_college",
+                state = "CA",
+                city = "Los Altos Hills",
+                tuition = 9800,
+                programName = baseProgramName,
+                degree = "AA",
+                duration = "2년",
+                recommendationType = "strategy",
+                explanation = "실리콘밸리 남부에 위치한 우수한 커뮤니티 칼리지입니다. 온라인 수업 옵션이 다양합니다.",
+                pros = listOf("유연한 수업 일정", "온라인 수업 다양", "아름다운 캠퍼스"),
+                cons = listOf("생활비 높음", "대중교통 제한적"),
+                featureBadges = listOf("온라인 수업", "아름다운 캠퍼스"),
+                totalScore = 73.0
+            ),
+            DefaultSchoolTemplate(
+                name = "Borough of Manhattan Community College",
+                type = "community_college",
+                state = "NY",
+                city = "New York",
+                tuition = 7500,
+                programName = baseProgramName,
+                degree = "AS",
+                duration = "2년",
+                recommendationType = "safe",
+                explanation = "맨해튼 중심의 커뮤니티 칼리지입니다. CUNY 편입 경로가 잘 갖춰져 있고 교통이 편리합니다.",
+                pros = listOf("맨해튼 위치", "CUNY 편입", "저렴한 학비", "대중교통 편리"),
+                cons = listOf("기숙사 없음", "도심 생활비 높음"),
+                featureBadges = listOf("CUNY 편입", "저렴한 학비"),
+                totalScore = 80.0
+            ),
+            DefaultSchoolTemplate(
+                name = "LaGuardia Community College",
+                type = "community_college",
+                state = "NY",
+                city = "Long Island City",
+                tuition = 6800,
+                programName = baseProgramName,
+                degree = "AA",
+                duration = "2년",
+                recommendationType = "safe",
+                explanation = "퀸스에 위치한 CUNY 소속 커뮤니티 칼리지입니다. 다양한 이민자 학생들이 편입을 준비합니다.",
+                pros = listOf("저렴한 학비", "CUNY 편입", "다문화 환경"),
+                cons = listOf("캠퍼스 규모 제한", "주차 불편"),
+                featureBadges = listOf("CUNY", "다문화"),
+                totalScore = 77.0
+            ),
+            DefaultSchoolTemplate(
+                name = "Kingsborough Community College",
+                type = "community_college",
+                state = "NY",
+                city = "Brooklyn",
+                tuition = 7200,
+                programName = baseProgramName,
+                degree = "AS",
+                duration = "2년",
+                recommendationType = "strategy",
+                explanation = "브루클린의 해변 인근 커뮤니티 칼리지입니다. CUNY 4년제 편입률이 높습니다.",
+                pros = listOf("브루클린 위치", "CUNY 편입", "캠퍼스 규모 적당"),
+                cons = listOf("대중교통 시간 소요"),
+                featureBadges = listOf("CUNY 편입", "해변 캠퍼스"),
+                totalScore = 76.0
+            ),
+            DefaultSchoolTemplate(
+                name = "Austin Community College",
+                type = "community_college",
+                state = "TX",
+                city = "Austin",
+                tuition = 6800,
+                programName = baseProgramName,
+                degree = "AA",
+                duration = "2년",
+                recommendationType = "safe",
+                explanation = "오스틴에 위치한 대형 커뮤니티 칼리지입니다. UT Austin 편입 협정이 잘 되어 있습니다.",
+                pros = listOf("UT Austin 편입", "저렴한 학비", "오스틴 거주 환경"),
+                cons = listOf("캠퍼스 분산", "여름 더움"),
+                featureBadges = listOf("UT 편입", "저렴한 학비"),
+                totalScore = 81.0
+            ),
+            DefaultSchoolTemplate(
+                name = "Houston Community College",
+                type = "community_college",
+                state = "TX",
+                city = "Houston",
+                tuition = 6200,
+                programName = baseProgramName,
+                degree = "AS",
+                duration = "2년",
+                recommendationType = "safe",
+                explanation = "휴스턴 지역 최대 커뮤니티 칼리지입니다. 다양한 캠퍼스와 전공을 제공합니다.",
+                pros = listOf("저렴한 학비", "다양한 캠퍼스", "휴스턴 대학 편입"),
+                cons = listOf("도시 규모로 인한 이동 시간"),
+                featureBadges = listOf("저렴한 학비", "다캠퍼스"),
+                totalScore = 78.0
+            ),
+            DefaultSchoolTemplate(
+                name = "Dallas College",
+                type = "community_college",
+                state = "TX",
+                city = "Dallas",
+                tuition = 6500,
+                programName = baseProgramName,
+                degree = "AA",
+                duration = "2년",
+                recommendationType = "strategy",
+                explanation = "댈러스-포트워스 지역의 커뮤니티 칼리지입니다. 4년제 편입 경로가 다양합니다.",
+                pros = listOf("저렴한 학비", "댈러스 지역", "편입 옵션 다양"),
+                cons = listOf("캠퍼스별 차이"),
+                featureBadges = listOf("저렴한 학비", "편입 다양"),
+                totalScore = 75.0
+            ),
+            DefaultSchoolTemplate(
+                name = "San Jose State University",
+                type = "university",
+                state = "CA",
+                city = "San Jose",
+                tuition = 18000,
+                programName = baseProgramName,
+                degree = "BS",
+                duration = "4년",
+                recommendationType = "challenge",
+                explanation = "실리콘밸리 중심의 공립 대학입니다. 테크 기업 채용 연계가 뛰어납니다.",
+                pros = listOf("실리콘밸리 위치", "테크 채용", "공립 4년제"),
+                cons = listOf("학비 높음", "경쟁률 높음"),
+                featureBadges = listOf("STEM 강점", "취업 연계"),
+                totalScore = 82.0
+            ),
+            DefaultSchoolTemplate(
+                name = "California State University, Long Beach",
+                type = "university",
+                state = "CA",
+                city = "Long Beach",
+                tuition = 16500,
+                programName = baseProgramName,
+                degree = "BS",
+                duration = "4년",
+                recommendationType = "strategy",
+                explanation = "CSU 시스템의 대형 캠퍼스입니다. 비용 대비 높은 취업률을 자랑합니다.",
+                pros = listOf("CSU 시스템", "해변 인근", "다양한 전공"),
+                cons = listOf("대형 강의", "주거비"),
+                featureBadges = listOf("CSU", "다양한 전공"),
+                totalScore = 79.0
+            )
+        )
     }
     
     /**

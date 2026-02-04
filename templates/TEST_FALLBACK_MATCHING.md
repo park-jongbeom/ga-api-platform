@@ -1,12 +1,12 @@
 # Fallback 매칭 테스트 목표 및 검증 가이드
 
-> **업데이트 (2026-02-04)**: GAM-3 Phase 10에서 Hard Filter 후 Fallback 로직이 추가되었습니다.
+> **업데이트 (2026-02-04)**: Fallback 메시지 및 기본 템플릿 개선.
 > - **2가지 Fallback 시나리오**: 벡터 검색 0개 + Hard Filter 0개
-> - **하이브리드 방식**: 필터링 이유 설명 + AI 추천 제공
-> - **필터링 통계**: filterSummary 객체로 상세 정보 제공
+> - **사용자 친화 메시지**: 두 시나리오 모두 `data.message` = `"맞춤형 추천을 제공합니다."` 로 통일
+> - **필터링 통계**: filterSummary 객체 (Hard Filter 0개 시나리오에만)
 > - Gemini API 실패/파싱 실패 시에도 기본 추천 반환 (빈 결과 없음)
-> - 프롬프트 엔지니어링 강화 (6대 지표, 추천 유형, 확장 필드)
-> - 실제 캘리포니아 커뮤니티 칼리지 기반 기본 추천 템플릿
+> - 프롬프트 엔지니어링: 예산·지역·전공 조건 강조, 6대 지표, 추천 유형, 확장 필드
+> - **기본 추천 템플릿 확장**: CA·NY·TX·University 등 13개, 사용자 예산·지역·프로그램 유형 기반 필터링 후 5개 반환
 
 ## 1. 목적
 
@@ -33,7 +33,7 @@
 1. 후보군 0건 시 Fallback 분기 진입 여부 확인
 2. **Gemini API 성공 시**: AI 생성 추천 결과 1~5건 반환
 3. **Gemini API 실패 시**: 기본 추천 템플릿 5건 반환 (빈 결과 없음)
-4. 응답 `data.message`에 Fallback 안내 문구 포함 여부 확인
+4. 응답 `data.message`에 `"맞춤형 추천을 제공합니다."` 포함 여부 확인
 5. `school.id`가 `fallback-*` 패턴으로 반환되는지 확인
 6. 확장 필드 포함 여부: `global_ranking`, `ranking_field`, `average_salary`, `feature_badges`
 7. `explanation`, `pros`, `cons`에 AI 생성 또는 기본 텍스트 포함 확인
@@ -51,12 +51,11 @@
 - `data.results[].explanation`이 비어있지 않음
 
 ### 시나리오 1 (벡터 검색 0개) 추가 기준
-- `data.message`가 "DB에 데이터가 없어 API 정보만으로 생성한 추천입니다."를 포함
+- `data.message`가 "맞춤형 추천을 제공합니다."를 포함
 - `data.filterSummary`가 `null` (벡터 검색 단계에서 종료)
 
 ### 시나리오 2 (Hard Filter 0개) 추가 기준 **NEW**
-- `data.message`가 "⚠️ 입력하신 조건으로는 적합한 학교가 없어"를 포함
-- `data.message`에 필터링 이유 포함 (예: "• 29개 학교 예산 초과")
+- `data.message`가 "맞춤형 추천을 제공합니다."를 포함
 - **`data.filterSummary`가 존재**하고 다음 필드 포함:
   - `totalCandidates > 0`: 필터링된 총 후보 수
   - `filteredByBudget >= 0`: 예산 초과로 필터링된 수
@@ -146,7 +145,7 @@ curl -s -X POST "$BASE_URL/api/v1/matching/run" \
 ```json
 {
   "data": {
-    "message": "DB에 데이터가 없어 API 정보만으로 생성한 추천입니다.",
+    "message": "맞춤형 추천을 제공합니다.",
     "filterSummary": null
   }
 }
@@ -156,7 +155,7 @@ curl -s -X POST "$BASE_URL/api/v1/matching/run" \
 ```json
 {
   "data": {
-    "message": "⚠️ 입력하신 조건으로는 적합한 학교가 없어 AI 추천을 제공합니다.\n\n필터링 이유:\n• 29개 학교 예산 초과 (최저 학비: $28,000)\n\n아래는 조건을 완화한 추천입니다.",
+    "message": "맞춤형 추천을 제공합니다.",
     "filterSummary": {
       "totalCandidates": 29,
       "filteredByBudget": 29,
@@ -172,7 +171,7 @@ curl -s -X POST "$BASE_URL/api/v1/matching/run" \
 
 ### 필수 검증 항목
 - [ ] `success: true`
-- [ ] `data.message`가 Fallback 안내 문구 포함
+- [ ] `data.message`가 "맞춤형 추천을 제공합니다." 포함
 - [ ] `data.total_matches >= 1` (항상 1개 이상)
 - [ ] `data.results[0].school.id`가 `fallback-1` 패턴
 - [ ] `data.results[0].recommendation_type`이 `safe`/`challenge`/`strategy` 중 하나
@@ -187,15 +186,18 @@ curl -s -X POST "$BASE_URL/api/v1/matching/run" \
 
 ## 8. 기본 추천 템플릿 (Gemini API 실패 시)
 
-Gemini API가 실패하면 아래 학교들이 기본 추천으로 반환됩니다:
+Gemini API가 실패하면 **사용자 예산·지역·프로그램 유형**에 맞게 필터링된 5개가 반환됩니다. 템플릿 풀에는 아래와 같은 지역·유형별 학교가 포함됩니다:
 
-| 순위 | 학교명 | 유형 | 추천 유형 |
-|------|--------|------|----------|
-| 1 | Santa Monica College | community_college | safe |
-| 2 | De Anza College | community_college | challenge |
-| 3 | Diablo Valley College | community_college | safe |
-| 4 | Orange Coast College | community_college | strategy |
-| 5 | Foothill College | community_college | strategy |
+| 지역/유형 | 학교 예시 | 유형 |
+|----------|----------|------|
+| CA (Community College) | Santa Monica College, De Anza College, Diablo Valley College, Orange Coast College, Foothill College | community_college |
+| NY (Community College) | Borough of Manhattan CC, LaGuardia CC, Kingsborough CC | community_college |
+| TX (Community College) | Austin CC, Houston CC, Dallas College | community_college |
+| CA (University) | San Jose State University, CSU Long Beach | university |
+
+- 예산: 학비가 예산의 70% 이하인 학교만 후보
+- 프로그램 유형: `target_program`(community_college/university 등)과 일치하는 것만
+- 지역: `target_location`(California, New York, Texas 등) 일치 시 우선 정렬 후 상위 5개
 
 ## 9. 프롬프트 엔지니어링 개선 사항
 

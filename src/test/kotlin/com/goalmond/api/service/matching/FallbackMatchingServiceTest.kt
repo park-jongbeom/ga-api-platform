@@ -424,9 +424,13 @@ class FallbackMatchingServiceTest {
             // When
             val results = fallbackMatchingService.generateDefaultRecommendations(testProfile, testPreference)
             
-            // Then
+            // Then: 전공이 영문(Computer Science) 또는 한글(컴퓨터/소프트웨어)로 반영
             val programNames = results.map { it.program.name }
-            assertThat(programNames.any { it.contains("Computer Science") }).isTrue()
+            assertThat(
+                programNames.any { name ->
+                    name.contains("Computer Science") || name.contains("컴퓨터") || name.contains("소프트웨어") || name.contains("CS ")
+                }
+            ).isTrue()
         }
         
         @Test
@@ -454,6 +458,63 @@ class FallbackMatchingServiceTest {
                 result.pros.forEach { assertThat(koreanPattern.containsMatchIn(it)).isTrue() }
                 result.cons.forEach { assertThat(koreanPattern.containsMatchIn(it)).isTrue() }
                 result.school.featureBadges.forEach { assertThat(koreanPattern.containsMatchIn(it)).isTrue() }
+            }
+        }
+        
+        @Nested
+        @DisplayName("다양한 입력에 따른 추천 검증")
+        inner class DiverseInputVerificationTest {
+            
+            private fun preferenceWith(location: String, major: String = testPreference.targetMajor!!) =
+                UserPreference(
+                    userId = testPreference.userId,
+                    targetMajor = major,
+                    targetProgram = testPreference.targetProgram,
+                    targetLocation = location,
+                    budgetUsd = testPreference.budgetUsd,
+                    careerGoal = testPreference.careerGoal,
+                    preferredTrack = testPreference.preferredTrack
+                )
+            
+            @Test
+            @DisplayName("California 선호 시 CA 학교가 추천에 포함된다")
+            fun `지역 California 추천에 CA 학교 포함`() {
+                val pref = preferenceWith("California", "경영학")
+                val results = fallbackMatchingService.generateDefaultRecommendations(testProfile, pref)
+                val states = results.map { it.school.state }.toSet()
+                assertThat(states).contains("CA")
+                assertThat(results).hasSize(5)
+            }
+            
+            @Test
+            @DisplayName("New York 선호 시 NY 학교가 추천에 포함된다")
+            fun `지역 New York 추천에 NY 학교 포함`() {
+                val pref = preferenceWith("New York", "경영학")
+                val results = fallbackMatchingService.generateDefaultRecommendations(testProfile, pref)
+                val states = results.map { it.school.state }.toSet()
+                assertThat(states).contains("NY")
+                assertThat(results).hasSize(5)
+            }
+            
+            @Test
+            @DisplayName("Texas 선호 시 TX 학교가 추천에 포함된다")
+            fun `지역 Texas 추천에 TX 학교 포함`() {
+                val pref = preferenceWith("Texas", "기계공학")
+                val results = fallbackMatchingService.generateDefaultRecommendations(testProfile, pref)
+                val states = results.map { it.school.state }.toSet()
+                assertThat(states).contains("TX")
+                assertThat(results).hasSize(5)
+            }
+            
+            @Test
+            @DisplayName("서로 다른 지역 입력 시 추천 학교 목록이 다르다")
+            fun `다른 입력에 다른 추천 결과`() {
+                val prefCA = preferenceWith("California")
+                val prefNY = preferenceWith("New York")
+                val resultsCA = fallbackMatchingService.generateDefaultRecommendations(testProfile, prefCA).map { it.school.name }.toSet()
+                val resultsNY = fallbackMatchingService.generateDefaultRecommendations(testProfile, prefNY).map { it.school.name }.toSet()
+                val common = resultsCA.intersect(resultsNY)
+                assertThat(common.size).isLessThan(5)
             }
         }
     }

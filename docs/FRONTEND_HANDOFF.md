@@ -18,18 +18,16 @@
 
 - **Hard Filter 후 Fallback 개선** (GAM-3 Phase 10): 조건에 맞는 학교가 없어도 항상 추천 제공 ✅
   - **하이브리드 방식**: Hard Filter에서 모든 학교가 필터링되어도 AI 추천 제공
-  - **상세 메시지**: 필터링 이유 (예산 초과, 영어 점수 미달) 및 개선 방안 안내
-  - **필터링 통계**: `filterSummary` 객체로 필터링 상세 정보 제공
-  - **2가지 Fallback 시나리오**:
-    1. 벡터 검색 0개 → "DB에 데이터가 없어 API 정보만으로 생성한 추천입니다."
-    2. Hard Filter 0개 → "⚠️ 입력하신 조건으로는 적합한 학교가 없어 AI 추천을 제공합니다.\n\n필터링 이유:\n• 29개 학교 예산 초과 (최저 학비: $28,000)\n\n아래는 조건을 완화한 추천입니다."
+  - **사용자 친화 메시지**: Fallback 시 `data.message`는 `"맞춤형 추천을 제공합니다."` 로 통일 (사용자 노출용)
+  - **필터링 통계**: `filterSummary` 객체로 필터링 상세 정보 제공 (Hard Filter 0개 시나리오)
+  - **2가지 Fallback 시나리오**: 벡터 검색 0개 / Hard Filter 0개 → 동일하게 `"맞춤형 추천을 제공합니다."` 반환
 
-- **Fallback 매칭 개선** (GAM-3 Phase 9): DB 데이터 없어도 항상 추천 결과 반환 보장 ✅
-  - 프롬프트 엔지니어링 강화: 6대 매칭 지표, 추천 유형(safe/challenge/strategy), 확장 필드 명시
+- **Fallback 매칭 개선** (GAM-3 Phase 9 및 사용자 입력 반영): DB 데이터 없어도 항상 추천 결과 반환 보장 ✅
+  - 프롬프트 엔지니어링: 예산·지역·전공 조건 강조, 6대 매칭 지표, 추천 유형(safe/challenge/strategy), 확장 필드 명시
   - 에러 처리 강화: Gemini API 실패/파싱 실패 시에도 기본 추천 반환
-  - 기본 추천 템플릿: 실제 캘리포니아 커뮤니티 칼리지 5개 기반
+  - **기본 추천 템플릿 확장**: CA·NY·TX·University 등 13개 템플릿, 사용자 예산·지역·프로그램 유형에 맞게 필터링 후 5개 반환
   - 확장 필드 지원: `global_ranking`, `average_salary`, `feature_badges` 등
-  - 테스트 코드 추가: `FallbackMatchingServiceTest` (17개 테스트 케이스)
+  - 테스트: `FallbackMatchingServiceTest` (다양한 입력 검증 포함)
 
 ## 이전 업데이트 (2026-02-03)
 
@@ -92,7 +90,7 @@
 ### RAG 기반 매칭 API (Week 3, local/lightsail 프로파일) ✅ 구현 완료
 
 **참고**: RAG 기반 실제 매칭 API는 DB가 연결된 환경(local/lightsail 프로파일)에서만 사용 가능합니다. Mock API(`default` 프로파일)와 동일한 엔드포인트를 사용하지만, 실제 벡터 검색 + Rule-based 알고리즘으로 매칭을 수행합니다.
-**Fallback**: DB에 학교/임베딩 데이터(`school_embeddings`)가 없으면 프로필·선호도만으로 Gemini가 생성한 추천을 동일한 형식으로 반환합니다. `data.message`에 안내 문구가 포함되며, 결과의 `school.id`/`program.id`는 `fallback-1`, `fallback-2` 등의 플레이스홀더입니다.
+**Fallback**: DB에 학교/임베딩 데이터(`school_embeddings`)가 없거나 Hard Filter 통과 결과가 없으면, 프로필·선호도만으로 Gemini가 생성한 추천(또는 기본 템플릿)을 동일한 형식으로 반환합니다. `data.message`는 사용자 노출용으로 `"맞춤형 추천을 제공합니다."` 로 설정되며, 결과의 `school.id`/`program.id`는 `fallback-1`, `fallback-2` 등의 플레이스홀더입니다.
 
 | 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
 |--------|------|------|-----------|------|

@@ -83,7 +83,7 @@ class MatchingEngineService(
                     executionTimeMs = fallbackTime.toInt(),
                     results = fallbackResults,
                     createdAt = Instant.now(),
-                    message = "DB에 데이터가 없어 API 정보만으로 생성한 추천입니다. 실제 DB 데이터와 무관할 수 있습니다."
+                    message = "맞춤형 추천을 제공합니다."
                 )
             }
             
@@ -110,9 +110,6 @@ class MatchingEngineService(
                     program.tuition ?: candidateSchools.find { it.id == program.schoolId }?.tuition
                 }.minOrNull()
                 
-                // 상세 메시지 생성
-                val message = buildFilteredMessage(preference, budgetFiltered, englishFiltered, minTuition)
-                
                 val fallbackResults = fallbackMatchingService.generateFallbackResults(profile, preference)
                 val fallbackTime = System.currentTimeMillis() - startTime
                 
@@ -123,7 +120,7 @@ class MatchingEngineService(
                     executionTimeMs = fallbackTime.toInt(),
                     results = fallbackResults,
                     createdAt = Instant.now(),
-                    message = message,
+                    message = "맞춤형 추천을 제공합니다.",
                     filterSummary = MatchingResponse.FilterSummary(
                         totalCandidates = filterResult.filtered.size,
                         filteredByBudget = budgetFiltered,

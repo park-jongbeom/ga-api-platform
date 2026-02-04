@@ -4,6 +4,18 @@
 
 ## 최근 업데이트 (2026-02-04)
 
+- **Indicator Scores API 제공**: 매칭 결과에 `indicator_scores` 필드 추가 ✅
+  - **프론트 계산 제거**: 기존에 프론트에서 계산하던 선형 게이지(Academic Fit, Career Outlook, Cost Efficiency)를 백엔드에서 계산
+  - **새 필드**: `results[].indicator_scores` (academic_fit, career_outlook, cost_efficiency)
+  - **하위 호환**: API에서 제공하되, 프론트는 없을 때 기존 계산 로직으로 폴백 가능
+  - 상세: [FRONTEND_API_CHANGELOG.md](FRONTEND_API_CHANGELOG.md)
+
+- **범용 조사 에이전트 API**: 매칭 후 학교 상세 정보 조사용 API 추가 ✅
+  - **4개 엔드포인트**: 전체 조사(`/full`), 단계별(`/stage/{stage}`), 단일 프롬프트(`/prompt/{id}`), 프롬프트 목록(`/prompts`)
+  - **Vocational 10개 프롬프트**: CC vs Trade 비교, TOP 5, 학교 리스트, STEM OPT, 취업 지원, 장학금, CPT, H-1B, EB-3, 도시 비교
+  - **사용 시나리오**: 매칭 결과에서 학교 선택 → 해당 학교/분야로 상세 조사 요청
+  - 상세: [research.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/research.md)
+
 - **Hard Filter 후 Fallback 개선** (GAM-3 Phase 10): 조건에 맞는 학교가 없어도 항상 추천 제공 ✅
   - **하이브리드 방식**: Hard Filter에서 모든 학교가 필터링되어도 AI 추천 제공
   - **상세 메시지**: 필터링 이유 (예산 초과, 영어 점수 미달) 및 개선 방안 안내
@@ -104,6 +116,34 @@ User Profile API는 **JWT 인증이 필요**합니다. 로그인 후 받은 토�
 
 매칭 알고리즘 상세는 백엔드 내부 문서로, 프론트 공유 문서에는 포함되지 않습니다.
 
+### 조사 API (Week 3, 전체 프로파일) ✅ 구현 완료
+
+**참고**: 조사 API는 매칭 결과 보완용으로, 인증 없이 사용 가능합니다. 매칭 후 사용자가 특정 학교를 선택했을 때 해당 학교/분야에 대한 심층 정보를 제공합니다.
+
+| 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
+|--------|------|------|-----------|------|
+| POST | `/api/v1/research/full` | 전체 4단계 조사 (10개 프롬프트) | [research.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/research.md) | ✅ |
+| POST | `/api/v1/research/stage/{stage}` | 특정 단계만 조사 (STAGE_1~4) | [research.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/research.md) | ✅ |
+| POST | `/api/v1/research/prompt/{promptId}` | 단일 프롬프트 실행 (P1~P10) | [research.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/research.md) | ✅ |
+| GET | `/api/v1/research/prompts?category=vocational` | 프롬프트 목록 조회 | [research.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/research.md) | ✅ |
+
+**사용 예시**:
+```typescript
+// 매칭 결과에서 학교 선택 후
+const researchRes = await fetch('/api/v1/research/full', {
+  method: 'POST',
+  body: JSON.stringify({
+    category: selectedSchool.school.type,  // "vocational"
+    field: user.targetMajor,              // "기계"
+    state: selectedSchool.school.state    // "California"
+  })
+})
+```
+
+**성능**:
+- 단일 프롬프트: ~1-2초, ~$0.01
+- 전체 조사 (10개): ~15초, ~$0.10
+
 ### 테스트 계정 (개발/연동용)
 
 Auth·User Profile API 연동 시 바로 로그인해서 토큰을 받을 수 있도록 테스트 계정을 제공합니다. **배포 환경(local/lightsail)에서 시드되어 있습니다.**
@@ -173,7 +213,7 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 |------|------|-----------|---------------|
 | Week 1 | GAM-1 | 23/23 | Mock API 4개 ✅ |
 | Week 2 | GAM-2 | 18/21 | Auth 2개 ✅, User Profile 4개 ✅ |
-| Week 3 | GAM-3 | 21/22 | RAG 매칭 API 1개 ✅ |
+| Week 3 | GAM-3 | 23/22 | RAG 매칭 API 1개 ✅, 조사 API 4개 ✅ |
 | Week 4 | GAM-4 | 0/21 | - |
 | Week 5 | GAM-5 | 2/19 | - |
 | Week 6 | GAM-6 | 0/9 | - |

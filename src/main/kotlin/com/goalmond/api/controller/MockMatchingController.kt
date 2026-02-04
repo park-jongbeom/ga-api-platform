@@ -390,6 +390,7 @@ class MockMatchingController {
                     optAvailable = true
                 ),
                 totalScore = totalScore,
+                estimatedRoi = 12.0 + rank,
                 scoreBreakdown = MatchingResponse.ScoreBreakdown(
                     academic = 14 + rank,
                     english = 12 + rank,

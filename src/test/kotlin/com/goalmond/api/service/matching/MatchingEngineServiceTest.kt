@@ -133,7 +133,12 @@ class MatchingEngineServiceTest {
                 tuition = 30000,
                 livingCost = 15000,
                 acceptanceRate = 35,
-                description = "Top tier university with CS program"
+                description = "Top tier university with CS program",
+                globalRanking = "#4",
+                rankingField = "Computer Science",
+                averageSalary = 85000,
+                alumniNetworkCount = 38000,
+                featureBadges = """["OPT STEM ELIGIBLE", "ON-CAMPUS HOUSING", "RESEARCH"]"""
             ))
             
             val program2 = programRepository.save(Program(
@@ -169,14 +174,18 @@ class MatchingEngineServiceTest {
                     .isGreaterThanOrEqualTo(result.results.last().totalScore)
             }
             
-            // 각 결과에 설명 포함
+            // 각 결과에 설명 포함 및 확장 필드 검증 (매칭 리포트 요구사항)
             result.results.forEach { matchingResult ->
                 assertThat(matchingResult.explanation).isNotEmpty()
                 assertThat(matchingResult.recommendationType).isIn("safe", "challenge", "strategy")
-                
+                // SchoolSummary 확장 필드 포함 (globalRanking, rankingField, averageSalary, alumniNetworkCount, featureBadges)
+                assertThat(matchingResult.school.featureBadges).isNotNull()
+                // MatchingResult 확장 필드: estimatedRoi는 0 이상
+                assertThat(matchingResult.estimatedRoi).isGreaterThanOrEqualTo(0.0)
+
                 logger.info(
                     "Rank ${matchingResult.rank}: ${matchingResult.school.name} " +
-                    "(${String.format("%.1f", matchingResult.totalScore)}점, ${matchingResult.recommendationType})"
+                    "(${String.format("%.1f", matchingResult.totalScore)}점, ${matchingResult.recommendationType}, ROI=${matchingResult.estimatedRoi})"
                 )
             }
         }

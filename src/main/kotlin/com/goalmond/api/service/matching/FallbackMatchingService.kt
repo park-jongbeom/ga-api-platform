@@ -132,6 +132,7 @@ class FallbackMatchingService(
                     optAvailable = true
                 ),
                 totalScore = 70.0,
+                estimatedRoi = 0.0,
                 scoreBreakdown = defaultScoreBreakdown,
                 recommendationType = "strategy",
                 explanation = explanation,

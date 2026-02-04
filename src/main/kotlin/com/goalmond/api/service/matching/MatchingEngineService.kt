@@ -1,6 +1,9 @@
 package com.goalmond.api.service.matching
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.goalmond.api.domain.dto.MatchingResponse
+import com.goalmond.api.domain.entity.School
 import com.goalmond.api.repository.AcademicProfileRepository
 import com.goalmond.api.repository.ProgramRepository
 import com.goalmond.api.repository.UserPreferenceRepository
@@ -140,6 +143,7 @@ class MatchingEngineService(
                     school = buildSchoolSummary(candidate.school),
                     program = buildProgramSummary(candidate.program),
                     totalScore = candidate.totalScore,
+                    estimatedRoi = calculateEstimatedRoi(candidate.school, candidate.program),
                     scoreBreakdown = buildScoreBreakdown(candidate.scores),
                     recommendationType = recommendationType,
                     explanation = explanation,
@@ -183,8 +187,6 @@ class MatchingEngineService(
      */
     private fun generateSimpleExplanation(candidate: MatchingCandidate, type: String): String {
         val school = candidate.school
-        val scores = candidate.scores
-        
         return when (type) {
             "safe" -> "이 학교는 예산 대비 학비가 안정적이며, 귀하의 영어 점수로 바로 입학이 가능하고, 졸업 후 OPT 연계 확률이 높아 추천되었습니다."
             "challenge" -> "이 학교는 ${school.city}에 위치하며 편입률이 높아 장기적으로 유리하지만, 경쟁률을 고려하여 도전해볼 만한 선택지입니다."
@@ -192,16 +194,48 @@ class MatchingEngineService(
         }
     }
     
-    private fun buildSchoolSummary(school: com.goalmond.api.domain.entity.School) = 
-        MatchingResponse.SchoolSummary(
+    private fun buildSchoolSummary(school: School): MatchingResponse.SchoolSummary {
+        val tuition = school.tuition ?: 0
+        return MatchingResponse.SchoolSummary(
             id = school.id.toString(),
             name = school.name,
             type = school.type,
             state = school.state ?: "",
             city = school.city ?: "",
-            tuition = school.tuition ?: 0,
-            imageUrl = "https://cdn.goalmond.com/schools/${school.id}.jpg"
+            tuition = tuition,
+            imageUrl = "https://cdn.goalmond.com/schools/${school.id}.jpg",
+            globalRanking = school.globalRanking,
+            rankingField = school.rankingField,
+            averageSalary = school.averageSalary,
+            alumniNetworkCount = school.alumniNetworkCount,
+            featureBadges = parseFeatureBadges(school.featureBadges)
         )
+    }
+
+    /**
+     * feature_badges JSON 문자열을 List로 파싱. 실패 시 빈 리스트.
+     */
+    private fun parseFeatureBadges(raw: String?): List<String> {
+        if (raw.isNullOrBlank()) return emptyList()
+        return try {
+            jacksonObjectMapper().readValue<List<String>>(raw)
+        } catch (e: Exception) {
+            logger.debug("feature_badges 파싱 실패: {}", raw, e)
+            emptyList()
+        }
+    }
+
+    /**
+     * 연간 예상 ROI (%): (average_salary - tuition) / tuition * 100.
+     * null 또는 tuition 0이면 0.0, 음수면 0.0.
+     */
+    private fun calculateEstimatedRoi(school: School, program: com.goalmond.api.domain.entity.Program): Double {
+        val salary = school.averageSalary ?: return 0.0
+        val tuition = school.tuition ?: program.tuition ?: return 0.0
+        if (tuition <= 0) return 0.0
+        val roi = (salary - tuition).toDouble() / tuition * 100
+        return roi.coerceAtLeast(0.0)
+    }
     
     private fun buildProgramSummary(program: com.goalmond.api.domain.entity.Program) = 
         MatchingResponse.ProgramSummary(

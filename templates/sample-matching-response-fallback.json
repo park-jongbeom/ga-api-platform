@@ -15,7 +15,12 @@
           "state": "CA",
           "city": "Santa Monica",
           "tuition": 12000,
-          "image_url": ""
+          "image_url": "",
+          "global_ranking": null,
+          "ranking_field": null,
+          "average_salary": null,
+          "alumni_network_count": null,
+          "feature_badges": []
         },
         "program": {
           "id": "fallback-1-p",
@@ -25,6 +30,7 @@
           "opt_available": true
         },
         "total_score": 70.0,
+        "estimated_roi": 0.0,
         "score_breakdown": {
           "academic": 75,
           "english": 75,
@@ -53,7 +59,12 @@
           "state": "CA",
           "city": "Cupertino",
           "tuition": 12500,
-          "image_url": ""
+          "image_url": "",
+          "global_ranking": null,
+          "ranking_field": null,
+          "average_salary": null,
+          "alumni_network_count": null,
+          "feature_badges": []
         },
         "program": {
           "id": "fallback-2-p",
@@ -63,6 +74,7 @@
           "opt_available": true
         },
         "total_score": 70.0,
+        "estimated_roi": 0.0,
         "score_breakdown": {
           "academic": 75,
           "english": 75,
@@ -90,7 +102,12 @@
           "state": "CA",
           "city": "Los Altos Hills",
           "tuition": 11800,
-          "image_url": ""
+          "image_url": "",
+          "global_ranking": null,
+          "ranking_field": null,
+          "average_salary": null,
+          "alumni_network_count": null,
+          "feature_badges": []
         },
         "program": {
           "id": "fallback-3-p",
@@ -100,6 +117,7 @@
           "opt_available": true
         },
         "total_score": 70.0,
+        "estimated_roi": 0.0,
         "score_breakdown": {
           "academic": 75,
           "english": 75,
@@ -127,7 +145,12 @@
           "state": "CA",
           "city": "Pleasant Hill",
           "tuition": 11500,
-          "image_url": ""
+          "image_url": "",
+          "global_ranking": null,
+          "ranking_field": null,
+          "average_salary": null,
+          "alumni_network_count": null,
+          "feature_badges": []
         },
         "program": {
           "id": "fallback-4-p",
@@ -137,6 +160,7 @@
           "opt_available": true
         },
         "total_score": 70.0,
+        "estimated_roi": 0.0,
         "score_breakdown": {
           "academic": 75,
           "english": 75,
@@ -164,7 +188,12 @@
           "state": "CA",
           "city": "Costa Mesa",
           "tuition": 11000,
-          "image_url": ""
+          "image_url": "",
+          "global_ranking": null,
+          "ranking_field": null,
+          "average_salary": null,
+          "alumni_network_count": null,
+          "feature_badges": []
         },
         "program": {
           "id": "fallback-5-p",
@@ -174,6 +203,7 @@
           "opt_available": true
         },
         "total_score": 70.0,
+        "estimated_roi": 0.0,
         "score_breakdown": {
           "academic": 75,
           "english": 75,

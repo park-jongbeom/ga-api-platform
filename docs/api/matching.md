@@ -63,6 +63,16 @@ interface MatchingRunRequest {
 
 (실제 `results` 배열에는 [공통 타입 (TypeScript)](API.md#공통-타입-typescript)의 `MatchingResult` 항목이 포함됩니다.)
 
+**MatchingResult 확장 필드 (매칭 리포트용)**  
+- `estimated_roi`: number — 연간 예상 ROI (%).
+
+**results[].school (SchoolSummary) 확장 필드**  
+- `global_ranking`: string | null — 글로벌 랭킹 표시 (예: "#4").  
+- `ranking_field`: string | null — 랭킹 기준 전공 (예: "Computer Science").  
+- `average_salary`: number | null — 평균 초봉 USD.  
+- `alumni_network_count`: number | null — 동문 네트워크 규모.  
+- `feature_badges`: string[] — 특징 배지 (예: ["OPT STEM ELIGIBLE", "ON-CAMPUS HOUSING"]).
+
 샘플 응답 예시:
 - 정상 응답: `templates/sample-matching-response-normal.json`
 - Fallback 응답: `templates/sample-matching-response-fallback.json`

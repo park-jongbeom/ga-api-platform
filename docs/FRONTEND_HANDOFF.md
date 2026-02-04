@@ -18,9 +18,8 @@
 - **Validation**: EducationRequest/PreferenceRequest 검증 강화 (GPA·예산 범위 등)
 - **Repository**: SchoolRepository, ProgramRepository 추가
 - **테스트**: 성공/실패 시나리오 및 JaCoCo 커버리지 측정. 전체 28개 테스트 통과
-- **문서**: [docs/erd.md](erd.md) (Mermaid ERD), [docs/RAG_ARCHITECTURE.md](RAG_ARCHITECTURE.md) (RAG 아키텍처) 추가
-- **작업 현황**: 전체 115개 작업 중 **64개 완료** (백로그 기준). 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
-- **로컬 연동**: [docs/LOCAL_TESTING.md](LOCAL_TESTING.md)에 React/Vite 로컬 연동 가이드 추가
+- **문서**: API 명세는 아래 링크된 문서만 프론트 공유 대상입니다. (내부 문서는 공유 제외)
+- **작업 현황**: 전체 115개 작업 중 **64개 완료**. 상세 일정은 전달받은 백로그/일정 링크를 참고하세요.
 
 ---
 
@@ -29,24 +28,24 @@
 | 구분 | 설명 | 예시 |
 |------|------|------|
 | **API Base URL** | 배포된 API 서버 주소. 모든 API 요청의 기준 URL. | `https://go-almond.ddnsfree.com` |
-| **API 문서 링크** | 스펙 확인용. 요청/응답 형식, TypeScript 타입 예시 등. **이 문서와 같은 저장소의 `docs/api/` 폴더**에 있음. | GitHub `docs/api` 페이지 링크 (예: `.../ga-api-platform/blob/main/docs/api/matching.md`) |
+| **API 문서 링크** | 스펙 확인용. 요청/응답 형식 등. 아래 표의 상세 문서는 **raw 링크**로 열람 가능. | 예: `https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/user-profile.md` |
 
-전달받은 **문서 링크**로 스펙을 확인한 뒤, **Base URL**로 API를 호출하면 됩니다. 상세 스펙·요청/응답 예시 파일은 **이 문서(FRONTEND_HANDOFF.md)와 같은 위치의 `docs/api/` 폴더** 안에 있습니다.
+전달받은 **문서 링크**로 스펙을 확인한 뒤, **Base URL**로 API를 호출하면 됩니다. 아래 표의 상세 문서는 Cursor/IDE에서 정확히 위치를 열기 위해 **raw GitHub URL**로 안내합니다.
 
 ---
 
 ## 지금 사용 가능한 API
 
-아래 API의 상세 스펙·요청/응답 예시는 **같은 저장소의 `docs/api/`** 안 문서를 링크했습니다.
+아래 API의 상세 스펙·요청/응답 예시는 **raw GitHub URL**로 링크했습니다. (Cursor 등에서 정확한 문서 위치 확인용)
 
 ### Mock API (Week 1, default 프로파일) ✅ 구현 완료
 
 | 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
 |--------|------|------|-----------|------|
-| POST | `/api/v1/matching/run` | 매칭 실행 (Mock, 인증 불필요) | [matching.md](api/matching.md) | ✅ |
-| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 (Mock) | [matching.md](api/matching.md) | ✅ |
-| GET | `/api/v1/programs?type=...` | 프로그램 목록 (type: university, community_college, vocational) | [programs.md](api/programs.md) | ✅ |
-| GET | `/api/v1/schools/{schoolId}` | 학교 상세 조회 | [schools.md](api/schools.md) | ✅ |
+| POST | `/api/v1/matching/run` | 매칭 실행 (Mock, 인증 불필요) | [matching.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/matching.md) | ✅ |
+| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 (Mock) | [matching.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/matching.md) | ✅ |
+| GET | `/api/v1/programs?type=...` | 프로그램 목록 (type: university, community_college, vocational) | [programs.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/programs.md) | ✅ |
+| GET | `/api/v1/schools/{schoolId}` | 학교 상세 조회 | [schools.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/schools.md) | ✅ |
 
 ### Auth & User Profile (Week 2, local/lightsail 프로파일) ✅ 구현 완료
 
@@ -54,12 +53,12 @@
 
 | 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
 |--------|------|------|-----------|------|
-| POST | `/api/v1/auth/signup` | 회원가입 | [auth.md](api/auth.md) | ✅ |
-| POST | `/api/v1/auth/login` | 로그인 (JWT 발급) | [auth.md](api/auth.md) | ✅ |
-| GET | `/api/v1/user/profile` | 프로필·학력·유학목표 통합 조회 | [user-profile.md](api/user-profile.md) | ✅ |
-| PUT | `/api/v1/user/profile` | 프로필 기본 정보 (MBTI, 태그, 자기소개) | [user-profile.md](api/user-profile.md) | ✅ |
-| POST | `/api/v1/user/education` | 학력 정보 입력 | [user-profile.md](api/user-profile.md) | ✅ |
-| POST | `/api/v1/user/preference` | 유학 목표 설정 | [user-profile.md](api/user-profile.md) | ✅ |
+| POST | `/api/v1/auth/signup` | 회원가입 | [auth.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/auth.md) | ✅ |
+| POST | `/api/v1/auth/login` | 로그인 (JWT 발급) | [auth.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/auth.md) | ✅ |
+| GET | `/api/v1/user/profile` | 프로필·학력·유학목표 통합 조회 | [user-profile.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/user-profile.md) | ✅ |
+| PUT | `/api/v1/user/profile` | 프로필 기본 정보 (MBTI, 태그, 자기소개) | [user-profile.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/user-profile.md) | ✅ |
+| POST | `/api/v1/user/education` | 학력 정보 입력 | [user-profile.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/user-profile.md) | ✅ |
+| POST | `/api/v1/user/preference` | 유학 목표 설정 | [user-profile.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/user-profile.md) | ✅ |
 
 ### RAG 기반 매칭 API (Week 3, local/lightsail 프로파일) ✅ 구현 완료
 
@@ -68,8 +67,8 @@
 
 | 메서드 | 경로 | 설명 | 상세 문서 | 상태 |
 |--------|------|------|-----------|------|
-| POST | `/api/v1/matching/run` | 매칭 실행 (RAG 기반, JWT 필요) | [matching.md](api/matching.md) | ✅ |
-| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 (local/lightsail에서는 **미구현**, Week 4 예정. 현재는 NOT_IMPLEMENTED 반환) | [matching.md](api/matching.md) | ⏳ Week 4 |
+| POST | `/api/v1/matching/run` | 매칭 실행 (RAG 기반, JWT 필요) | [matching.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/matching.md) | ✅ |
+| GET | `/api/v1/matching/result` | 최신 매칭 결과 조회 (local/lightsail에서는 **미구현**, Week 4 예정. 현재는 NOT_IMPLEMENTED 반환) | [matching.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/matching.md) | ⏳ Week 4 |
 
 User Profile API는 **JWT 인증이 필요**합니다. 로그인 후 받은 토큰을 `Authorization: Bearer <token>` 헤더에 포함하여 호출하세요.
 
@@ -86,7 +85,7 @@ User Profile API는 **JWT 인증이 필요**합니다. 로그인 후 받은 토�
 5. Risk Penalty (경쟁률, 임계 점수, 의사 불명확 등)
 6. Explainable AI (Gemini 기반 설명 생성)
 
-상세: [docs/RAG_ARCHITECTURE.md](RAG_ARCHITECTURE.md)
+매칭 알고리즘 상세는 백엔드 내부 문서로, 프론트 공유 문서에는 포함되지 않습니다.
 
 ### 테스트 계정 (개발/연동용)
 
@@ -135,7 +134,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 const res = await fetch(`${API_URL}/api/v1/programs?type=university`);
 ```
 
-상세: [docs/LOCAL_TESTING.md](LOCAL_TESTING.md) "로컬 프론트엔드(React/Vite) 연동" 참조.
+로컬 연동 방법은 전달받은 가이드 또는 팀 채널을 참고하세요.
 
 ---
 
@@ -153,8 +152,6 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 
 ## 작업 진행 현황
 
-작업 목록 및 완료 여부([x]/[ ])는 **[docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)** 를 기준으로 합니다. 진행률은 해당 문서의 Epic별 **Tasks** 체크 상태를 확인하세요.
-
 | 주차 | Epic | 완료/전체 | 사용 가능 API |
 |------|------|-----------|---------------|
 | Week 1 | GAM-1 | 23/23 | Mock API 4개 ✅ |
@@ -164,10 +161,8 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 | Week 5 | GAM-5 | 2/19 | - |
 | Week 6 | GAM-6 | 0/9 | - |
 
-- 전체: **64/115** (백로그 문서 Epic별 Tasks 기준)
-- 상세: [docs/jira/JIRA_BACKLOG.md](jira/JIRA_BACKLOG.md)
-
-상세 일정은 전달받은 백로그/일정 링크를 참고하세요.
+- 전체: **64/115** (백로그 기준)
+- 상세 일정·작업 목록은 전달받은 백로그/일정 링크를 참고하세요.
 
 ---
 
@@ -185,7 +180,7 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 | `matching_results` | (DTO) | 매칭 결과 | V3 |
 | `applications` | (미구현) | 지원 현황 | V3 |
 
-상세: [docs/DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)
+상세 DB 스키마는 백엔드 내부 문서로, 프론트 공유 문서에는 포함되지 않습니다.
 
 ---
 
@@ -193,7 +188,8 @@ curl "https://go-almond.ddnsfree.com/api/v1/programs?type=community_college"
 
 - **응답 래퍼**: `success`, `data`, `code`, `message`, `timestamp`
 - **에러 시**: `success: false`, `code`, `message` 포함
-- 자세한 형식은 **같은 저장소의 `docs/api/`** 안 API 문서를 참고하세요. 예: [matching.md](api/matching.md), [programs.md](api/programs.md), [schools.md](api/schools.md), [auth.md](api/auth.md), [user-profile.md](api/user-profile.md), [README.md](api/README.md).
+- 자세한 형식은 아래 raw 링크의 API 문서를 참고하세요.  
+  [matching.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/matching.md) · [programs.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/programs.md) · [schools.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/schools.md) · [auth.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/auth.md) · [user-profile.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/user-profile.md) · [README.md](https://raw.githubusercontent.com/park-jongbeom/ga-api-platform/refs/heads/main/docs/api/README.md)
 
 ---
 

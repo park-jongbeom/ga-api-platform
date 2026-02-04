@@ -17,6 +17,7 @@ data class MatchingResponse(
         val school: SchoolSummary,
         val program: ProgramSummary,
         val totalScore: Double,
+        val estimatedRoi: Double,
         val scoreBreakdown: ScoreBreakdown,
         val recommendationType: String,
         val explanation: String,
@@ -31,7 +32,12 @@ data class MatchingResponse(
         val state: String,
         val city: String,
         val tuition: Int,
-        val imageUrl: String
+        val imageUrl: String,
+        val globalRanking: String? = null,
+        val rankingField: String? = null,
+        val averageSalary: Int? = null,
+        val alumniNetworkCount: Int? = null,
+        val featureBadges: List<String> = emptyList()
     )
 
     data class ProgramSummary(

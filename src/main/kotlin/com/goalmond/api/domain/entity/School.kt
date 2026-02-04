@@ -51,6 +51,21 @@ class School(
     @Column(length = 500)
     var website: String? = null,
 
+    @Column(name = "global_ranking", length = 50)
+    var globalRanking: String? = null,
+
+    @Column(name = "ranking_field", length = 255)
+    var rankingField: String? = null,
+
+    @Column(name = "average_salary")
+    var averageSalary: Int? = null,
+
+    @Column(name = "alumni_network_count")
+    var alumniNetworkCount: Int? = null,
+
+    @Column(name = "feature_badges", columnDefinition = "TEXT")
+    var featureBadges: String? = null,
+
     @Column(name = "created_at")
     var createdAt: Instant = Instant.now(),
 

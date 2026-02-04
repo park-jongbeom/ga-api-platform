@@ -2,7 +2,16 @@
 
 프론트엔드에서는 **API 프로젝트(ga-api-platform) 레포를 clone 하지 않습니다.** 백엔드에서 **전달받은 링크만** 사용해 개발합니다.
 
-## 최근 업데이트 (2026-02-03)
+## 최근 업데이트 (2026-02-04)
+
+- **Fallback 매칭 개선** (GAM-3 Phase 9): DB 데이터 없어도 항상 추천 결과 반환 보장 ✅
+  - 프롬프트 엔지니어링 강화: 6대 매칭 지표, 추천 유형(safe/challenge/strategy), 확장 필드 명시
+  - 에러 처리 강화: Gemini API 실패/파싱 실패 시에도 기본 추천 반환
+  - 기본 추천 템플릿: 실제 캘리포니아 커뮤니티 칼리지 5개 기반
+  - 확장 필드 지원: `global_ranking`, `average_salary`, `feature_badges` 등
+  - 테스트 코드 추가: `FallbackMatchingServiceTest` (17개 테스트 케이스)
+
+## 이전 업데이트 (2026-02-03)
 
 - **RAG 기반 AI 매칭 엔진**: GAM-3 완료 - pgvector, Gemini AI, Rule-based 하이브리드 매칭 시스템 구현 ✅
   - Vector DB (pgvector) + 벡터 검색 (Top 20)

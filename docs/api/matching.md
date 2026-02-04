@@ -77,14 +77,25 @@ interface MatchingRunRequest {
 - 정상 응답: `templates/sample-matching-response-normal.json`
 - Fallback 응답: `templates/sample-matching-response-fallback.json`
 
-**Fallback (DB 데이터 없을 때)**: DB에 학교/임베딩 데이터(`school_embeddings`)가 없으면 벡터 검색 후보가 0건이 되며, 이때 **프로필·선호도만으로 Gemini가 생성한 추천**을 동일한 `MatchingResponse` 형식으로 반환합니다.
+**Fallback (DB 데이터 없을 때 또는 조건에 맞는 학교 없을 때)**: 두 가지 시나리오에서 **프로필·선호도만으로 Gemini가 생성한 추천**을 동일한 `MatchingResponse` 형식으로 반환합니다.
 
-**Fallback 개선 (2026-02-04)**: 
+**Fallback 시나리오**:
+1. **벡터 검색 0개**: DB에 `school_embeddings` 데이터가 없는 경우
+2. **Hard Filter 0개** (NEW): 벡터 검색은 성공했으나 모든 학교가 Hard Filter(예산, 영어 점수 등)에서 필터링된 경우
+
+**Fallback 개선 (2026-02-04)**:
+- **하이브리드 방식**: 필터링 이유를 설명하면서 AI 추천도 함께 제공
 - **항상 결과 반환 보장**: Gemini API 실패/파싱 실패 시에도 기본 추천 템플릿(캘리포니아 CC 5개) 반환
+- **상세 메시지**: 필터링 통계(예산 초과 수, 최저 학비 등)를 포함한 개선 방안 안내
+- **필터링 통계**: `data.filterSummary` 객체로 상세 정보 제공 (Hard Filter 0개 시나리오에만)
 - **프롬프트 엔지니어링**: 6대 매칭 지표, 추천 유형(safe/challenge/strategy), 확장 필드 명시
 - **확장 필드 지원**: `global_ranking`, `average_salary`, `feature_badges` 등 매칭 리포트 필드 포함
 
-`data.message`에 "DB에 데이터가 없어 API 정보만으로 생성한 추천입니다. 실제 DB 데이터와 무관할 수 있습니다."가 설정되므로, 클라이언트에서 이 문구를 노출해 사용자에게 안내할 수 있습니다. `results` 내 항목의 `school.id` / `program.id`는 `fallback-1`, `fallback-2` 등 플레이스홀더입니다.
+**메시지 예시**:
+- 시나리오 1 (벡터 검색 0개): `"DB에 데이터가 없어 API 정보만으로 생성한 추천입니다. 실제 DB 데이터와 무관할 수 있습니다."`
+- 시나리오 2 (Hard Filter 0개): `"⚠️ 입력하신 조건으로는 적합한 학교가 없어 AI 추천을 제공합니다.\n\n필터링 이유:\n• 29개 학교 예산 초과 (최저 학비: $28,000)\n\n아래는 조건을 완화한 추천입니다."`
+
+`data.message`가 설정되어 있으면 Fallback 모드이므로, 클라이언트에서 이 문구를 사용자에게 노출하여 안내할 수 있습니다. `results` 내 항목의 `school.id` / `program.id`는 `fallback-1`, `fallback-2` 등 플레이스홀더입니다.
 
 Fallback 테스트 절차는 `templates/TEST_FALLBACK_MATCHING.md`를 참고하세요.
 

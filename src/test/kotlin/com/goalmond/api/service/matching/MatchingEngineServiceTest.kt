@@ -197,6 +197,86 @@ class MatchingEngineServiceTest {
     }
     
     /**
+     * Hard Filter에서 모두 필터링되어도 Fallback으로 결과 제공 (GAM-3, Phase 10).
+     * 
+     * 시나리오:
+     * - 벡터 검색은 성공 (후보군 존재)
+     * - Hard Filter에서 모든 후보가 예산 초과로 필터링
+     * - Fallback으로 AI 추천 제공 (하이브리드 방식)
+     * - message에 필터링 이유 포함
+     * - filterSummary 객체 제공
+     */
+    @Test
+    fun `Hard Filter 0건 시 Fallback 실행 및 상세 메시지 제공`() {
+        // Given: 매우 낮은 예산으로 설정하여 모든 학교 필터링 유도
+        val lowBudgetEmail = "lowbudget${System.currentTimeMillis()}@test.com"
+        val lowBudgetUser = User(
+            email = lowBudgetEmail,
+            fullName = "Low Budget Test User"
+        )
+        val savedUser = userRepository.save(lowBudgetUser)
+        
+        val profile = AcademicProfile(
+            userId = savedUser.id,
+            schoolName = "서울 고등학교",
+            degree = "고등학교",
+            gpa = BigDecimal("3.5"),
+            gpaScale = BigDecimal("4.0"),
+            englishTestType = "TOEFL",
+            englishScore = 90
+        )
+        academicProfileRepository.save(profile)
+        
+        val preference = UserPreference(
+            userId = savedUser.id,
+            targetMajor = "Computer Science",
+            targetProgram = "community_college",
+            targetLocation = "California",
+            budgetUsd = 5000,  // 매우 낮은 예산 → 모든 학교 필터링
+            careerGoal = "Software Engineer",
+            preferredTrack = "편입"
+        )
+        userPreferenceRepository.save(preference)
+        
+        // When: 매칭 실행
+        val result = matchingEngineService.executeMatching(savedUser.id!!)
+        
+        // Then: Fallback으로 결과 제공되어야 함
+        assertThat(result).isNotNull()
+        assertThat(result.results).isNotEmpty() // 항상 결과 존재
+        assertThat(result.message).isNotNull() // Fallback 안내 메시지 존재
+        assertThat(result.message).contains("조건으로는 적합한 학교가 없어")
+        
+        // filterSummary 검증 (하이브리드 방식)
+        assertThat(result.filterSummary).isNotNull()
+        result.filterSummary?.let { summary ->
+            assertThat(summary.totalCandidates).isGreaterThan(0)
+            assertThat(summary.filteredByBudget).isGreaterThan(0) // 예산 초과로 필터링됨
+            assertThat(summary.minimumTuitionFound).isNotNull()
+            assertThat(summary.minimumTuitionFound).isGreaterThan(5000) // 최저 학비가 예산보다 높음
+            
+            logger.info("필터링 통계: 총 ${summary.totalCandidates}개 중 예산 초과 ${summary.filteredByBudget}개, 최저 학비 \$${summary.minimumTuitionFound}")
+        }
+        
+        // Fallback 결과 검증
+        result.results.forEach { matchingResult ->
+            assertThat(matchingResult.school.id).startsWith("fallback-")
+            assertThat(matchingResult.school.name).isNotBlank()
+            assertThat(matchingResult.explanation).isNotBlank()
+            assertThat(matchingResult.recommendationType).isIn("safe", "challenge", "strategy")
+            assertThat(matchingResult.pros).hasSizeGreaterThanOrEqualTo(3)
+            assertThat(matchingResult.cons).hasSizeGreaterThanOrEqualTo(1)
+            
+            logger.info(
+                "  Fallback Rank ${matchingResult.rank}: ${matchingResult.school.name} " +
+                "(${matchingResult.recommendationType}, ${matchingResult.school.state})"
+            )
+        }
+        
+        logger.info("Hard Filter 0건 → Fallback 테스트 성공: ${result.results.size}개 추천 제공")
+    }
+    
+    /**
      * 매칭 결과 항상 반환 테스트 (GAM-3, Phase 9).
      * 
      * DB 상태와 무관하게 매칭 API는 항상 결과를 반환해야 함:

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.goalmond.api.domain.dto.MatchingResponse
 import com.goalmond.api.domain.entity.School
+import com.goalmond.api.domain.entity.UserPreference
 import com.goalmond.api.repository.AcademicProfileRepository
 import com.goalmond.api.repository.ProgramRepository
 import com.goalmond.api.repository.UserPreferenceRepository
@@ -94,6 +95,44 @@ class MatchingEngineService(
             val filterResult = hardFilterService.filterPrograms(profile, preference, programs)
             logger.info("Hard Filter: ${filterResult.passedCount()}개 통과, ${filterResult.filteredCount()}개 필터링")
             
+            // Fallback: Hard Filter 통과 결과가 없으면 AI 추천 생성 (하이브리드 방식)
+            if (filterResult.passed.isEmpty()) {
+                logger.info("Hard Filter 통과 결과 없음 → Fallback(AI 추천) 실행")
+                
+                // 필터링 통계 수집
+                val budgetFiltered = filterResult.filtered.count { it.filterType == com.goalmond.api.domain.dto.FilterType.BUDGET_EXCEEDED }
+                val englishFiltered = filterResult.filtered.count { it.filterType == com.goalmond.api.domain.dto.FilterType.ENGLISH_SCORE }
+                val visaFiltered = filterResult.filtered.count { it.filterType == com.goalmond.api.domain.dto.FilterType.VISA_REQUIREMENT }
+                
+                // 최저 학비 찾기 (프로그램 또는 학교 학비 중 최소값)
+                val minTuition = programs.mapNotNull { program ->
+                    program.tuition ?: candidateSchools.find { it.id == program.schoolId }?.tuition
+                }.minOrNull()
+                
+                // 상세 메시지 생성
+                val message = buildFilteredMessage(preference, budgetFiltered, englishFiltered, minTuition)
+                
+                val fallbackResults = fallbackMatchingService.generateFallbackResults(profile, preference)
+                val fallbackTime = System.currentTimeMillis() - startTime
+                
+                return MatchingResponse(
+                    matchingId = UUID.randomUUID().toString(),
+                    userId = userId.toString(),
+                    totalMatches = fallbackResults.size,
+                    executionTimeMs = fallbackTime.toInt(),
+                    results = fallbackResults,
+                    createdAt = Instant.now(),
+                    message = message,
+                    filterSummary = MatchingResponse.FilterSummary(
+                        totalCandidates = filterResult.filtered.size,
+                        filteredByBudget = budgetFiltered,
+                        filteredByEnglish = englishFiltered,
+                        filteredByVisa = visaFiltered,
+                        minimumTuitionFound = minTuition
+                    )
+                )
+            }
+            
             // Step 5: 점수 계산 및 최종 점수 산출
             val candidates = filterResult.passed.mapNotNull { program ->
                 val school = candidateSchools.find { it.id == program.schoolId } ?: return@mapNotNull null
@@ -168,6 +207,42 @@ class MatchingEngineService(
             logger.error("매칭 실패 (${elapsed}ms)", e)
             throw MatchingException("Matching failed for user $userId", e)
         }
+    }
+    
+    /**
+     * Hard Filter에서 모두 필터링되었을 때 상세 메시지 생성 (하이브리드 방식).
+     * 
+     * @param preference 사용자 선호도
+     * @param budgetFiltered 예산 초과로 필터링된 수
+     * @param englishFiltered 영어 점수 미달로 필터링된 수
+     * @param minTuition 후보 중 최저 학비
+     * @return 사용자에게 보여줄 상세 안내 메시지
+     */
+    private fun buildFilteredMessage(
+        preference: UserPreference,
+        budgetFiltered: Int,
+        englishFiltered: Int,
+        minTuition: Int?
+    ): String {
+        val reasons = mutableListOf<String>()
+        
+        if (budgetFiltered > 0) {
+            val budget = preference.budgetUsd ?: 0
+            val suggestion = if (minTuition != null && minTuition > budget) {
+                " (최저 학비: \$$minTuition)"
+            } else ""
+            reasons.add("• ${budgetFiltered}개 학교 예산 초과$suggestion")
+        }
+        
+        if (englishFiltered > 0) {
+            reasons.add("• ${englishFiltered}개 학교 영어 점수 미달")
+        }
+        
+        val reasonText = if (reasons.isNotEmpty()) {
+            "\n\n필터링 이유:\n${reasons.joinToString("\n")}"
+        } else ""
+        
+        return "⚠️ 입력하신 조건으로는 적합한 학교가 없어 AI 추천을 제공합니다.$reasonText\n\n아래는 조건을 완화한 추천입니다."
     }
     
     /**

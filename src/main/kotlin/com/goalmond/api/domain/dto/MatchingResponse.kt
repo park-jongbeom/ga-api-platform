@@ -10,7 +10,9 @@ data class MatchingResponse(
     val results: List<MatchingResult>,
     val createdAt: Instant,
     /** DB 데이터 없을 때 Fallback(AI 추천) 사용 시 안내 문구. null이면 RAG/DB 기반 결과. */
-    val message: String? = null
+    val message: String? = null,
+    /** Hard Filter에서 필터링된 통계 (Fallback 시에만 제공). null이면 정상 매칭 결과. */
+    val filterSummary: FilterSummary? = null
 ) {
     data class MatchingResult(
         val rank: Int,
@@ -55,5 +57,22 @@ data class MatchingResponse(
         val location: Int,
         val duration: Int,
         val career: Int
+    )
+    
+    /**
+     * Hard Filter 통계 (Fallback 시 제공).
+     * 사용자에게 왜 조건에 맞는 학교가 없는지 설명하는 데 사용.
+     */
+    data class FilterSummary(
+        /** 필터링된 총 후보 수 */
+        val totalCandidates: Int,
+        /** 예산 초과로 필터링된 수 */
+        val filteredByBudget: Int,
+        /** 영어 점수 미달로 필터링된 수 */
+        val filteredByEnglish: Int,
+        /** 비자 요건으로 필터링된 수 */
+        val filteredByVisa: Int,
+        /** 후보 중 최저 학비 (USD, null이면 학비 정보 없음) */
+        val minimumTuitionFound: Int?
     )
 }

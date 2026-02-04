@@ -81,12 +81,20 @@ class MatchingResponseTest {
                 duration = 8,
                 career = 25
             ),
+            indicatorScores = MatchingResponse.IndicatorScores(
+                academicFit = 16,
+                careerOutlook = 16,
+                costEfficiency = 11
+            ),
             recommendationType = "safe",
             explanation = "추천 설명",
             pros = listOf("장점1"),
             cons = listOf("단점1")
         )
         assertThat(result.estimatedRoi).isEqualTo(12.5)
+        assertThat(result.indicatorScores.academicFit).isEqualTo(16)
+        assertThat(result.indicatorScores.careerOutlook).isEqualTo(16)
+        assertThat(result.indicatorScores.costEfficiency).isEqualTo(11)
     }
 
     @Test
@@ -123,6 +131,11 @@ class MatchingResponseTest {
                     totalScore = 90.0,
                     estimatedRoi = 10.0,
                     scoreBreakdown = MatchingResponse.ScoreBreakdown(15, 12, 14, 8, 8, 24),
+                    indicatorScores = MatchingResponse.IndicatorScores(
+                        academicFit = 13,
+                        careerOutlook = 16,
+                        costEfficiency = 11
+                    ),
                     recommendationType = "safe",
                     explanation = "설명",
                     pros = emptyList(),

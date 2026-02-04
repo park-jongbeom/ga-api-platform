@@ -166,6 +166,12 @@ class FallbackMatchingServiceTest {
             assertThat(results).isNotEmpty()
             assertThat(results.size).isGreaterThanOrEqualTo(1)
             assertThat(results.first().school.id).startsWith("fallback-")
+            // 기본 추천은 defaultScoreBreakdown(75,75,75,75,75,75) → indicator_scores (75, 75, 75)
+            results.forEach { r ->
+                assertThat(r.indicatorScores.academicFit).isEqualTo(75)
+                assertThat(r.indicatorScores.careerOutlook).isEqualTo(75)
+                assertThat(r.indicatorScores.costEfficiency).isEqualTo(75)
+            }
         }
         
         @Test
@@ -327,6 +333,10 @@ class FallbackMatchingServiceTest {
             assertThat(result.scoreBreakdown.location).isEqualTo(95)
             assertThat(result.scoreBreakdown.duration).isEqualTo(80)
             assertThat(result.scoreBreakdown.career).isEqualTo(95)
+            // indicator_scores: score_breakdown 기반 계산 (반올림)
+            assertThat(result.indicatorScores.academicFit).isEqualTo(88)  // (90+85)/2 = 87.5 → 88
+            assertThat(result.indicatorScores.careerOutlook).isEqualTo(95)
+            assertThat(result.indicatorScores.costEfficiency).isEqualTo(75)
             
             // 설명 및 장단점
             assertThat(result.explanation).contains("학업 성적")

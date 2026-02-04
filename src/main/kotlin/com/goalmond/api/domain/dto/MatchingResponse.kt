@@ -21,6 +21,8 @@ data class MatchingResponse(
         val totalScore: Double,
         val estimatedRoi: Double,
         val scoreBreakdown: ScoreBreakdown,
+        /** 프론트엔드 선형 게이지용 통합 지표. score_breakdown 조합으로 계산. */
+        val indicatorScores: IndicatorScores,
         val recommendationType: String,
         val explanation: String,
         val pros: List<String>,
@@ -57,6 +59,19 @@ data class MatchingResponse(
         val location: Int,
         val duration: Int,
         val career: Int
+    )
+
+    /**
+     * 프론트엔드 선형 게이지용 통합 지표.
+     * score_breakdown의 조합으로 계산.
+     */
+    data class IndicatorScores(
+        /** 학업 적합도: (academic + english) / 2 */
+        val academicFit: Int,
+        /** 진로 전망: (career + location) / 2 */
+        val careerOutlook: Int,
+        /** 비용 효율: (budget + duration) / 2 */
+        val costEfficiency: Int
     )
     
     /**

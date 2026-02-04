@@ -65,6 +65,10 @@ interface MatchingRunRequest {
 
 **MatchingResult 확장 필드 (매칭 리포트용)**  
 - `estimated_roi`: number — 연간 예상 ROI (%).
+- `indicator_scores`: object — 프론트엔드 선형 게이지용 통합 지표 (API에서 계산하여 제공).
+  - `academic_fit`: number — 학업 적합도 (score_breakdown.academic + score_breakdown.english) / 2, 반올림.
+  - `career_outlook`: number — 진로 전망 (score_breakdown.career + score_breakdown.location) / 2, 반올림.
+  - `cost_efficiency`: number — 비용 효율 (score_breakdown.budget + score_breakdown.duration) / 2, 반올림.
 
 **results[].school (SchoolSummary) 확장 필드**  
 - `global_ranking`: string | null — 글로벌 랭킹 표시 (예: "#4").  

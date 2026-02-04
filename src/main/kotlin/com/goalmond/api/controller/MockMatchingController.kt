@@ -399,6 +399,11 @@ class MockMatchingController {
                     duration = 7 + rank,
                     career = 20 + rank
                 ),
+                indicatorScores = MatchingResponse.IndicatorScores(
+                    academicFit = 13 + rank,
+                    careerOutlook = 14 + rank,
+                    costEfficiency = 10 + rank
+                ),
                 recommendationType = recommendationType,
                 explanation = explanation,
                 pros = pros,

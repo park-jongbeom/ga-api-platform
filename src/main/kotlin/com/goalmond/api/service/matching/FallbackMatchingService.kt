@@ -7,6 +7,7 @@ import com.goalmond.api.domain.entity.AcademicProfile
 import com.goalmond.api.domain.entity.UserPreference
 import com.goalmond.api.service.ai.GeminiClient
 import com.goalmond.api.service.ai.GeminiApiException
+import kotlin.math.roundToInt
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -312,10 +313,23 @@ class FallbackMatchingService(
             totalScore = totalScore.coerceIn(0.0, 100.0),
             estimatedRoi = 0.0,
             scoreBreakdown = scoreBreakdown,
+            indicatorScores = calculateIndicatorScores(scoreBreakdown),
             recommendationType = recommendationType,
             explanation = explanation,
             pros = pros,
             cons = cons
+        )
+    }
+
+    /**
+     * 프론트엔드 선형 게이지용 통합 지표 계산.
+     * score_breakdown 조합: academicFit=(academic+english)/2, careerOutlook=(career+location)/2, costEfficiency=(budget+duration)/2.
+     */
+    private fun calculateIndicatorScores(breakdown: MatchingResponse.ScoreBreakdown): MatchingResponse.IndicatorScores {
+        return MatchingResponse.IndicatorScores(
+            academicFit = ((breakdown.academic + breakdown.english) / 2.0).roundToInt(),
+            careerOutlook = ((breakdown.career + breakdown.location) / 2.0).roundToInt(),
+            costEfficiency = ((breakdown.budget + breakdown.duration) / 2.0).roundToInt()
         )
     }
     
@@ -494,6 +508,7 @@ class FallbackMatchingService(
                 totalScore = template.totalScore,
                 estimatedRoi = 0.0,
                 scoreBreakdown = defaultScoreBreakdown,
+                indicatorScores = calculateIndicatorScores(defaultScoreBreakdown),
                 recommendationType = template.recommendationType,
                 explanation = template.explanation,
                 pros = template.pros,

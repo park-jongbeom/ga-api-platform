@@ -39,6 +39,11 @@
           "duration": 75,
           "career": 75
         },
+        "indicator_scores": {
+          "academic_fit": 75,
+          "career_outlook": 75,
+          "cost_efficiency": 75
+        },
         "recommendation_type": "strategy",
         "explanation": "예산 효율적이며 캘리포니아 지역의 4년제 대학 편입 경로를 제공합니다.",
         "pros": [
@@ -83,6 +88,11 @@
           "duration": 75,
           "career": 75
         },
+        "indicator_scores": {
+          "academic_fit": 75,
+          "career_outlook": 75,
+          "cost_efficiency": 75
+        },
         "recommendation_type": "strategy",
         "explanation": "실리콘밸리 인접으로 커리어 연계성이 높고 편입 성과가 좋습니다.",
         "pros": [
@@ -125,6 +135,11 @@
           "location": 75,
           "duration": 75,
           "career": 75
+        },
+        "indicator_scores": {
+          "academic_fit": 75,
+          "career_outlook": 75,
+          "cost_efficiency": 75
         },
         "recommendation_type": "strategy",
         "explanation": "학비 부담을 낮추면서도 UC 계열 편입 경로를 확보할 수 있습니다.",
@@ -169,6 +184,11 @@
           "duration": 75,
           "career": 75
         },
+        "indicator_scores": {
+          "academic_fit": 75,
+          "career_outlook": 75,
+          "cost_efficiency": 75
+        },
         "recommendation_type": "strategy",
         "explanation": "예산 안정성과 편입 성공률을 함께 고려한 전략적 추천입니다.",
         "pros": [
@@ -211,6 +231,11 @@
           "location": 75,
           "duration": 75,
           "career": 75
+        },
+        "indicator_scores": {
+          "academic_fit": 75,
+          "career_outlook": 75,
+          "cost_efficiency": 75
         },
         "recommendation_type": "strategy",
         "explanation": "캘리포니아 내 안정적인 편입 루트를 제공하는 비용 효율적 선택입니다.",

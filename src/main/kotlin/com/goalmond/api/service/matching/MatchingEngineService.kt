@@ -12,6 +12,7 @@ import com.goalmond.api.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.math.roundToInt
 import java.time.Instant
 import java.util.UUID
 
@@ -184,6 +185,7 @@ class MatchingEngineService(
                     totalScore = candidate.totalScore,
                     estimatedRoi = calculateEstimatedRoi(candidate.school, candidate.program),
                     scoreBreakdown = buildScoreBreakdown(candidate.scores),
+                    indicatorScores = buildIndicatorScores(candidate.scores),
                     recommendationType = recommendationType,
                     explanation = explanation,
                     pros = pros,
@@ -330,6 +332,18 @@ class MatchingEngineService(
             duration = scores.duration.toInt(),
             career = scores.career.toInt()
         )
+
+    /**
+     * 프론트엔드 선형 게이지용 통합 지표 계산.
+     * score_breakdown 조합: academicFit=(academic+english)/2, careerOutlook=(career+location)/2, costEfficiency=(budget+duration)/2.
+     */
+    private fun buildIndicatorScores(scores: ScoreBreakdown): MatchingResponse.IndicatorScores {
+        return MatchingResponse.IndicatorScores(
+            academicFit = ((scores.academic + scores.english) / 2.0).roundToInt(),
+            careerOutlook = ((scores.career + scores.location) / 2.0).roundToInt(),
+            costEfficiency = ((scores.budget + scores.duration) / 2.0).roundToInt()
+        )
+    }
 }
 
 /**

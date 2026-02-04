@@ -182,6 +182,13 @@ class MatchingEngineServiceTest {
                 assertThat(matchingResult.school.featureBadges).isNotNull()
                 // MatchingResult 확장 필드: estimatedRoi는 0 이상
                 assertThat(matchingResult.estimatedRoi).isGreaterThanOrEqualTo(0.0)
+                // indicator_scores는 score_breakdown 기반 반올림 계산 검증
+                assertThat(matchingResult.indicatorScores.academicFit)
+                    .isEqualTo(kotlin.math.round((matchingResult.scoreBreakdown.academic + matchingResult.scoreBreakdown.english) / 2.0).toInt())
+                assertThat(matchingResult.indicatorScores.careerOutlook)
+                    .isEqualTo(kotlin.math.round((matchingResult.scoreBreakdown.career + matchingResult.scoreBreakdown.location) / 2.0).toInt())
+                assertThat(matchingResult.indicatorScores.costEfficiency)
+                    .isEqualTo(kotlin.math.round((matchingResult.scoreBreakdown.budget + matchingResult.scoreBreakdown.duration) / 2.0).toInt())
 
                 logger.info(
                     "Rank ${matchingResult.rank}: ${matchingResult.school.name} " +
@@ -258,7 +265,7 @@ class MatchingEngineServiceTest {
             logger.info("필터링 통계: 총 ${summary.totalCandidates}개 중 예산 초과 ${summary.filteredByBudget}개, 최저 학비 \$${summary.minimumTuitionFound}")
         }
         
-        // Fallback 결과 검증
+        // Fallback 결과 검증 (indicator_scores 포함)
         result.results.forEach { matchingResult ->
             assertThat(matchingResult.school.id).startsWith("fallback-")
             assertThat(matchingResult.school.name).isNotBlank()
@@ -266,6 +273,12 @@ class MatchingEngineServiceTest {
             assertThat(matchingResult.recommendationType).isIn("safe", "challenge", "strategy")
             assertThat(matchingResult.pros).hasSizeGreaterThanOrEqualTo(3)
             assertThat(matchingResult.cons).hasSizeGreaterThanOrEqualTo(1)
+            assertThat(matchingResult.indicatorScores.academicFit)
+                .isEqualTo(kotlin.math.round((matchingResult.scoreBreakdown.academic + matchingResult.scoreBreakdown.english) / 2.0).toInt())
+            assertThat(matchingResult.indicatorScores.careerOutlook)
+                .isEqualTo(kotlin.math.round((matchingResult.scoreBreakdown.career + matchingResult.scoreBreakdown.location) / 2.0).toInt())
+            assertThat(matchingResult.indicatorScores.costEfficiency)
+                .isEqualTo(kotlin.math.round((matchingResult.scoreBreakdown.budget + matchingResult.scoreBreakdown.duration) / 2.0).toInt())
             
             logger.info(
                 "  Fallback Rank ${matchingResult.rank}: ${matchingResult.school.name} " +

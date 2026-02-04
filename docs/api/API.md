@@ -6,6 +6,7 @@ AI 매칭 Mock API 문서. Base URL: `http://localhost:8080` (또는 배포 환�
 
 - **Content-Type**: `application/json`
 - **응답 형식**: 모든 성공 응답은 `ApiResponse<T>` 래퍼를 사용합니다.
+- **네이밍 규칙**: 모든 Request/Response JSON 필드는 **snake_case**를 사용합니다 (예: `school_name`, `gpa_scale`, `target_major`).
 
 ### ApiResponse<T>
 
@@ -44,9 +45,23 @@ interface ApiResponse<T> {
 // 매칭 결과 항목 (matching/run, matching/result 의 data.results[] 요소)
 interface MatchingResult {
   rank: number;
-  school: { id: string; name: string; type: string; state: string; city: string; tuition: number; image_url: string };
+  school: {
+    id: string;
+    name: string;
+    type: string;
+    state: string;
+    city: string;
+    tuition: number;
+    image_url: string;
+    global_ranking?: string | null;
+    ranking_field?: string | null;
+    average_salary?: number | null;
+    alumni_network_count?: number | null;
+    feature_badges: string[];
+  };
   program: { id: string; name: string; degree: string; duration: string; opt_available: boolean };
   total_score: number;
+  estimated_roi: number;
   score_breakdown: { academic: number; english: number; budget: number; location: number; duration: number; career: number };
   recommendation_type: string;
   explanation: string;

@@ -4,6 +4,8 @@
 
 로그인 후 받은 토큰을 `Authorization: Bearer <token>` 헤더에 포함하여 호출하세요.
 
+**중요**: 이 API는 **snake_case** JSON 형식을 사용합니다. Request/Response 모두 필드명이 `school_name`, `gpa_scale`, `target_major` 등 snake_case입니다.
+
 ---
 
 ## 프로필·학력·유학목표 통합 조회
@@ -95,32 +97,32 @@
 
 ```json
 {
-  "schoolName": "테스트고등학교",
-  "schoolLocation": "서울",
+  "school_name": "테스트고등학교",
+  "school_location": "서울",
   "gpa": 3.5,
-  "gpaScale": 4.0,
-  "englishTestType": "TOEFL",
-  "englishScore": 95,
-  "degreeType": "고등학교",
+  "gpa_scale": 4.0,
+  "english_test_type": "TOEFL",
+  "english_score": 95,
+  "degree_type": "고등학교",
   "degree": "고등학교",
   "major": "문과",
-  "graduationDate": "2024-02-01",
+  "graduation_date": "2024-02-01",
   "institution": "테스트고"
 }
 ```
 
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| schoolName | string | O | 학교명 (1~255자) |
-| schoolLocation | string | - | 학교 지역 |
-| gpa | number | - | GPA (0~5, gpaScale 기준) |
-| gpaScale | number | - | GPA 스케일 (1~5, 기본 4.0) |
-| englishTestType | string | - | 영어 시험 유형 (TOEFL, IELTS 등) |
-| englishScore | number | - | 영어 점수 (0~120) |
-| degreeType | string | - | 학위 유형 |
+| school_name | string | O | 학교명 (1~255자) |
+| school_location | string | - | 학교 지역 |
+| gpa | number | - | GPA (0~5, gpa_scale 기준) |
+| gpa_scale | number | - | GPA 스케일 (1~5, 기본 4.0) |
+| english_test_type | string | - | 영어 시험 유형 (TOEFL, IELTS 등) |
+| english_score | number | - | 영어 점수 (0~120) |
+| degree_type | string | - | 학위 유형 |
 | degree | string | - | 학위 (기본: 고등학교) |
 | major | string | - | 전공 (최대 100자) |
-| graduationDate | string | - | 졸업일 (YYYY-MM-DD) |
+| graduation_date | string | - | 졸업일 (YYYY-MM-DD) |
 | institution | string | - | 기관명 (최대 255자) |
 
 ### Response (200)
@@ -142,23 +144,23 @@
 
 ```json
 {
-  "targetProgram": "community_college",
-  "targetMajor": "CS",
-  "targetLocation": "CA",
-  "budgetUsd": 50000,
-  "careerGoal": "소프트웨어 엔지니어",
-  "preferredTrack": "2+2"
+  "target_program": "community_college",
+  "target_major": "CS",
+  "target_location": "CA",
+  "budget_usd": 50000,
+  "career_goal": "소프트웨어 엔지니어",
+  "preferred_track": "2+2"
 }
 ```
 
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| targetProgram | string | - | 목표 프로그램 (community_college, university 등) |
-| targetMajor | string | - | 희망 전공 |
-| targetLocation | string | - | 선호 지역 |
-| budgetUsd | number | - | 예산 (USD, 0~500000) |
-| careerGoal | string | - | 커리어 목표 |
-| preferredTrack | string | - | 선호 트랙 (2+2 등) |
+| target_program | string | - | 목표 프로그램 (community_college, university 등) |
+| target_major | string | - | 희망 전공 |
+| target_location | string | - | 선호 지역 |
+| budget_usd | number | - | 예산 (USD, 0~500000) |
+| career_goal | string | - | 커리어 목표 |
+| preferred_track | string | - | 선호 트랙 (2+2 등) |
 
 ### Response (200)
 
@@ -193,13 +195,13 @@ curl -X PUT http://localhost:8080/api/v1/user/profile \
 curl -X POST http://localhost:8080/api/v1/user/education \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"schoolName":"테스트고","schoolLocation":"서울","gpa":3.5,"degree":"고등학교"}'
+  -d '{"school_name":"테스트고","school_location":"서울","gpa":3.5,"degree":"고등학교"}'
 
 # 5. 유학 목표 저장
 curl -X POST http://localhost:8080/api/v1/user/preference \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"targetProgram":"community_college","targetMajor":"CS","budgetUsd":50000}'
+  -d '{"target_program":"community_college","target_major":"CS","budget_usd":50000}'
 ```
 
 ---

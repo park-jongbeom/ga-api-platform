@@ -430,6 +430,22 @@ class FallbackMatchingServiceTest {
                 assertThat(result.school.tuition).isLessThanOrEqualTo(testPreference.budgetUsd!!)
             }
         }
+        
+        @Test
+        @DisplayName("기본 추천의 텍스트 필드는 한글로 제공되어야 한다")
+        fun `기본 추천 한글화 검증`() {
+            // When
+            val results = fallbackMatchingService.generateDefaultRecommendations(testProfile, testPreference)
+            
+            // Then: explanation, pros, cons, featureBadges에 한글이 포함되어야 함
+            val koreanPattern = Regex("[가-힣]+")
+            results.forEach { result ->
+                assertThat(koreanPattern.containsMatchIn(result.explanation)).isTrue()
+                result.pros.forEach { assertThat(koreanPattern.containsMatchIn(it)).isTrue() }
+                result.cons.forEach { assertThat(koreanPattern.containsMatchIn(it)).isTrue() }
+                result.school.featureBadges.forEach { assertThat(koreanPattern.containsMatchIn(it)).isTrue() }
+            }
+        }
     }
     
     // 헬퍼 메서드

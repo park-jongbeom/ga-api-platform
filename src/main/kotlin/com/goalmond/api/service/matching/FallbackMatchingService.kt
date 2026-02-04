@@ -139,7 +139,8 @@ class FallbackMatchingService(
 - "challenge": 도전적 선택 (명문대, 경쟁률 높음, 높은 성과 필요)
 - "strategy": 전략적 선택 (편입 경로, 비용 효율, 장기적 이점)
 
-[필수 출력 형식] 반드시 아래 JSON 배열만 출력하세요. 다른 설명이나 마크다운 없이 JSON만 출력합니다:
+[필수 출력 형식] 반드시 아래 JSON 배열만 출력하세요. 다른 설명이나 마크다운 없이 JSON만 출력합니다.
+**중요: 모든 텍스트 필드(explanation, pros, cons, program_name 등)는 반드시 한국어로 작성하세요.**
 [
   {
     "school_name": "학교 정식 명칭 (예: Santa Monica College)",
@@ -151,8 +152,8 @@ class FallbackMatchingService(
     "ranking_field": "랭킹 기준 전공 또는 null (예: Computer Science 또는 null)",
     "average_salary": 평균초봉_숫자_또는_null (예: 85000 또는 null),
     "alumni_network_count": 동문수_숫자_또는_null (예: 38000 또는 null),
-    "feature_badges": ["특징 배지"] (예: ["OPT STEM ELIGIBLE", "HIGH TRANSFER RATE"]),
-    "program_name": "프로그램명 (예: Computer Science AA)",
+    "feature_badges": ["특징 배지 한글로"] (예: ["높은 편입률", "저렴한 학비", "OPT STEM 인정"]),
+    "program_name": "프로그램명 한글로 (예: 컴퓨터공학 편입 프로그램)",
     "degree": "학위 (예: AA, AS, BS, MS)",
     "duration": "기간 (예: 2년, 4년)",
     "opt_available": true_또는_false,
@@ -181,6 +182,8 @@ class FallbackMatchingService(
 6. 연간 예산($$budgetUsd)을 초과하는 학교는 추천하지 않음
 7. recommendation_type은 반드시 "safe", "challenge", "strategy" 중 하나
 8. 첫 번째 추천은 "safe", 두 번째는 "challenge", 나머지는 다양하게 배치
+9. 모든 explanation, pros, cons는 한국어로 작성 (영어 사용 금지)
+10. 학교명(school_name)은 원어(영어) 그대로 유지 (예: Santa Monica College)
         """.trimIndent()
     }
 
@@ -372,10 +375,10 @@ class FallbackMatchingService(
     ): List<MatchingResponse.MatchingResult> {
         logger.info("기본 추천 생성: major=${preference.targetMajor}, budget=${preference.budgetUsd}")
         
-        val targetMajor = preference.targetMajor ?: "General Studies"
+        val targetMajor = preference.targetMajor ?: "일반"
         val budget = preference.budgetUsd ?: 30000
         
-        // 기본 추천 템플릿 (실제 존재하는 학교 기반)
+        // 기본 추천 템플릿 (실제 존재하는 학교 기반, 한글 표기)
         val templates = listOf(
             DefaultSchoolTemplate(
                 name = "Santa Monica College",
@@ -383,14 +386,14 @@ class FallbackMatchingService(
                 state = "CA",
                 city = "Santa Monica",
                 tuition = 9000,
-                programName = "$targetMajor Transfer Program",
+                programName = "$targetMajor 편입 프로그램",
                 degree = "AA",
                 duration = "2년",
                 recommendationType = "safe",
                 explanation = "예산 내에서 높은 편입률을 자랑하는 커뮤니티 칼리지입니다. UCLA, USC 등 명문대 편입 실적이 우수합니다.",
                 pros = listOf("높은 UC 편입률", "저렴한 학비", "다양한 전공 제공", "LA 위치"),
                 cons = listOf("경쟁이 치열할 수 있음", "기숙사 미제공"),
-                featureBadges = listOf("HIGH TRANSFER RATE", "AFFORDABLE"),
+                featureBadges = listOf("높은 편입률", "저렴한 학비"),
                 totalScore = 85.0
             ),
             DefaultSchoolTemplate(
@@ -399,14 +402,14 @@ class FallbackMatchingService(
                 state = "CA",
                 city = "Cupertino",
                 tuition = 9500,
-                programName = "$targetMajor Transfer Program",
+                programName = "$targetMajor 편입 프로그램",
                 degree = "AS",
                 duration = "2년",
                 recommendationType = "challenge",
                 explanation = "실리콘밸리 중심에 위치한 우수한 커뮤니티 칼리지입니다. 테크 기업 인턴십 기회가 풍부합니다.",
                 pros = listOf("실리콘밸리 위치", "테크 기업 연계", "우수한 STEM 프로그램"),
                 cons = listOf("생활비가 높음", "주거 경쟁 치열"),
-                featureBadges = listOf("SILICON VALLEY", "STEM FOCUSED"),
+                featureBadges = listOf("실리콘밸리 위치", "STEM 집중"),
                 totalScore = 78.0
             ),
             DefaultSchoolTemplate(
@@ -415,14 +418,14 @@ class FallbackMatchingService(
                 state = "CA",
                 city = "Pleasant Hill",
                 tuition = 8500,
-                programName = "$targetMajor Studies",
+                programName = "$targetMajor 전공 과정",
                 degree = "AA",
                 duration = "2년",
                 recommendationType = "safe",
                 explanation = "UC Berkeley 편입률이 높은 커뮤니티 칼리지입니다. 예산 대비 뛰어난 교육 품질을 제공합니다.",
                 pros = listOf("UC Berkeley 편입률 1위", "합리적인 학비", "소규모 수업"),
                 cons = listOf("대중교통 불편", "도심 외곽 위치"),
-                featureBadges = listOf("TOP UC TRANSFER", "SMALL CLASS SIZE"),
+                featureBadges = listOf("UC 편입 1위", "소규모 수업"),
                 totalScore = 82.0
             ),
             DefaultSchoolTemplate(
@@ -431,14 +434,14 @@ class FallbackMatchingService(
                 state = "CA",
                 city = "Costa Mesa",
                 tuition = 9200,
-                programName = "$targetMajor Program",
+                programName = "$targetMajor 프로그램",
                 degree = "AS",
                 duration = "2년",
                 recommendationType = "strategy",
                 explanation = "오렌지카운티의 대표적인 커뮤니티 칼리지입니다. 다양한 전공과 실무 중심 교육을 제공합니다.",
                 pros = listOf("다양한 전공 선택", "좋은 날씨", "해변 근처"),
                 cons = listOf("교통 혼잡", "주거비 다소 높음"),
-                featureBadges = listOf("DIVERSE PROGRAMS", "OPT STEM ELIGIBLE"),
+                featureBadges = listOf("다양한 전공", "OPT STEM 인정"),
                 totalScore = 75.0
             ),
             DefaultSchoolTemplate(
@@ -447,14 +450,14 @@ class FallbackMatchingService(
                 state = "CA",
                 city = "Los Altos Hills",
                 tuition = 9800,
-                programName = "$targetMajor Transfer Track",
+                programName = "$targetMajor 편입 트랙",
                 degree = "AA",
                 duration = "2년",
                 recommendationType = "strategy",
                 explanation = "실리콘밸리 남부에 위치한 우수한 커뮤니티 칼리지입니다. 온라인 수업 옵션이 다양합니다.",
                 pros = listOf("유연한 수업 일정", "온라인 수업 다양", "아름다운 캠퍼스"),
                 cons = listOf("생활비 높음", "대중교통 제한적"),
-                featureBadges = listOf("ONLINE OPTIONS", "BEAUTIFUL CAMPUS"),
+                featureBadges = listOf("온라인 수업", "아름다운 캠퍼스"),
                 totalScore = 73.0
             )
         )

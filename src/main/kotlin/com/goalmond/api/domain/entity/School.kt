@@ -1,6 +1,7 @@
 package com.goalmond.api.domain.entity
 
 import jakarta.persistence.*
+import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
 
@@ -65,6 +66,27 @@ class School(
 
     @Column(name = "feature_badges", columnDefinition = "TEXT")
     var featureBadges: String? = null,
+
+    @Column(name = "international_email", length = 255)
+    var internationalEmail: String? = null,
+
+    @Column(name = "international_phone", length = 50)
+    var internationalPhone: String? = null,
+
+    @Column(name = "employment_rate")
+    var employmentRate: BigDecimal? = null,
+
+    @Column(name = "facilities", columnDefinition = "JSONB")
+    var facilities: String? = null,
+
+    @Column(name = "staff_info", columnDefinition = "JSONB")
+    var staffInfo: String? = null,
+
+    @Column(name = "esl_program", columnDefinition = "JSONB")
+    var eslProgram: String? = null,
+
+    @Column(name = "international_support", columnDefinition = "JSONB")
+    var internationalSupport: String? = null,
 
     @Column(name = "created_at")
     var createdAt: Instant = Instant.now(),

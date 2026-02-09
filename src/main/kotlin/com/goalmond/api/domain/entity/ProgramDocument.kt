@@ -33,11 +33,11 @@ class ProgramDocument(
     var content: String = "",
     
     /**
-     * 768차원 임베딩 벡터.
+     * 768차원 임베딩 벡터 (Gemini). nullable: college-crawler는 텍스트만 저장, ga-api-platform에서 생성.
      * pgvector는 String 형식으로 저장: "[0.1, 0.2, 0.3, ...]"
      */
-    @Column(columnDefinition = "vector(768)", nullable = false)
-    var embedding: String = "",
+    @Column(columnDefinition = "vector(768)", nullable = true)
+    var embedding: String? = null,
     
     /**
      * 메타데이터 (JSONB).
@@ -53,11 +53,12 @@ class ProgramDocument(
     var updatedAt: Instant = Instant.now()
 ) {
     /**
-     * 임베딩 벡터를 List<Double>로 파싱
+     * 임베딩 벡터를 List<Double>로 파싱. null이면 빈 리스트 반환.
      */
     fun getEmbeddingVector(): List<Double> {
-        return embedding
-            .trim('[', ']')
+        val e = embedding ?: return emptyList()
+        if (e.isBlank()) return emptyList()
+        return e.trim('[', ']')
             .split(",")
             .map { it.trim().toDouble() }
     }
@@ -66,6 +67,6 @@ class ProgramDocument(
      * List<Double>을 pgvector 형식 문자열로 변환
      */
     fun setEmbeddingVector(vector: List<Double>) {
-        this.embedding = vector.joinToString(prefix = "[", postfix = "]")
+        this.embedding = if (vector.isEmpty()) null else vector.joinToString(prefix = "[", postfix = "]")
     }
 }

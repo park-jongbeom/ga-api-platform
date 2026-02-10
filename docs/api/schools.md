@@ -59,6 +59,32 @@
       "email": "admissions@ivc.edu",
       "phone": "+1-949-451-5100",
       "address": "5500 Irvine Center Dr, Irvine, CA 92618"
+    },
+    "global_ranking": "Top 50 in California",
+    "average_salary": 65000,
+    "alumni_network_count": 15000,
+    "feature_badges": "Top Transfer Rate, Best Value",
+    "international_email": "international@ivc.edu",
+    "international_phone": "+1-949-451-5200",
+    "employment_rate": 82.5,
+    "facilities": {
+      "library": true,
+      "sports_center": true,
+      "computer_labs": 5
+    },
+    "staff_info": {
+      "international_advisor": "Jane Doe",
+      "office_hours": "Mon-Fri 9-5"
+    },
+    "esl_program": {
+      "available": true,
+      "levels": 6,
+      "cost": 3000
+    },
+    "international_support": {
+      "orientation": true,
+      "counseling": true,
+      "visa_assistance": true
     }
   }
 }

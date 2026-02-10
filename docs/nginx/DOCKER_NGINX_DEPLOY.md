@@ -1,5 +1,9 @@
 # Docker Nginx 전용 배포 가이드
 
+**사용하는 설정 파일 경로**: `docs/nginx/go-almond.swagger.conf` (프로젝트 루트 기준).  
+서버에서는 `/home/<user>/ga-api-platform/docs/nginx/go-almond.swagger.conf` 한 파일만 ga-nginx에 마운트됩니다.  
+`docs/nginx/docs/nginx/` 같은 중첩 경로는 사용하지 않으며, 배포 시 제거됩니다.
+
 `go-almond.swagger.conf`는 **Docker 컨테이너(ga-nginx) 전용** 설정입니다.  
 upstream 호스트명(`ga-matching-api`)은 Docker 네트워크(ga-network) 안에서만 동작하므로, **호스트 nginx의 sites-enabled에 이 설정을 두면 안 됩니다.**
 

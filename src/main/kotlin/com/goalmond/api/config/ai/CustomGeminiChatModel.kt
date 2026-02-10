@@ -34,8 +34,10 @@ class CustomGeminiChatModel(
         val userMessage = prompt.instructions.firstOrNull()?.content 
             ?: throw IllegalArgumentException("Prompt must contain at least one message")
         
-        // 기존 GeminiClient 호출 (무료 API)
-        val response = geminiClient.generateContent(userMessage)
+        // 기존 GeminiClient 호출 (무료 API). RAG 설명 생성은 균형 잡힌 출력을 위해 temperature 0.5 사용
+        val temperature = (prompt.options?.temperature)?.takeIf { it > 0 } ?: 0.5
+        val topP = (prompt.options?.topP)?.takeIf { it > 0 } ?: 0.9
+        val response = geminiClient.generateContent(userMessage, temperature, topP)
         
         // Spring AI ChatResponse로 변환
         return ChatResponse(

@@ -69,7 +69,7 @@ class FallbackMatchingService(
         logger.debug("Gemini 프롬프트:\n$prompt")
         
         return try {
-            val raw = geminiClient.generateContent(prompt)
+            val raw = geminiClient.generateContent(prompt, temperature = 0.3, topP = 0.9)
             logger.info("Gemini API 호출 성공 (응답 길이: ${raw.length}자)")
             logger.debug("Gemini 응답:\n${raw.take(1000)}...")
             
@@ -192,6 +192,91 @@ class FallbackMatchingService(
 8. 첫 번째 추천은 "safe", 두 번째는 "challenge", 나머지는 다양하게 배치
 9. 모든 explanation, pros, cons는 한국어로 작성 (영어 사용 금지)
 10. 학교명(school_name)은 원어(영어) 그대로 유지 (예: Santa Monica College)
+
+[중요: 추론 과정]
+각 학교를 추천하기 전에 다음을 먼저 생각하세요 (응답에 포함하지 않음):
+1. 예산 체크: 학비 + 생활비(약 ${'$'}15,000) <= 예산?
+2. 지역 체크: 희망 지역과 일치 또는 인근?
+3. 전공 체크: 해당 전공 프로그램 제공?
+4. GPA 체크: 학생 GPA >= 학교 최소 요구?
+5. 점수 계산: 6대 지표 각각 0-100점으로 산출
+6. 추천 유형: safe(합격률 높음), challenge(명문), strategy(전략적 선택)
+
+이 과정을 거친 후, 최종 JSON만 출력하세요.
+
+[자가 검증 체크리스트]
+JSON 출력 전에 다음을 확인하세요:
+- 5개 학교가 모두 다른가?
+- 모든 학교의 tuition이 예산 이하인가?
+- explanation에 구체적 숫자(GPA, 학비, 편입률 등)가 포함되었는가?
+- pros는 3개 이상, cons는 2개 이상인가?
+- recommendation_type이 "safe", "challenge", "strategy" 중 하나인가?
+- 모든 텍스트가 한국어인가? (school_name 제외)
+검증 실패 시 해당 항목을 수정하세요.
+
+[모범 응답 예시 1]
+{
+  "school_name": "Santa Monica College",
+  "school_type": "community_college",
+  "state": "CA",
+  "city": "Santa Monica",
+  "tuition": 9000,
+  "global_ranking": null,
+  "ranking_field": null,
+  "average_salary": 65000,
+  "alumni_network_count": 38000,
+  "feature_badges": ["높은 편입률", "저렴한 학비", "UCLA 근처"],
+  "program_name": "컴퓨터공학 편입 프로그램",
+  "degree": "AA",
+  "duration": "2년",
+  "opt_available": true,
+  "recommendation_type": "safe",
+  "total_score": 85,
+  "score_breakdown": {
+    "academic": 80,
+    "english": 75,
+    "budget": 95,
+    "location": 90,
+    "duration": 85,
+    "career": 85
+  },
+  "explanation": "학생의 GPA 3.5는 이 학교의 평균 입학 요건(3.0)을 상회하며, 연간 예산 ${'$'}30,000에서 학비 ${'$'}9,000 + 생활비 ${'$'}15,000로 여유가 있습니다. UCLA, USC 등으로의 높은 편입률(65%)이 커리어 목표와 부합합니다.",
+  "pros": ["UCLA 편입률 65%로 매우 높음", "학비가 예산의 30%로 부담 적음", "LA 지역으로 인턴십 기회 많음"],
+  "cons": ["경쟁이 치열하여 좋은 성적 유지 필요", "기숙사 미제공으로 주거 직접 해결"]
+}
+
+[모범 응답 예시 2]
+{
+  "school_name": "De Anza College",
+  "school_type": "community_college",
+  "state": "CA",
+  "city": "Cupertino",
+  "tuition": 9500,
+  "global_ranking": null,
+  "ranking_field": null,
+  "average_salary": 72000,
+  "alumni_network_count": 25000,
+  "feature_badges": ["실리콘밸리 위치", "STEM 집중", "테크 기업 연계"],
+  "program_name": "소프트웨어 개발 집중 과정",
+  "degree": "AS",
+  "duration": "2년",
+  "opt_available": true,
+  "recommendation_type": "challenge",
+  "total_score": 78,
+  "score_breakdown": {
+    "academic": 75,
+    "english": 80,
+    "budget": 90,
+    "location": 85,
+    "duration": 80,
+    "career": 90
+  },
+  "explanation": "실리콘밸리 중심에 위치해 테크 기업 인턴십 기회가 풍부합니다. 학생의 전공 목표(컴퓨터공학)와 높은 진로 연계성을 보이며, 학비 ${'$'}9,500는 예산 내입니다. 다만 입학 경쟁이 있어 challenge 유형으로 분류했습니다.",
+  "pros": ["실리콘밸리 위치로 구글·애플 인턴십 접근 용이", "STEM OPT 인정 프로그램", "UC Berkeley·Stanford 편입 실적 우수"],
+  "cons": ["생활비가 높음", "주거 경쟁 치열"]
+}
+
+이제 위 형식과 품질을 따라 5개 추천을 생성하세요. 반드시 JSON 배열만 출력하고, 다른 설명이나 마크다운 없이 [ 로 시작하는 배열만 출력하세요.
         """.trimIndent()
     }
 

@@ -31,14 +31,24 @@ class GeminiClient(
     
     /**
      * 텍스트 생성 API (Explainable AI용).
-     * 
+     *
      * @param prompt 프롬프트 텍스트
      * @return 생성된 텍스트
      * @throws GeminiApiException API 호출 실패 시
      */
-    fun generateContent(prompt: String): String {
+    fun generateContent(prompt: String): String = generateContent(prompt, temperature = null, topP = null)
+
+    /**
+     * 텍스트 생성 API (temperature, topP 지정).
+     *
+     * @param prompt 프롬프트 텍스트
+     * @param temperature 낮을수록 일관적(0.3), 높을수록 창의적(0.8). null이면 API 기본값
+     * @param topP nucleus sampling. null이면 API 기본값
+     * @return 생성된 텍스트
+     */
+    fun generateContent(prompt: String, temperature: Double?, topP: Double?): String {
         return executeWithRetry("generateContent") {
-            val request = mapOf(
+            val contents = mapOf(
                 "contents" to listOf(
                     mapOf(
                         "parts" to listOf(
@@ -47,7 +57,11 @@ class GeminiClient(
                     )
                 )
             )
-            
+            val generationConfig = mutableMapOf<String, Any>()
+            temperature?.let { generationConfig["temperature"] = it }
+            topP?.let { generationConfig["topP"] = it }
+            val request = if (generationConfig.isEmpty()) contents else contents + ("generationConfig" to generationConfig)
+
             val response = restClient.post()
                 .uri("/models/${geminiProperties.model}:generateContent")
                 .header("x-goog-api-key", geminiProperties.apiKey)
@@ -60,7 +74,7 @@ class GeminiClient(
                     throw GeminiApiException("Server error: ${resp.statusCode}")
                 }
                 .body(Map::class.java) as Map<*, *>
-            
+
             extractTextFromResponse(response)
         }
     }

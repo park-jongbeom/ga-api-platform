@@ -120,7 +120,7 @@ class ResearchAgentService(
 
     private fun callLLM(userPrompt: String): String {
         val fullPrompt = "$systemPrompt\n\n$userPrompt"
-        return geminiClient.generateContent(fullPrompt)
+        return geminiClient.generateContent(fullPrompt, temperature = 0.8, topP = 0.95)
     }
 
     private fun buildVariables(request: ResearchRequest): Map<String, Any> {

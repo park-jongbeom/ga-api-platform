@@ -101,5 +101,6 @@
       "username": "dbmasteruser",
       "password": "w,*i.uAk7f^Gj;Gk`3O`oqZx3`0fj9Vm"
     }
-  ]
+  ],
+  "remote.autoForwardPortsFallback": 0
 }

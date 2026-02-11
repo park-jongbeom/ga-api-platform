@@ -73,10 +73,6 @@
   "kotlin.languageServer.jvm.jvmargs": "-Xmx1G",
   "java.import.gradle.wrapper.enabled": true,
   "gradle.nestedProjects": true,
-  "remote.SSH.useLocalServer": false,
-  "remote.SSH.enableDynamicForwarding": true,
-  "remote.SSH.connectTimeout": 60,
-  "remote.SSH.remoteServerListenOnSocket": true,
   "sqltools.connections": [
     {
       "pgOptions": {
@@ -101,6 +97,5 @@
       "username": "dbmasteruser",
       "password": "w,*i.uAk7f^Gj;Gk`3O`oqZx3`0fj9Vm"
     }
-  ],
-  "remote.autoForwardPortsFallback": 0
+  ]
 }

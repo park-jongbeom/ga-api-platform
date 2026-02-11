@@ -28,7 +28,8 @@ import org.springframework.stereotype.Service
 class RAGService(
     private val chatModel: CustomGeminiChatModel,
     @Qualifier("schoolDocumentVectorStore")
-    private val schoolDocumentVectorStore: VectorStore
+    private val schoolDocumentVectorStore: VectorStore,
+    private val crawledDataContextBuilder: CrawledDataContextBuilder
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     
@@ -88,13 +89,14 @@ class RAGService(
      * QuestionAnswerAdvisor가 이 프롬프트를 기반으로 관련 문서를 검색하고
      * 검색된 문서를 프롬프트에 포함하여 LLM에 전달합니다.
      */
-    private fun buildUserPrompt(
+    internal fun buildUserPrompt(
         profile: AcademicProfile,
         preference: UserPreference,
         program: Program,
         school: School,
         scores: ScoreBreakdown
     ): String {
+        val crawledContext = crawledDataContextBuilder.buildCrawledDataContext(school)
         val enhancedPersona = """
 당신은 10년 경력의 미국 유학 전문 컨설턴트입니다.
 
@@ -128,6 +130,7 @@ $enhancedPersona
 - 학비: ${'$'}${program.tuition}/년
 - 합격률: ${school.acceptanceRate}%
 - 편입률: ${school.transferRate}%
+${if (crawledContext.isNotBlank()) crawledContext else ""}
 
 [매칭 점수]
 - 총점: ${String.format("%.1f", scores.total())}점

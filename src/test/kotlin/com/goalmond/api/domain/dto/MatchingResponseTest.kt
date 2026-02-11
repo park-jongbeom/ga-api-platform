@@ -148,4 +148,50 @@ class MatchingResponseTest {
         assertThat(response.results[0].school.globalRanking).isEqualTo("#4")
         assertThat(response.results[0].estimatedRoi).isEqualTo(10.0)
     }
+
+    @Test
+    fun `MatchingResponse에 indicatorDescription 필드를 포함할 수 있다`() {
+        val response = MatchingResponse(
+            matchingId = "m-2",
+            userId = "u-2",
+            totalMatches = 0,
+            executionTimeMs = 120,
+            results = emptyList(),
+            createdAt = Instant.now(),
+            indicatorDescription = "학업 적합도와 진로 전망이 높아 추천 정확도가 우수합니다."
+        )
+
+        assertThat(response.indicatorDescription).contains("학업 적합도")
+    }
+
+    @Test
+    fun `MatchingResponse에 nextSteps를 포함할 수 있다`() {
+        val steps = listOf(
+            MatchingResponse.NextStep(
+                id = 1,
+                title = "영어 점수 준비",
+                description = "TOEFL 또는 IELTS 최소 점수를 먼저 확보하세요.",
+                priority = "urgent"
+            ),
+            MatchingResponse.NextStep(
+                id = 2,
+                title = "지원 서류 점검",
+                description = "학업 성적표와 SOP를 검토하세요.",
+                priority = "recommended"
+            )
+        )
+
+        val response = MatchingResponse(
+            matchingId = "m-3",
+            userId = "u-3",
+            totalMatches = 0,
+            executionTimeMs = 98,
+            results = emptyList(),
+            createdAt = Instant.now(),
+            nextSteps = steps
+        )
+
+        assertThat(response.nextSteps).hasSize(2)
+        assertThat(response.nextSteps?.first()?.priority).isEqualTo("urgent")
+    }
 }

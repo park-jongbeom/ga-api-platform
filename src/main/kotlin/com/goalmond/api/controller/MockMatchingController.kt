@@ -171,7 +171,34 @@ class MockMatchingController {
                 totalMatches = results.size,
                 executionTimeMs = executionTimeMs,
                 results = results,
-                createdAt = now
+                createdAt = now,
+                indicatorDescription = "학업 적합도와 진로 전망에서 가장 높은 적합성을 보이며, 비용 효율성도 안정적입니다.",
+                nextSteps = listOf(
+                    MatchingResponse.NextStep(
+                        id = 1,
+                        title = "서류 심사",
+                        description = "GPA 및 시험 점수를 업로드하여 최종 검토를 진행하세요.",
+                        priority = "recommended"
+                    ),
+                    MatchingResponse.NextStep(
+                        id = 2,
+                        title = "SOP 워크숍",
+                        description = "전문 편집자와의 세션을 예약해 지원서를 고도화하세요.",
+                        priority = "recommended"
+                    ),
+                    MatchingResponse.NextStep(
+                        id = 3,
+                        title = "지원 포털 접근",
+                        description = "학교별 마감일에 맞춰 공통 지원서를 제출하세요.",
+                        priority = "recommended"
+                    ),
+                    MatchingResponse.NextStep(
+                        id = 4,
+                        title = "비자 준비",
+                        description = "I-20 서류 준비 및 인터뷰 일정을 미리 계획하세요.",
+                        priority = "optional"
+                    )
+                )
             )
         }
 

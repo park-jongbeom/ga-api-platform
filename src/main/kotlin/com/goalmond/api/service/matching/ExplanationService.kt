@@ -97,6 +97,18 @@ class ExplanationService(
         if ((school.transferRate ?: 0) > 65) {
             pros.add("높은 편입 성공률 (${school.transferRate}%)")
         }
+
+        school.employmentRate?.let {
+            pros.add("취업률 정보 제공 (${it}%)")
+        }
+
+        if (!school.internationalEmail.isNullOrBlank()) {
+            pros.add("유학생 담당 연락 채널 확인 가능")
+        }
+
+        if (!school.eslProgram.isNullOrBlank() && school.eslProgram!!.contains("true", ignoreCase = true)) {
+            pros.add("ESL 지원 정보 확인 가능")
+        }
         
         // Cons
         if ((school.acceptanceRate ?: 100) < 40) {
@@ -109,6 +121,10 @@ class ExplanationService(
         
         if (scores.location < 5) {
             cons.add("선호 지역과 거리 있음")
+        }
+
+        if (school.internationalEmail.isNullOrBlank()) {
+            cons.add("유학생 전용 연락처 정보가 부족할 수 있음")
         }
         
         return Pair(pros, cons)

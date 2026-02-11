@@ -167,6 +167,8 @@ class MatchingEngineServiceTest {
             assertThat(result.results).isNotEmpty()
             assertThat(result.results.size).isLessThanOrEqualTo(5)
             assertThat(result.userId).isEqualTo(testUser.id.toString())
+            assertThat(result.indicatorDescription).isNotBlank()
+            assertThat(result.nextSteps).isNotEmpty()
             
             // 점수 내림차순 정렬 확인
             if (result.results.size > 1) {

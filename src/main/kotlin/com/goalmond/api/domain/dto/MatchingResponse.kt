@@ -12,7 +12,11 @@ data class MatchingResponse(
     /** DB 데이터 없을 때 Fallback(AI 추천) 사용 시 안내 문구. null이면 RAG/DB 기반 결과. */
     val message: String? = null,
     /** Hard Filter에서 필터링된 통계 (Fallback 시에만 제공). null이면 정상 매칭 결과. */
-    val filterSummary: FilterSummary? = null
+    val filterSummary: FilterSummary? = null,
+    /** 매칭 지표 해설 문구. 없으면 프론트에서 기본 문구를 사용한다. */
+    val indicatorDescription: String? = null,
+    /** 사용자 상황에 맞춘 다음 단계 가이드. 없으면 프론트 기본 단계를 사용한다. */
+    val nextSteps: List<NextStep>? = null
 ) {
     data class MatchingResult(
         val rank: Int,
@@ -41,7 +45,34 @@ data class MatchingResponse(
         val rankingField: String? = null,
         val averageSalary: Int? = null,
         val alumniNetworkCount: Int? = null,
-        val featureBadges: List<String> = emptyList()
+        val featureBadges: List<String> = emptyList(),
+        val employmentRate: Double? = null,
+        val facilities: FacilityInfo? = null,
+        val staffInfo: String? = null,
+        val eslProgram: EslProgramInfo? = null,
+        val internationalSupport: InternationalSupportInfo? = null,
+        val internationalEmail: String? = null,
+        val internationalPhone: String? = null
+    )
+
+    data class FacilityInfo(
+        val dormitory: Boolean = false,
+        val dining: Boolean = false,
+        val gym: Boolean = false,
+        val library: Boolean = false,
+        val lab: Boolean = false,
+        val entertainment: Boolean = false
+    )
+
+    data class EslProgramInfo(
+        val available: Boolean = false,
+        val description: String? = null
+    )
+
+    data class InternationalSupportInfo(
+        val available: Boolean = false,
+        val services: List<String> = emptyList(),
+        val description: String? = null
     )
 
     data class ProgramSummary(
@@ -89,5 +120,16 @@ data class MatchingResponse(
         val filteredByVisa: Int,
         /** 후보 중 최저 학비 (USD, null이면 학비 정보 없음) */
         val minimumTuitionFound: Int?
+    )
+
+    /**
+     * 매칭 이후 행동 가이드.
+     */
+    data class NextStep(
+        val id: Int,
+        val title: String,
+        val description: String,
+        /** 우선순위: urgent, recommended, optional */
+        val priority: String? = null
     )
 }

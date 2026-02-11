@@ -1,6 +1,8 @@
 package com.goalmond.api.domain.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
@@ -76,15 +78,19 @@ class School(
     @Column(name = "employment_rate")
     var employmentRate: BigDecimal? = null,
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "facilities", columnDefinition = "JSONB")
     var facilities: String? = null,
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "staff_info", columnDefinition = "JSONB")
     var staffInfo: String? = null,
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "esl_program", columnDefinition = "JSONB")
     var eslProgram: String? = null,
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "international_support", columnDefinition = "JSONB")
     var internationalSupport: String? = null,
 

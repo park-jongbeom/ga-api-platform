@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
+import java.math.BigDecimal
 import kotlin.system.measureTimeMillis
 
 /**
@@ -48,12 +49,13 @@ class EmbeddingServiceTest {
         // 테스트 데이터 정리 (실제 DB 사용하므로 안전한 범위만 삭제)
         val testSchools = schoolRepository.findByNameStartingWith(testPrefix)
         testSchools.forEach { school ->
-            programRepository.findBySchoolId(school.id!!).let { programs ->
+            val schoolId = requireNotNull(school.id)
+            programRepository.findBySchoolId(schoolId).let { programs ->
                 if (programs.isNotEmpty()) {
                     programRepository.deleteAll(programs)
                 }
             }
-            schoolEmbeddingRepository.findBySchoolId(school.id!!)?.let {
+            schoolEmbeddingRepository.findBySchoolId(schoolId)?.let {
                 schoolEmbeddingRepository.delete(it)
             }
             schoolRepository.delete(school)
@@ -74,6 +76,8 @@ class EmbeddingServiceTest {
             acceptanceRate = 45,
             transferRate = 75,
             graduationRate = 68,
+            averageSalary = 52000,
+            employmentRate = BigDecimal("88.5"),
             ranking = 15
         )
         
@@ -89,6 +93,8 @@ class EmbeddingServiceTest {
         assertThat(text).contains("합격률: 45%")
         assertThat(text).contains("편입률: 75%")
         assertThat(text).contains("졸업률: 68%")
+        assertThat(text).contains("초봉(중간값): \$52000")
+        assertThat(text).contains("취업률: 88.5%")
         
         logger.info("Generated embedding text:\n$text")
     }
@@ -112,9 +118,10 @@ class EmbeddingServiceTest {
         // Then
         assertThat(success).isTrue()
         
-        val embedding = schoolEmbeddingRepository.findBySchoolId(saved.id!!)
+        val savedId = requireNotNull(saved.id)
+        val embedding = schoolEmbeddingRepository.findBySchoolId(savedId)
         assertThat(embedding).isNotNull
-        assertThat(embedding?.schoolId).isEqualTo(saved.id)
+        assertThat(embedding?.schoolId).isEqualTo(savedId)
         assertThat(embedding?.embeddingText).contains("${testPrefix}School for Embedding")
         
         // 768차원 벡터 검증
@@ -138,7 +145,8 @@ class EmbeddingServiceTest {
         
         // When: 첫 번째 임베딩
         embeddingService.embedSchool(saved)
-        val first = schoolEmbeddingRepository.findBySchoolId(saved.id!!)
+        val savedId = requireNotNull(saved.id)
+        val first = schoolEmbeddingRepository.findBySchoolId(savedId)
         val firstText = first?.embeddingText
         
         // 학교 정보 변경
@@ -147,13 +155,13 @@ class EmbeddingServiceTest {
         
         // 두 번째 임베딩
         embeddingService.embedSchool(saved)
-        val second = schoolEmbeddingRepository.findBySchoolId(saved.id!!)
+        val second = schoolEmbeddingRepository.findBySchoolId(savedId)
         val secondText = second?.embeddingText
         
         // Then
         assertThat(firstText).isNotEqualTo(secondText) // 텍스트 변경됨
         assertThat(secondText).contains("Updated description")
-        assertThat(schoolEmbeddingRepository.countBySchoolId(saved.id!!)).isEqualTo(1L)
+        assertThat(schoolEmbeddingRepository.countBySchoolId(savedId)).isEqualTo(1L)
     }
     
     @Test

@@ -37,7 +37,7 @@ class EmbeddingService(
      * - 학교명, 유형, 위치
      * - 학비, 생활비
      * - 설명
-     * - 합격률, 편입률, 졸업률
+     * - 합격률, 편입률, 졸업률, 초봉/취업률(가능한 경우)
      */
     fun buildSchoolText(school: School): String {
         return buildString {
@@ -50,6 +50,8 @@ class EmbeddingService(
             school.acceptanceRate?.let { appendLine("합격률: $it%") }
             school.transferRate?.let { appendLine("편입률: $it%") }
             school.graduationRate?.let { appendLine("졸업률: $it%") }
+            school.averageSalary?.let { appendLine("초봉(중간값): $$it") }
+            school.employmentRate?.let { appendLine("취업률: ${it.stripTrailingZeros().toPlainString()}%") }
             school.ranking?.let { appendLine("랭킹: $it") }
         }.trim()
     }

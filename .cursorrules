@@ -22,3 +22,22 @@
 ### 필수 참조 문서
 - **데이터베이스 스키마**: `docs/DATABASE_SCHEMA.md` - 모든 DB 관련 작업 시 반드시 참조하십시오. 실제 PostgreSQL 17 스키마 구조와 JPA 엔티티 매핑 관계를 확인하십시오.
 - **로컬 테스트**: `docs/LOCAL_TESTING.md` - 작업 완료 후 로컬에서 테스트하는 방법. default 프로파일(Mock만) vs local 프로파일(전체 API, DB 필요) 실행 방법 및 curl 예시를 참조하십시오.
+- **계획 인덱스**: `docs/PLANS_INDEX.md` - 전체 계획 구조 및 바로가기
+
+### 통합 계획 문서 (최우선 참조)
+AI 유학 상담 고도화 작업 시 반드시 다음 통합 계획 폴더를 참조하십시오:
+
+**위치**: `/media/ubuntu/data120g/ai-consulting-plans/`
+
+**핵심 문서**:
+- **마스터 계획**: `00_MASTER_PLAN/ai_유학_상담_고도화_마스터플랜.md` - 전체 로드맵, Level 1 완료 상태, 다음 단계 확인
+- **GraphRAG 구축**: `01_GRAPHRAG/` - Ontology 정의, Knowledge Graph 구축 계획, PostgreSQL 기반 Lightweight GraphRAG
+- **Step 0 벤치마킹**: `01_GRAPHRAG/step0_오픈소스_벤치마킹.md` - Microsoft GraphRAG, LangChain, LlamaIndex 패턴 분석
+- **현재 RAG 시스템**: `02_RAG_CURRENT/` - 기존 벡터 검색 아키텍처 및 매칭 엔진
+
+**작업 시 반드시**:
+1. 세션 시작 시 `ai-consulting-plans/README.md` 먼저 읽어 현재 진행 상태 확인
+2. GraphRAG 관련 작업 시 `01_GRAPHRAG/` 폴더 참조
+3. RAG/매칭 엔진 개선 시 `02_RAG_CURRENT/` 참조
+4. 새 기능 구현 전 해당 Phase의 완료 기준 및 TDD 전략 확인
+5. Ontology(Entity, Relation) 관련 작업 시 마스터 계획의 정의 준수

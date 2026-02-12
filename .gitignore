@@ -69,9 +69,13 @@ src/main/resources/application-local.yml
 docs/*
 docs/RAG_ARCHITECTURE.md
 !docs/FRONTEND_HANDOFF.md
+!docs/PLANS_INDEX.md
 !docs/api/
 !docs/api/**
 !docs/nginx/
 !docs/nginx/**
 # docs/nginx 내 로컬 전용은 다시 제외 (위 58행과 동일, docs/* 예외 적용 후 재적용)
 docs/nginx/go-almond.local.conf
+
+# 통합 계획 문서는 별도 폴더에서 관리
+# /media/ubuntu/data120g/ai-consulting-plans/

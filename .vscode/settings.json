@@ -5,6 +5,8 @@
   "cursor.backgroundAgent.enabled": true,
   "cursor.chat.enabled": true,
   "cursor.composer.enabled": true,
+  "cursor.chat.defaultModel": "Gemini 3 Flash",
+  "cursor.composer.defaultModel": "Gemini 3 Flash",
   "git.commitMessageLanguage": "ko",
   "git.useCommitInputAsStashMessage": true,
   "files.encoding": "utf8",

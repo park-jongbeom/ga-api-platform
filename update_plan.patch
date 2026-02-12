@@ -1,0 +1,11 @@
+--- a/phase1_detailed_plan.md
++++ b/phase1_detailed_plan.md
+@@ -208,7 +208,7 @@
+ ### 기능적 완료 기준
+ 
+ - [x] DB 스키마 구축 완료
+-- [ ] Ontology Enum 클래스 구현 완료
++- [x] Ontology Enum 클래스 구현 완료
+ - [ ] Triple 추출 서비스 구현 완료
+ - [ ] Seed Data 구축 완료 (10개 학교, 500개 Triples)
+ - [ ] GraphSearchService 구현 완료

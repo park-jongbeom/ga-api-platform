@@ -60,7 +60,7 @@ AI 유학 상담 고도화 작업 시 반드시 다음 통합 계획 폴더를 �
 **위치**: `/media/ubuntu/data120g/ai-consulting-plans/`
 
 **핵심 문서**:
-- **마스터 계획**: `00_MASTER_PLAN/ai_유학_상담_고도화_마스터플랜.md` - 전체 로드맵, Level 1 완료 상태, 다음 단계 확인
+- **마스터 계획**: `ai-consulting-plans/00_MASTER_PLAN.md` - 전체 로드맵, Level 1 완료 상태, 다음 단계 확인
 - **GraphRAG 구축**: `01_GRAPHRAG/` - Ontology 정의, Knowledge Graph 구축 계획, PostgreSQL 기반 Lightweight GraphRAG
 - **Step 0 벤치마킹**: `01_GRAPHRAG/step0_오픈소스_벤치마킹.md` - Microsoft GraphRAG, LangChain, LlamaIndex 패턴 분석
 - **현재 RAG 시스템**: `02_RAG_CURRENT/` - 기존 벡터 검색 아키텍처 및 매칭 엔진

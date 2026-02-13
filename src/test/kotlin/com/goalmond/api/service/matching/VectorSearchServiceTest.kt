@@ -125,7 +125,8 @@ class VectorSearchServiceTest {
         assertThat(results.size).isLessThanOrEqualTo(20) // topK = 20
         
         logger.info("Vector search found ${results.size} schools")
-        results.take(5).forEachIndexed { index, school ->
+        results.take(5).forEachIndexed { index, candidate ->
+            val school = candidate.school
             logger.info("Top ${index + 1}: ${school.name} (${school.city}, ${school.state})")
         }
     }

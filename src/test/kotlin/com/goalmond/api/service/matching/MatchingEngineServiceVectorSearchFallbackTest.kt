@@ -5,9 +5,11 @@ import com.goalmond.api.domain.entity.AcademicProfile
 import com.goalmond.api.domain.entity.User
 import com.goalmond.api.domain.entity.UserPreference
 import com.goalmond.api.repository.AcademicProfileRepository
+import com.goalmond.api.repository.GraphRagEntityRepository
 import com.goalmond.api.repository.ProgramRepository
 import com.goalmond.api.repository.UserPreferenceRepository
 import com.goalmond.api.repository.UserRepository
+import com.goalmond.api.service.graphrag.GraphSearchService
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -28,6 +30,8 @@ class MatchingEngineServiceVectorSearchFallbackTest {
         val userPreferenceRepository = mockk<UserPreferenceRepository>()
         val programRepository = mockk<ProgramRepository>(relaxed = true)
         val vectorSearchService = mockk<VectorSearchService>()
+        val graphSearchService = mockk<GraphSearchService>(relaxed = true)
+        val graphRagEntityRepository = mockk<GraphRagEntityRepository>(relaxed = true)
         val hardFilterService = mockk<HardFilterService>(relaxed = true)
         val scoringService = mockk<ScoringService>(relaxed = true)
         val pathOptimizationService = mockk<PathOptimizationService>(relaxed = true)
@@ -107,6 +111,8 @@ class MatchingEngineServiceVectorSearchFallbackTest {
             userPreferenceRepository = userPreferenceRepository,
             programRepository = programRepository,
             vectorSearchService = vectorSearchService,
+            graphSearchService = graphSearchService,
+            graphRagEntityRepository = graphRagEntityRepository,
             hardFilterService = hardFilterService,
             scoringService = scoringService,
             pathOptimizationService = pathOptimizationService,
@@ -127,4 +133,3 @@ class MatchingEngineServiceVectorSearchFallbackTest {
         assertTrue(response.createdAt.isBefore(Instant.now().plusSeconds(5)))
     }
 }
-

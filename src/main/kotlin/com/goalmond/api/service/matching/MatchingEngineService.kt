@@ -6,9 +6,13 @@ import com.goalmond.api.domain.dto.MatchingResponse
 import com.goalmond.api.domain.entity.School
 import com.goalmond.api.domain.entity.UserPreference
 import com.goalmond.api.repository.AcademicProfileRepository
+import com.goalmond.api.repository.GraphRagEntityRepository
 import com.goalmond.api.repository.ProgramRepository
 import com.goalmond.api.repository.UserPreferenceRepository
 import com.goalmond.api.repository.UserRepository
+import com.goalmond.api.domain.graphrag.EntityType
+import com.goalmond.api.service.graphrag.CareerPath
+import com.goalmond.api.service.graphrag.GraphSearchService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,6 +40,8 @@ class MatchingEngineService(
     private val userPreferenceRepository: UserPreferenceRepository,
     private val programRepository: ProgramRepository,
     private val vectorSearchService: VectorSearchService,
+    private val graphSearchService: GraphSearchService,
+    private val graphRagEntityRepository: GraphRagEntityRepository,
     private val hardFilterService: HardFilterService,
     private val scoringService: ScoringService,
     private val pathOptimizationService: PathOptimizationService,
@@ -68,36 +74,49 @@ class MatchingEngineService(
             logger.info("매칭 시작: user=$userId, major=${preference.targetMajor}, budget=${preference.budgetUsd}")
             
             // Step 2: RAG 벡터 검색 (Top 20)
-            val candidateSchools = try {
+            val vectorCandidates = try {
                 vectorSearchService.searchSimilarSchools(user, profile, preference)
                     .also { logger.info("벡터 검색 완료: ${it.size}개 후보군") }
             } catch (e: VectorSearchException) {
-                // 운영/로컬에서 Gemini 임베딩(또는 pgvector) 오류가 발생해도 매칭 API가 500으로 터지지 않도록 방어합니다.
-                // 벡터 검색 실패는 "후보군 없음"과 동일하게 취급하고 Fallback(AI 또는 기본 추천)으로 전환합니다.
                 logger.warn("벡터 검색 실패 → Fallback 전환 (user=$userId): ${e.message}")
                 emptyList()
             }
-            
-            // Fallback: DB에 학교/임베딩 데이터가 없으면 프로필·선호도만으로 Gemini 추천 생성
-            if (candidateSchools.isEmpty()) {
+
+            if (vectorCandidates.isEmpty()) {
                 logger.info("후보군 없음 → Fallback(AI 추천) 실행")
                 val fallbackResults = fallbackMatchingService.generateFallbackResults(profile, preference)
-                val fallbackTime = System.currentTimeMillis() - startTime
-                return MatchingResponse(
-                    matchingId = UUID.randomUUID().toString(),
-                    userId = userId.toString(),
-                    totalMatches = fallbackResults.size,
-                    executionTimeMs = fallbackTime.toInt(),
-                    results = fallbackResults,
-                    createdAt = Instant.now(),
-                    message = "맞춤형 추천을 제공합니다.",
-                    indicatorDescription = generateIndicatorDescription(fallbackResults.firstOrNull()),
-                    nextSteps = generateNextSteps(preference)
-                )
+                return buildFallbackMatchingResponse(userId, preference, fallbackResults, startTime)
             }
+
+            val vectorSchoolMap = vectorCandidates.mapNotNull { candidate ->
+                val schoolId = candidate.school.id ?: return@mapNotNull null
+                schoolId to candidate.school
+            }.toMap()
+
+            val vectorScoreMap = vectorCandidates.mapNotNull { candidate ->
+                val schoolId = candidate.school.id ?: return@mapNotNull null
+                schoolId to candidate.similarity
+            }.toMap()
+
+            if (vectorSchoolMap.isEmpty()) {
+                logger.warn("벡터 후보 중 유효한 학교 ID 없음 → Fallback(AI 추천)")
+                val fallbackResults = fallbackMatchingService.generateFallbackResults(profile, preference)
+                return buildFallbackMatchingResponse(userId, preference, fallbackResults, startTime)
+            }
+
+            val graphIntent = buildGraphIntent(preference)
+            val careerPaths = graphIntent?.let { intent ->
+                graphSearchService.findCareerPaths(
+                    targetCompany = intent.companyName,
+                    targetJob = intent.jobName,
+                    requiredSkills = emptyList(),
+                    maxDepth = 4
+                )
+            } ?: emptyList()
+            val maxGraphWeight = careerPaths.maxOfOrNull { it.weight } ?: 1.0
             
             // Step 3: School에 연결된 Program 조회
-            val schoolIds = candidateSchools.mapNotNull { it.id }
+            val schoolIds = vectorSchoolMap.keys
             val programs = programRepository.findBySchoolIdIn(schoolIds)
             logger.info("프로그램 조회: ${programs.size}개")
             
@@ -108,30 +127,17 @@ class MatchingEngineService(
             // Fallback: Hard Filter 통과 결과가 없으면 AI 추천 생성 (하이브리드 방식)
             if (filterResult.passed.isEmpty()) {
                 logger.info("Hard Filter 통과 결과 없음 → Fallback(AI 추천) 실행")
-                
-                // 필터링 통계 수집
+
                 val budgetFiltered = filterResult.filtered.count { it.filterType == com.goalmond.api.domain.dto.FilterType.BUDGET_EXCEEDED }
                 val englishFiltered = filterResult.filtered.count { it.filterType == com.goalmond.api.domain.dto.FilterType.ENGLISH_SCORE }
                 val visaFiltered = filterResult.filtered.count { it.filterType == com.goalmond.api.domain.dto.FilterType.VISA_REQUIREMENT }
-                
-                // 최저 학비 찾기 (프로그램 또는 학교 학비 중 최소값)
+
                 val minTuition = programs.mapNotNull { program ->
-                    program.tuition ?: candidateSchools.find { it.id == program.schoolId }?.tuition
+                    program.tuition ?: vectorSchoolMap[program.schoolId]?.tuition
                 }.minOrNull()
-                
+
                 val fallbackResults = fallbackMatchingService.generateFallbackResults(profile, preference)
-                val fallbackTime = System.currentTimeMillis() - startTime
-                
-                return MatchingResponse(
-                    matchingId = UUID.randomUUID().toString(),
-                    userId = userId.toString(),
-                    totalMatches = fallbackResults.size,
-                    executionTimeMs = fallbackTime.toInt(),
-                    results = fallbackResults,
-                    createdAt = Instant.now(),
-                    message = "맞춤형 추천을 제공합니다.",
-                    indicatorDescription = generateIndicatorDescription(fallbackResults.firstOrNull()),
-                    nextSteps = generateNextSteps(preference),
+                return buildFallbackMatchingResponse(userId, preference, fallbackResults, startTime).copy(
                     filterSummary = MatchingResponse.FilterSummary(
                         totalCandidates = filterResult.filtered.size,
                         filteredByBudget = budgetFiltered,
@@ -144,20 +150,13 @@ class MatchingEngineService(
             
             // Step 5: 점수 계산 및 최종 점수 산출
             val candidates = filterResult.passed.mapNotNull { program ->
-                val school = candidateSchools.find { it.id == program.schoolId } ?: return@mapNotNull null
-                
-                // 6대 지표 Base Score
+                val school = vectorSchoolMap[program.schoolId] ?: return@mapNotNull null
+
                 val scores = scoringService.calculateScore(profile, preference, program, school)
-                
-                // 경로 최적화 가점
                 val optimization = pathOptimizationService.applyOptimization(profile, preference, program, school)
-                
-                // 리스크 패널티
                 val penalty = riskPenaltyService.applyPenalty(profile, preference, program, school)
-                
-                // 최종 점수
                 val totalScore = scores.total() + optimization + penalty
-                
+
                 MatchingCandidate(
                     program = program,
                     school = school,
@@ -167,30 +166,45 @@ class MatchingEngineService(
                     totalScore = totalScore.coerceAtLeast(0.0)
                 )
             }
-            
-            // Step 6: Top 5 선정 (최종 점수 내림차순)
-            val top5 = candidates
-                .sortedByDescending { it.totalScore }
+
+            val enrichedCandidates = candidates.map { candidate ->
+                val schoolId = candidate.school.id
+                val vectorScore = schoolId?.let { vectorScoreMap[it] } ?: 0.0
+                val graphPath = selectGraphPath(candidate, careerPaths)
+                val graphScore = computeGraphScore(graphPath, maxGraphWeight)
+                val preferenceNormalized = (candidate.scores.career / MAX_CAREER_SCORE).coerceIn(0.0, 1.0)
+                val hybridNormalized = (vectorScore * VECTOR_WEIGHT) +
+                    (graphScore * GRAPH_WEIGHT) +
+                    (preferenceNormalized * PREFERENCE_WEIGHT)
+                val rankingScore = (hybridNormalized * 100).coerceIn(0.0, 100.0)
+
+                candidate.copy(
+                    vectorScore = vectorScore,
+                    graphScore = graphScore,
+                    graphPath = graphPath,
+                    rankingScore = rankingScore
+                )
+            }
+
+            val top5 = enrichedCandidates
+                .sortedByDescending { it.rankingScore }
                 .take(5)
-            
-            logger.info("Top 5 선정 완료: 점수 범위 ${top5.firstOrNull()?.totalScore} ~ ${top5.lastOrNull()?.totalScore}")
-            
-            // Step 7: 설명 생성 및 추천 유형 분류
+
+            logger.info("Top 5 선정 완료: Hybrid 점수 ${top5.firstOrNull()?.rankingScore} ~ ${top5.lastOrNull()?.rankingScore}")
+
             val results = top5.mapIndexed { index, candidate ->
                 val (pros, cons) = explanationService.generateProsAndCons(
                     profile, preference, candidate.program, candidate.school, candidate.scores
                 )
-                
-                val recommendationType = classifyRecommendationType(candidate.totalScore)
-                
-                // Gemini 설명 생성은 Quota 이슈로 인해 템플릿 사용
+
+                val recommendationType = classifyRecommendationType(candidate.rankingScore)
                 val explanation = generateSimpleExplanation(candidate, recommendationType)
-                
+
                 MatchingResponse.MatchingResult(
                     rank = index + 1,
                     school = buildSchoolSummary(candidate.school),
                     program = buildProgramSummary(candidate.program),
-                    totalScore = candidate.totalScore,
+                    totalScore = candidate.rankingScore,
                     estimatedRoi = calculateEstimatedRoi(candidate.school, candidate.program),
                     scoreBreakdown = buildScoreBreakdown(candidate.scores),
                     indicatorScores = buildIndicatorScores(candidate.scores),
@@ -200,9 +214,9 @@ class MatchingEngineService(
                     cons = cons
                 )
             }
-            
+
             val executionTime = System.currentTimeMillis() - startTime
-            
+
             return MatchingResponse(
                 matchingId = UUID.randomUUID().toString(),
                 userId = userId.toString(),
@@ -219,42 +233,6 @@ class MatchingEngineService(
             logger.error("매칭 실패 (${elapsed}ms)", e)
             throw MatchingException("Matching failed for user $userId", e)
         }
-    }
-    
-    /**
-     * Hard Filter에서 모두 필터링되었을 때 상세 메시지 생성 (하이브리드 방식).
-     * 
-     * @param preference 사용자 선호도
-     * @param budgetFiltered 예산 초과로 필터링된 수
-     * @param englishFiltered 영어 점수 미달로 필터링된 수
-     * @param minTuition 후보 중 최저 학비
-     * @return 사용자에게 보여줄 상세 안내 메시지
-     */
-    private fun buildFilteredMessage(
-        preference: UserPreference,
-        budgetFiltered: Int,
-        englishFiltered: Int,
-        minTuition: Int?
-    ): String {
-        val reasons = mutableListOf<String>()
-        
-        if (budgetFiltered > 0) {
-            val budget = preference.budgetUsd ?: 0
-            val suggestion = if (minTuition != null && minTuition > budget) {
-                " (최저 학비: \$$minTuition)"
-            } else ""
-            reasons.add("• ${budgetFiltered}개 학교 예산 초과$suggestion")
-        }
-        
-        if (englishFiltered > 0) {
-            reasons.add("• ${englishFiltered}개 학교 영어 점수 미달")
-        }
-        
-        val reasonText = if (reasons.isNotEmpty()) {
-            "\n\n필터링 이유:\n${reasons.joinToString("\n")}"
-        } else ""
-        
-        return "⚠️ 입력하신 조건으로는 적합한 학교가 없어 AI 추천을 제공합니다.$reasonText\n\n아래는 조건을 완화한 추천입니다."
     }
     
     /**
@@ -279,11 +257,21 @@ class MatchingEngineService(
         school.eslProgram?.takeIf { it.contains("true", ignoreCase = true) }?.let { dataHints.add("ESL 프로그램 제공") }
         school.facilities?.takeIf { it.contains("dormitory", ignoreCase = true) }?.let { dataHints.add("기숙사 정보 확인 가능") }
         val hintText = if (dataHints.isNotEmpty()) " 또한 ${dataHints.joinToString(", ")} 기준으로 실무 준비도를 확인했습니다." else ""
-        return when (type) {
-            "safe" -> "이 학교는 예산 대비 학비가 안정적이며, 귀하의 영어 점수로 바로 입학이 가능하고, 졸업 후 OPT 연계 확률이 높아 추천되었습니다.$hintText"
-            "challenge" -> "이 학교는 ${school.city}에 위치하며 편입률이 높아 장기적으로 유리하지만, 경쟁률을 고려하여 도전해볼 만한 선택지입니다.$hintText"
-            else -> "이 학교는 예산과 목표에 맞춰 전략적으로 선택할 수 있는 프로그램입니다.$hintText"
+
+        val graphNarrative = candidate.graphPath?.let { path ->
+            val skillsText = path.skills.takeIf { it.isNotEmpty() }?.joinToString(", ") ?: "관련 역량"
+            val programName = path.programName ?: candidate.program.name
+            val jobName = path.job ?: "목표 직무"
+            " ${path.company}은 ${path.schoolName}의 $programName 졸업생을 $jobName으로 채용하며 $skillsText을(를) 강조합니다."
+        } ?: ""
+
+        val baseText = when (type) {
+            "safe" -> "이 학교는 예산 대비 학비가 안정적이며, 귀하의 영어 점수로 바로 입학이 가능하고, 졸업 후 OPT 연계 확률이 높아 추천되었습니다."
+            "challenge" -> "이 학교는 ${school.city}에 위치하며 편입률이 높아 장기적으로 유리하지만, 경쟁률을 고려하여 도전해볼 만한 선택지입니다."
+            else -> "이 학교는 예산과 목표에 맞춰 전략적으로 선택할 수 있는 프로그램입니다."
         }
+
+        return "$baseText$hintText$graphNarrative"
     }
 
     /**
@@ -336,6 +324,90 @@ class MatchingEngineService(
             )
         )
     }
+
+    private fun buildFallbackMatchingResponse(
+        userId: UUID,
+        preference: UserPreference,
+        fallbackResults: List<MatchingResponse.MatchingResult>,
+        startTime: Long
+    ): MatchingResponse {
+        val elapsed = System.currentTimeMillis() - startTime
+        return MatchingResponse(
+            matchingId = UUID.randomUUID().toString(),
+            userId = userId.toString(),
+            totalMatches = fallbackResults.size,
+            executionTimeMs = elapsed.toInt(),
+            results = fallbackResults,
+            createdAt = Instant.now(),
+            message = "맞춤형 추천을 제공합니다.",
+            indicatorDescription = generateIndicatorDescription(fallbackResults.firstOrNull()),
+            nextSteps = generateNextSteps(preference)
+        )
+    }
+
+    private fun selectGraphPath(candidate: MatchingCandidate, paths: List<CareerPath>): CareerPath? {
+        val schoolId = candidate.school.id ?: return null
+        val matchingPaths = paths.filter { it.schoolId == schoolId }
+        if (matchingPaths.isEmpty()) return null
+        val programMatch = candidate.program.id?.let { pid ->
+            matchingPaths.firstOrNull { it.programId == pid }
+        }
+        return programMatch ?: matchingPaths.maxByOrNull { it.weight }
+    }
+
+    private fun computeGraphScore(path: CareerPath?, maxWeight: Double): Double {
+        if (path == null || maxWeight <= 0.0) return 0.0
+        return (path.weight / maxWeight).coerceIn(0.0, 1.0)
+    }
+
+    private fun buildGraphIntent(preference: UserPreference): GraphIntent? {
+        val goal = preference.careerGoal?.trim().takeUnless { it.isNullOrBlank() } ?: return null
+        val companyName = detectCompanyFromGoal(goal) ?: return null
+        val jobName = detectJobFromGoal(goal)
+        return GraphIntent(companyName, jobName)
+    }
+
+    private fun detectCompanyFromGoal(goal: String): String? {
+        detectEntityName(EntityType.COMPANY, goal)?.let { return it }
+        val keywords = listOf(" at ", " @ ", " for ")
+        keywords.forEach { keyword ->
+            val candidate = extractAfterKeyword(goal, keyword)
+            if (!candidate.isNullOrBlank()) {
+                detectEntityName(EntityType.COMPANY, candidate)?.let { return it }
+                return candidate
+            }
+        }
+        return null
+    }
+
+    private fun detectJobFromGoal(goal: String): String? {
+        detectEntityName(EntityType.JOB, goal)?.let { return it }
+        val beforeAt = goal.substringBeforeLast(" at ", goal).trim()
+        if (beforeAt.isBlank() || beforeAt == goal) return null
+        detectEntityName(EntityType.JOB, beforeAt)?.let { return it }
+        return beforeAt
+    }
+
+    private fun extractAfterKeyword(text: String, keyword: String): String? {
+        val lower = text.lowercase()
+        val index = lower.lastIndexOf(keyword.lowercase())
+        if (index < 0) return null
+        val start = index + keyword.length
+        val fragment = text.substring(start).split(Regex("[,\\.]"))[0].trim()
+        return fragment.takeIf { it.isNotBlank() }
+    }
+
+    private fun detectEntityName(entityType: EntityType, term: String): String? {
+        val trimmed = term.trim()
+        if (trimmed.isBlank()) return null
+        return graphRagEntityRepository.searchByTypeAndName(entityType, trimmed)
+            .firstOrNull()?.entityName
+    }
+
+    private data class GraphIntent(
+        val companyName: String,
+        val jobName: String?
+    )
     
     private fun buildSchoolSummary(school: School): MatchingResponse.SchoolSummary {
         val tuition = school.tuition ?: 0
@@ -405,6 +477,13 @@ class MatchingEngineService(
         }
     }
 
+    private companion object {
+        const val VECTOR_WEIGHT = 0.4
+        const val GRAPH_WEIGHT = 0.5
+        const val PREFERENCE_WEIGHT = 0.1
+        const val MAX_CAREER_SCORE = 30.0
+    }
+
     /**
      * 연간 예상 ROI (%): (average_salary - tuition) / tuition * 100.
      * null 또는 tuition 0이면 0.0, 음수면 0.0.
@@ -458,7 +537,11 @@ data class MatchingCandidate(
     val scores: ScoreBreakdown,
     val optimization: Double,
     val penalty: Double,
-    val totalScore: Double
+    val totalScore: Double,
+    val vectorScore: Double = 0.0,
+    val graphScore: Double = 0.0,
+    val graphPath: CareerPath? = null,
+    val rankingScore: Double = 0.0
 )
 
 /**

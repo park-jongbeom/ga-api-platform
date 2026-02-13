@@ -69,7 +69,7 @@ class VectorSearchService(
         user: User,
         profile: AcademicProfile,
         preference: UserPreference
-    ): List<School> {
+    ): List<VectorSearchCandidate> {
         val startTime = System.currentTimeMillis()
         
         try {
@@ -93,23 +93,29 @@ class VectorSearchService(
             
             // 5. 유사도 순서 유지 (검색 결과 순서대로 정렬)
             val schoolMap = schools.associateBy { it.id }
-            val sortedSchools = schoolIds.mapNotNull { schoolMap[it] }
+            val sortedCandidates = searchResults.mapNotNull { result ->
+                val school = schoolMap[result.getSchoolId()] ?: return@mapNotNull null
+                VectorSearchCandidate(
+                    school = school,
+                    similarity = result.getSimilarity()
+                )
+            }
             
             val elapsed = System.currentTimeMillis() - startTime
             logger.info(
-                "Vector search completed: ${sortedSchools.size} schools found in ${elapsed}ms " +
+                "Vector search completed: ${sortedCandidates.size} schools found in ${elapsed}ms " +
                 "(topK=$topK, user=${user.id})"
             )
             
             // 유사도 로깅 (상위 5개)
-            searchResults.take(5).forEachIndexed { index, result ->
-                val school = schoolMap[result.getSchoolId()]
+            sortedCandidates.take(5).forEachIndexed { index, candidate ->
                 logger.debug(
-                    "Top ${index + 1}: ${school?.name} (similarity=${String.format("%.4f", result.getSimilarity())})"
+                    "Top ${index + 1}: ${candidate.school.name} " +
+                    "(similarity=${String.format("%.4f", candidate.similarity)})"
                 )
             }
             
-            return sortedSchools
+            return sortedCandidates
             
         } catch (e: Exception) {
             val elapsed = System.currentTimeMillis() - startTime
@@ -126,3 +132,11 @@ class VectorSearchException(
     message: String,
     cause: Throwable? = null
 ) : RuntimeException(message, cause)
+
+/**
+ * 벡터 검색 결과 후보.
+ */
+data class VectorSearchCandidate(
+    val school: School,
+    val similarity: Double
+)

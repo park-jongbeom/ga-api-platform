@@ -1,0 +1,38 @@
+# 테스트 프로파일: @ActiveProfiles("test") 사용 시 적용
+# EntityResolutionServiceTest, GraphSearchServiceTest 등 @SpringBootTest 기반 통합 테스트 전용
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:postgresql://ls-584229d62cccd625a5fa723267dbdbc614b3b0e5.c9wi0gwweu9n.ap-northeast-2.rds.amazonaws.com:5432/ga_db?sslmode=require
+    username: dbmasteruser
+    password: "w,*i.uAk7f^Gj;Gk`3O`oqZx3`0fj9Vm"
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: false  # 테스트 시 마이그레이션 비활성화 (스키마는 이미 존재)
+
+app:
+  seed-test-user:
+    enabled: false
+  matching:
+    weights:
+      academic: 0.20
+      english: 0.15
+      budget: 0.15
+      location: 0.10
+      duration: 0.10
+      career: 0.30
+    vector-search:
+      top-k: 20
+  ai:
+    gemini:
+      api-key: "test-api-key"
+      model: "gemini-2.0-flash"
+      embedding-model: "gemini-embedding-001"
+      api-url: "https://generativelanguage.googleapis.com/v1beta"

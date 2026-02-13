@@ -15,7 +15,7 @@ class CustomGeminiChatModelTest {
     @Test
     fun `call은 Prompt에서 메시지를 추출하여 GeminiClient 호출 후 ChatResponse 반환`() {
         val geminiClient = org.mockito.kotlin.mock<GeminiClient> {
-            on { generateContent("안녕") }.thenReturn("안녕하세요")
+            on { generateContent("안녕", 0.5, 0.9) }.thenReturn("안녕하세요")
         }
         val chatModel = CustomGeminiChatModel(geminiClient)
 

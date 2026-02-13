@@ -44,7 +44,7 @@ class ResearchAgentServiceTest {
     @Test
     @DisplayName("단일 프롬프트 실행 시 한글 응답이 반환되어야 한다")
     fun `단일 프롬프트 실행 시 한글 응답이 반환되어야 한다`() {
-        every { geminiClient.generateContent(any()) } returns "Community College는 2년제이며, Trade School는 1년..."
+        every { geminiClient.generateContent(any(), 0.8, 0.95) } returns "Community College는 2년제이며, Trade School는 1년..."
 
         val result = researchAgentService.researchPrompt(
             "P1_COLLEGE_TYPES",
@@ -99,7 +99,7 @@ class ResearchAgentServiceTest {
     @Test
     @DisplayName("Gemini API 실패 시 confidence 0으로 결과 반환")
     fun `Gemini API 실패 시 confidence 0으로 결과 반환`() {
-        every { geminiClient.generateContent(any()) } throws GeminiApiException("API Error")
+        every { geminiClient.generateContent(any(), 0.8, 0.95) } throws GeminiApiException("API Error")
 
         val result = researchAgentService.researchPrompt(
             "P1_COLLEGE_TYPES",

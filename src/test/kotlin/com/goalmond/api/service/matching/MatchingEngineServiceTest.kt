@@ -11,6 +11,7 @@ import com.goalmond.api.repository.SchoolRepository
 import com.goalmond.api.repository.UserPreferenceRepository
 import com.goalmond.api.repository.UserRepository
 import com.goalmond.api.support.FakeGeminiTestConfig
+import com.goalmond.api.support.PostgresTestcontainersConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,7 +33,7 @@ import kotlin.system.measureTimeMillis
  */
 @SpringBootTest
 @ActiveProfiles("local")
-@Import(FakeGeminiTestConfig::class)
+@Import(FakeGeminiTestConfig::class, PostgresTestcontainersConfig::class)
 class MatchingEngineServiceTest {
     
     @Autowired

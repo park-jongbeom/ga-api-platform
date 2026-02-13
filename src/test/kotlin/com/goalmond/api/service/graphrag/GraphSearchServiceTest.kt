@@ -63,7 +63,7 @@ class GraphSearchServiceTest {
         assertThat(paths[0].schoolName).contains("Stanford")
         assertThat(paths[0].skills).contains("Machine Learning")
         assertThat(paths[0].company).isEqualTo("Google")
-        assertThat(paths[0].weight).isGreaterThan(0.5)
+        assertThat(paths[0].weight).isGreaterThan(0.4)  // 4-hop 누적 곱: 0.9×0.9 × 0.8×0.85 × 1.0×0.9 × 1.0×0.95 ≈ 0.471
     }
     
     @Test

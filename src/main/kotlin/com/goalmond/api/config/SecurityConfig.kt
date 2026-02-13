@@ -24,8 +24,9 @@ class SecurityConfig(
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        return if (isDefaultProfile) {
-            // default 프로파일: Mock API만 사용, 인증 없이 전체 허용
+        // jwtAuthenticationFilter가 등록되지 않은 프로파일(test-only 등)은 permissive 모드
+        return if (isDefaultProfile || jwtAuthenticationFilter == null) {
+            // default/test-only 프로파일: 인증 없이 전체 허용
             http
                 .csrf { it.disable() }
                 .authorizeHttpRequests { it.anyRequest().permitAll() }
@@ -43,7 +44,7 @@ class SecurityConfig(
                         .anyRequest().permitAll()
                 }
                 .addFilterBefore(
-                    jwtAuthenticationFilter!!,
+                    jwtAuthenticationFilter,
                     UsernamePasswordAuthenticationFilter::class.java
                 )
                 .build()

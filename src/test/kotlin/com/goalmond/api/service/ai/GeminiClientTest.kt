@@ -58,6 +58,7 @@ class GeminiClientTest {
     }
     
     @Test
+    @Disabled("실제 API 호출 - Quota 초과로 수동 실행 필요")
     fun `Gemini embedContent 768차원 벡터 반환`() {
         // Given
         val text = """
@@ -100,6 +101,7 @@ class GeminiClientTest {
     }
     
     @Test
+    @Disabled("실제 API 호출 - Quota 초과로 수동 실행 필요")
     fun `동일한 텍스트는 항상 동일한 임베딩을 반환한다`() {
         // Given
         val text = "Test text for embedding consistency"
@@ -116,6 +118,7 @@ class GeminiClientTest {
     }
     
     @Test
+    @Disabled("실제 API 호출 - Quota 초과로 수동 실행 필요")
     fun `서로 다른 텍스트는 다른 임베딩을 반환한다`() {
         // Given
         val text1 = "Computer Science program in California"

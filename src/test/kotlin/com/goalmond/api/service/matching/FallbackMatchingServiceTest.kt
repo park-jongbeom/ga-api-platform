@@ -295,11 +295,11 @@ class FallbackMatchingServiceTest {
                 }
             ]
             """.trimIndent()
-            every { geminiClient.generateContent(any()) } returns responseWithExtendedFields
-            
+            every { geminiClient.generateContent(any(), 0.3, 0.9) } returns responseWithExtendedFields
+
             // When
             val results = fallbackMatchingService.generateFallbackResults(testProfile, testPreference)
-            
+
             // Then
             assertThat(results).hasSize(1)
             val result = results[0]
@@ -355,7 +355,7 @@ class FallbackMatchingServiceTest {
             ]
             ```
             """.trimIndent()
-            every { geminiClient.generateContent(any()) } returns markdownWrappedResponse
+            every { geminiClient.generateContent(any(), 0.3, 0.9) } returns markdownWrappedResponse
             
             // When
             val results = fallbackMatchingService.generateFallbackResults(testProfile, testPreference)
@@ -372,7 +372,7 @@ class FallbackMatchingServiceTest {
             val responseWithInvalidType = """
             [{"school_name": "Test", "school_type": "cc", "state": "CA", "city": "LA", "tuition": 10000, "recommendation_type": "invalid_type"}]
             """.trimIndent()
-            every { geminiClient.generateContent(any()) } returns responseWithInvalidType
+            every { geminiClient.generateContent(any(), 0.3, 0.9) } returns responseWithInvalidType
             
             // When
             val results = fallbackMatchingService.generateFallbackResults(testProfile, testPreference)

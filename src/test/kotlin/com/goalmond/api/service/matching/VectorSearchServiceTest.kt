@@ -9,6 +9,7 @@ import com.goalmond.api.repository.SchoolRepository
 import com.goalmond.api.repository.UserPreferenceRepository
 import com.goalmond.api.repository.UserRepository
 import com.goalmond.api.support.FakeGeminiTestConfig
+import com.goalmond.api.support.PostgresTestcontainersConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,7 +22,7 @@ import kotlin.system.measureTimeMillis
 
 /**
  * VectorSearchService 통합 테스트 (GAM-3, Phase 3).
- * 
+ *
  * 테스트 목표:
  * 1. 사용자 프로필 → 쿼리 텍스트 생성 (필수 정보 포함)
  * 2. 쿼리 임베딩 생성 (768차원)
@@ -31,7 +32,7 @@ import kotlin.system.measureTimeMillis
  */
 @SpringBootTest
 @ActiveProfiles("local")
-@Import(FakeGeminiTestConfig::class)
+@Import(FakeGeminiTestConfig::class, PostgresTestcontainersConfig::class)
 class VectorSearchServiceTest {
     
     @Autowired

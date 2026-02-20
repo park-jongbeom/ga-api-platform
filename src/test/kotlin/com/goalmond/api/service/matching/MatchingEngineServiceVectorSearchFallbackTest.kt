@@ -127,7 +127,8 @@ class MatchingEngineServiceVectorSearchFallbackTest {
             pathOptimizationService = pathOptimizationService,
             riskPenaltyService = riskPenaltyService,
             explanationService = explanationService,
-            fallbackMatchingService = fallbackMatchingService
+            fallbackMatchingService = fallbackMatchingService,
+            hybridRankingService = HybridRankingService()
         )
 
         val response = service.executeMatching(userId)
@@ -286,7 +287,8 @@ class MatchingEngineServiceVectorSearchFallbackTest {
             pathOptimizationService = pathOptimizationService,
             riskPenaltyService = riskPenaltyService,
             explanationService = explanationService,
-            fallbackMatchingService = fallbackMatchingService
+            fallbackMatchingService = fallbackMatchingService,
+            hybridRankingService = HybridRankingService()
         )
 
         val response = service.executeMatching(userId)

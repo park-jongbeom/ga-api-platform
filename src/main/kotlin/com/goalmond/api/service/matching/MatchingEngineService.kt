@@ -13,7 +13,6 @@ import com.goalmond.api.repository.UserRepository
 import com.goalmond.api.domain.graphrag.EntityType
 import com.goalmond.api.service.graphrag.CareerPath
 import com.goalmond.api.service.graphrag.GraphSearchService
-import com.goalmond.api.service.graphrag.ProgramSearchResult
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -48,7 +47,8 @@ class MatchingEngineService(
     private val pathOptimizationService: PathOptimizationService,
     private val riskPenaltyService: RiskPenaltyService,
     private val explanationService: ExplanationService,
-    private val fallbackMatchingService: FallbackMatchingService
+    private val fallbackMatchingService: FallbackMatchingService,
+    private val hybridRankingService: HybridRankingService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     
@@ -122,10 +122,6 @@ class MatchingEngineService(
                 emptyList()
             }
 
-            val maxGraphWeight = careerPaths.maxOfOrNull { it.weight } ?: 1.0
-            val maxSkillRelevance = skillProgramMatches.maxOfOrNull { it.relevanceScore } ?: 1.0
-            val programSkillScoreMap = buildProgramSkillScoreMap(skillProgramMatches, maxSkillRelevance)
-
             logger.info(
                 "Hybrid graph signals: careerPaths={}, detectedSkills={}, skillProgramMatches={}",
                 careerPaths.size,
@@ -185,41 +181,13 @@ class MatchingEngineService(
                 )
             }
 
-            val enrichedCandidates = candidates.map { candidate ->
-                val schoolId = candidate.school.id
-                val vectorScore = schoolId?.let { vectorScoreMap[it] } ?: 0.0
-                val graphPath = selectGraphPath(candidate, careerPaths)
-                val pathGraphScore = computeGraphScore(graphPath, maxGraphWeight)
-                val skillGraphScore = candidate.program.id?.let { programSkillScoreMap[it] } ?: 0.0
-                val graphScore = (
-                    (pathGraphScore * GRAPH_PATH_SIGNAL_WEIGHT) +
-                        (skillGraphScore * GRAPH_SKILL_SIGNAL_WEIGHT)
-                    ).coerceIn(0.0, 1.0)
-                val preferenceNormalized = (candidate.scores.career / MAX_CAREER_SCORE).coerceIn(0.0, 1.0)
-                val hybridNormalized = (vectorScore * VECTOR_WEIGHT) +
-                    (graphScore * GRAPH_WEIGHT) +
-                    (preferenceNormalized * PREFERENCE_WEIGHT)
-                val rankingScore = (hybridNormalized * 100).coerceIn(0.0, 100.0)
-
-                candidate.copy(
-                    vectorScore = vectorScore,
-                    graphScore = graphScore,
-                    graphPath = graphPath,
-                    rankingScore = rankingScore
-                )
-            }
-
-            val top5 = enrichedCandidates
-                .sortedWith(
-                    compareByDescending<MatchingCandidate> { it.rankingScore }
-                        .thenByDescending { it.graphScore }
-                        .thenByDescending { it.vectorScore }
-                        .thenByDescending { it.totalScore }
-                        .thenBy { it.school.name }
-                )
-                .take(5)
-
-            logHybridDiagnostics(top5, detectedSkills)
+            val top5 = hybridRankingService.rankCandidates(
+                candidates = candidates,
+                vectorScoreMap = vectorScoreMap,
+                careerPaths = careerPaths,
+                skillProgramMatches = skillProgramMatches,
+                detectedSkills = detectedSkills
+            )
 
             logger.info("Top 5 선정 완료: Hybrid 점수 ${top5.firstOrNull()?.rankingScore} ~ ${top5.lastOrNull()?.rankingScore}")
 
@@ -457,70 +425,6 @@ class MatchingEngineService(
             }
     }
 
-    private fun buildProgramSkillScoreMap(
-        matches: List<ProgramSearchResult>,
-        maxSkillRelevance: Double
-    ): Map<UUID, Double> {
-        if (matches.isEmpty() || maxSkillRelevance <= 0.0) return emptyMap()
-
-        return matches.mapNotNull { result ->
-            val programId = result.programId ?: return@mapNotNull null
-            val normalizedScore = (result.relevanceScore / maxSkillRelevance).coerceIn(0.0, 1.0)
-            programId to normalizedScore
-        }.toMap()
-    }
-
-    private fun logHybridDiagnostics(
-        topCandidates: List<MatchingCandidate>,
-        detectedSkills: List<String>
-    ) {
-        if (topCandidates.isEmpty()) {
-            logger.info("Hybrid diagnostics: no top candidates")
-            return
-        }
-
-        val graphPathCount = topCandidates.count { it.graphPath != null }
-        val graphPathCoverage = graphPathCount.toDouble() / topCandidates.size.toDouble()
-        val avgVector = topCandidates.map { it.vectorScore }.average()
-        val avgGraph = topCandidates.map { it.graphScore }.average()
-        val avgPreference = topCandidates
-            .map { (it.scores.career / MAX_CAREER_SCORE).coerceIn(0.0, 1.0) }
-            .average()
-
-        logger.info(
-            "Hybrid diagnostics: topN={}, graphPathCoverage={}/{}, detectedSkills={}, avgVector={}, avgGraph={}, avgPreference={}",
-            topCandidates.size,
-            graphPathCount,
-            topCandidates.size,
-            detectedSkills,
-            String.format("%.4f", avgVector),
-            String.format("%.4f", avgGraph),
-            String.format("%.4f", avgPreference)
-        )
-
-        topCandidates.forEachIndexed { index, candidate ->
-            logger.debug(
-                "Hybrid rank {}: school='{}', program='{}', rankingScore={}, vectorScore={}, graphScore={}, totalScore={}, hasGraphPath={}",
-                index + 1,
-                candidate.school.name,
-                candidate.program.name,
-                String.format("%.2f", candidate.rankingScore),
-                String.format("%.4f", candidate.vectorScore),
-                String.format("%.4f", candidate.graphScore),
-                String.format("%.2f", candidate.totalScore),
-                candidate.graphPath != null
-            )
-        }
-
-        if (graphPathCoverage < GRAPH_PATH_COVERAGE_ALERT_THRESHOLD) {
-            logger.warn(
-                "Hybrid diagnostics alert: graph path coverage below threshold (coverage={}, threshold={})",
-                String.format("%.2f", graphPathCoverage),
-                GRAPH_PATH_COVERAGE_ALERT_THRESHOLD
-            )
-        }
-    }
-
     private data class GraphIntent(
         val companyName: String,
         val jobName: String?
@@ -595,14 +499,7 @@ class MatchingEngineService(
     }
 
     private companion object {
-        const val VECTOR_WEIGHT = 0.4
-        const val GRAPH_WEIGHT = 0.5
-        const val PREFERENCE_WEIGHT = 0.1
-        const val GRAPH_PATH_SIGNAL_WEIGHT = 0.7
-        const val GRAPH_SKILL_SIGNAL_WEIGHT = 0.3
-        const val MAX_CAREER_SCORE = 30.0
         const val MAX_DETECTED_SKILLS = 5
-        const val GRAPH_PATH_COVERAGE_ALERT_THRESHOLD = 0.4
         val STOP_WORDS = setOf(
             "and", "or", "the", "for", "with", "to", "in", "at", "of", "on", "a", "an",
             "취업", "목표", "희망", "전공", "진로", "분야", "관련"

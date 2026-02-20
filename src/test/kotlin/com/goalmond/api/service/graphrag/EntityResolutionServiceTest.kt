@@ -114,12 +114,45 @@ class EntityResolutionServiceTest {
             confidenceScore = 0.8,
             sourceUrls = arrayOf("https://google.com", "https://careers.google.com")
         )
-        
+
         // When
         val newScore = entityResolutionService.recalculateConfidenceScore(entity, tripleCount = 10)
-        
+
         // Then
         assertThat(newScore).isGreaterThan(0.8)  // Source + Triple 보너스
         assertThat(newScore).isLessThanOrEqualTo(1.0)  // 최대값 제한
+    }
+
+    @Test
+    fun `External alias dictionary is applied to normalization`() {
+        val normalized = entityResolutionService.normalizeEntityName("NYU")
+        assertThat(normalized).isEqualTo("new york university")
+        val normalizedBack = entityResolutionService.normalizeEntityName("New York University")
+        assertThat(normalizedBack).isEqualTo("new york university")
+    }
+
+    @Test
+    fun `Resolve or create reuses canonical entity for synonyms`() {
+        val first = entityResolutionService.resolveOrCreateEntity(
+            name = "Nova Labs",
+            type = EntityType.COMPANY,
+            aliases = listOf("Nova Labs Inc")
+        )
+        val second = entityResolutionService.resolveOrCreateEntity(
+            name = "Nova Labs Inc.",
+            type = EntityType.COMPANY
+        )
+        assertThat(second.uuid).isEqualTo(first.uuid)
+    }
+
+    @Test
+    fun `Batch resolution completes large input quickly`() {
+        val batch = List(1000) { index -> "BatchCo-${index % 5}" }
+        val start = System.nanoTime()
+        val resolved = entityResolutionService.resolveEntitiesBatch(batch, EntityType.COMPANY)
+        val durationMs = (System.nanoTime() - start) / 1_000_000
+        assertThat(resolved).hasSize(batch.size)
+        assertThat(durationMs).isLessThan(1000)
+        assertThat(resolved.map { it.uuid }.distinct().size).isLessThanOrEqualTo(5)
     }
 }

@@ -15,3 +15,10 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+app:
+  entity-resolution:
+    aliases-path: entity-resolution/aliases.json
+    similarity-threshold: 0.85
+    cache-size: 512
+    cache-ttl-minutes: 10
+    default-confidence-score: 0.75

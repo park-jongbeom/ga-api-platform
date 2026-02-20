@@ -39,3 +39,9 @@ app:
       model: ${GEMINI_MODEL:gemini-2.0-flash}
       embedding-model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
       api-url: https://generativelanguage.googleapis.com/v1beta
+  entity-resolution:
+    aliases-path: entity-resolution/aliases.json
+    similarity-threshold: 0.85
+    cache-size: 512
+    cache-ttl-minutes: 10
+    default-confidence-score: 0.75

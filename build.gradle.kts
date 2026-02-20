@@ -87,6 +87,7 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     
     // Spring AI (무료 Gemini API용 - Vertex AI 제외)
     implementation(platform("org.springframework.ai:spring-ai-bom:${property("springAiVersion")}"))

@@ -1,115 +1,116 @@
 package com.goalmond.api.service.graphrag
 
+import com.goalmond.api.config.EntityResolutionProperties
 import com.goalmond.api.domain.entity.GraphRagEntity
 import com.goalmond.api.domain.graphrag.EntityType
 import com.goalmond.api.repository.GraphRagEntityRepository
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
+import java.time.Duration
 import java.util.UUID
 
 /**
  * Entity Resolution Service
- * 
+ *
  * Entity 중복 제거 및 정규화를 담당합니다.
- * - Canonical name 정규화
- * - Alias 매칭
- * - 신뢰도 점수 기반 병합
  */
 @Service
 class EntityResolutionService(
-    private val entityRepository: GraphRagEntityRepository
+    private val entityRepository: GraphRagEntityRepository,
+    private val properties: EntityResolutionProperties,
+    @Qualifier("entityAliasDictionary")
+    private val aliasDictionary: Map<String, List<String>>
 ) {
     private val logger = LoggerFactory.getLogger(EntityResolutionService::class.java)
-    
+
+    private val aliasToCanonicalLookup: Map<String, String>
+    private val canonicalAliasLookup: Map<String, List<String>>
+    private val cacheDuration = Duration.ofMinutes(properties.cacheTtlMinutes)
+    private val entityListCache: LoadingCache<EntityType, List<GraphRagEntity>>
+    private val aliasIndexCache: LoadingCache<EntityType, Map<String, GraphRagEntity>>
+
+    init {
+        val canonicalBuilder = mutableMapOf<String, MutableList<String>>()
+        val aliasBuilder = mutableMapOf<String, String>()
+
+        aliasDictionary.forEach { (canonical, aliases) ->
+            val canonicalNormalized = basicNormalize(canonical)
+            aliasBuilder[canonicalNormalized] = canonicalNormalized
+            val normalizedAliases = aliases.map { basicNormalize(it) }.filter { it.isNotBlank() }
+            normalizedAliases.forEach { aliasNormalized ->
+                aliasBuilder[aliasNormalized] = canonicalNormalized
+            }
+            canonicalBuilder.computeIfAbsent(canonicalNormalized) { mutableListOf() }
+                .addAll(normalizedAliases)
+        }
+
+        canonicalAliasLookup = canonicalBuilder.mapValues { it.value.distinct() }
+        aliasBuilder.putAll(canonicalAliasLookup.keys.associateWith { it })
+        aliasToCanonicalLookup = aliasBuilder.toMap()
+
+        entityListCache = Caffeine.newBuilder()
+            .maximumSize(properties.cacheSize.toLong())
+            .expireAfterWrite(cacheDuration)
+            .build { entityRepository.findByEntityType(it) }
+
+        aliasIndexCache = Caffeine.newBuilder()
+            .maximumSize(properties.cacheSize.toLong())
+            .expireAfterWrite(cacheDuration)
+            .build { type -> buildAliasIndex(entityListCache.get(type)) }
+    }
+
     /**
      * Entity 이름을 정규화하여 Canonical Name 생성
-     * 
-     * 규칙:
-     * 1. 소문자 변환
-     * 2. 앞뒤 공백 제거
-     * 3. 연속된 공백을 하나로 축소
-     * 4. 특수문자 정리 (& → and, Inc. 제거 등)
      */
     fun normalizeEntityName(name: String): String {
-        return name.trim()
-            .lowercase()
-            .replace(Regex("\\s+"), " ")  // 연속된 공백을 하나로
-            .replace("&", "and")
-            .replace(Regex("\\bincorporated\\b"), "")  // "Incorporated" 제거
-            .replace(Regex("\\binc\\.?\\b"), "")  // "Inc." 또는 "Inc" 제거
-            .replace(Regex("\\bcorporation\\b"), "")  // "Corporation" 제거
-            .replace(Regex("\\bcorp\\.?\\b"), "")  // "Corp." 또는 "Corp" 제거
-            .replace(Regex("\\bllc\\.?\\b"), "")  // "LLC" 제거
-            .replace(Regex("\\bltd\\.?\\b"), "")  // "Ltd." 제거
-            .replace(Regex("[^a-z0-9\\s-]"), "")  // 알파벳, 숫자, 공백, 하이픈만 남김
-            .replace(Regex("\\s+"), " ")  // 제거 후 남은 연속 공백 재정리
-            .trim()
+        val result = basicNormalize(name)
+        return aliasToCanonicalLookup[result] ?: result
     }
-    
+
     /**
      * Alias와 매칭되는 Entity 찾기
-     * 
-     * @param name Entity 이름
-     * @param type Entity 타입
-     * @return 매칭된 Entity (없으면 null)
      */
     fun findByAlias(name: String, type: EntityType): GraphRagEntity? {
         val normalizedName = normalizeEntityName(name)
-        
-        // 1. Canonical name으로 정확 매칭
-        val exactMatch = entityRepository.findByEntityTypeAndCanonicalName(type, normalizedName)
-        if (exactMatch.isPresent) {
-            logger.debug("Found exact match for '{}': {}", name, exactMatch.get().entityName)
-            return exactMatch.get()
+        val aliasMap = aliasIndexCache.get(type)
+        val found = aliasMap[normalizedName]
+        if (found != null) {
+            logger.debug("Alias match for '{}' -> {}", name, found.entityName)
         }
-        
-        // 2. Aliases에서 매칭
-        val entities = entityRepository.findByEntityType(type)
-        for (entity in entities) {
-            if (entity.aliases.any { normalizeEntityName(it) == normalizedName }) {
-                logger.debug("Found alias match for '{}': {}", name, entity.entityName)
-                return entity
-            }
-        }
-        
-        return null
+        return found
     }
-    
+
     /**
      * Entity 유사도 점수 계산 (0.0 ~ 1.0)
-     * 
-     * - Exact match: 1.0
-     * - Alias match: 0.9
-     * - Fuzzy match (Levenshtein): 0.5 ~ 0.8
      */
     fun calculateSimilarityScore(entity1: GraphRagEntity, entity2: GraphRagEntity): Double {
         if (entity1.entityType != entity2.entityType) {
             return 0.0
         }
-        
-        val name1 = entity1.canonicalName
-        val name2 = entity2.canonicalName
-        
-        // Exact match
+
+        val name1 = normalizeEntityName(entity1.canonicalName)
+        val name2 = normalizeEntityName(entity2.canonicalName)
+
         if (name1 == name2) {
             return 1.0
         }
-        
-        // Alias match
+
         if (entity1.aliases.any { normalizeEntityName(it) == name2 } ||
             entity2.aliases.any { normalizeEntityName(it) == name1 }) {
             return 0.9
         }
-        
-        // Fuzzy match using Levenshtein distance on suffix-stripped names
-        // Strip common institution suffixes to avoid false-positive similarity
-        // e.g. "Stanford University" vs "Harvard University" shares "University"
+
         val stripped1 = stripInstitutionSuffixes(name1)
         val stripped2 = stripInstitutionSuffixes(name2)
         val compare1 = if (stripped1.isNotBlank()) stripped1 else name1
         val compare2 = if (stripped2.isNotBlank()) stripped2 else name2
 
-        // If stripped core names are identical → strong match
         if (compare1 == compare2) return 0.95
 
         val distance = levenshteinDistance(compare1, compare2)
@@ -121,35 +122,15 @@ class EntityResolutionService(
     }
 
     /**
-     * 기관명에서 공통 접미어(university, college 등) 제거
-     * Levenshtein 비교 시 false-positive 방지용
-     */
-    private fun stripInstitutionSuffixes(name: String): String {
-        val suffixes = listOf(
-            "university", "univ", "college", "institute", "school",
-            "academy", "polytechnic", "tech", "technology"
-        )
-        var result = name
-        for (suffix in suffixes) {
-            result = result.replace(Regex("\\b$suffix\\b"), "").trim()
-        }
-        return result.replace(Regex("\\s+"), " ").trim()
-    }
-    
-    /**
      * 중복 Entity 감지 및 병합 후보 반환
-     * 
-     * @param type Entity 타입
-     * @param similarityThreshold 유사도 임계값 (기본 0.85)
-     * @return 병합 후보 Entity 쌍 리스트
      */
     fun findDuplicateCandidates(
         type: EntityType,
-        similarityThreshold: Double = 0.85
+        similarityThreshold: Double = properties.similarityThreshold
     ): List<Pair<GraphRagEntity, GraphRagEntity>> {
-        val entities = entityRepository.findByEntityType(type)
+        val entities = entityListCache.get(type)
         val duplicates = mutableListOf<Pair<GraphRagEntity, GraphRagEntity>>()
-        
+
         for (i in entities.indices) {
             for (j in i + 1 until entities.size) {
                 val score = calculateSimilarityScore(entities[i], entities[j])
@@ -164,56 +145,220 @@ class EntityResolutionService(
                 }
             }
         }
-        
+
         return duplicates
     }
-    
+
     /**
-     * Levenshtein Distance 계산 (편집 거리)
+     * Entity 신뢰도 점수 재계산
      */
+    fun recalculateConfidenceScore(entity: GraphRagEntity, tripleCount: Int): Double {
+        var score = entity.confidenceScore.toDouble()
+
+        val sourceBonus = minOf(entity.sourceUrls.size * 0.02, 0.1)
+        score += sourceBonus
+
+        val tripleBonus = minOf(tripleCount * 0.03, 0.15)
+        score += tripleBonus
+
+        return minOf(score, 1.0)
+    }
+
+    /**
+     * 이름/타입으로 Entity를 찾거나 신규 등록합니다.
+     */
+    @Transactional
+    fun resolveOrCreateEntity(
+        name: String,
+        type: EntityType,
+        aliases: List<String> = emptyList(),
+        metadata: Map<String, Any> = emptyMap(),
+        schoolId: UUID? = null,
+        programId: UUID? = null,
+        confidenceScore: Double? = null,
+        sourceUrls: Array<String> = emptyArray()
+    ): GraphRagEntity {
+        findByAlias(name, type)?.let { return it }
+        val canonical = normalizeEntityName(name)
+        val created = persistNewEntity(
+            name = name.trim(),
+            canonicalName = canonical,
+            type = type,
+            metadata = metadata,
+            aliases = aliases,
+            schoolId = schoolId,
+            programId = programId,
+            confidenceScore = confidenceScore ?: properties.defaultConfidenceScore,
+            sourceUrls = sourceUrls
+        )
+        refreshCachesForType(type)
+        return created
+    }
+
+    /**
+     * 배치 엔티티 정규화 및 등록 (1000개 이상 처리 목표)
+     */
+    @Transactional
+    fun resolveEntitiesBatch(rawNames: List<String>, type: EntityType): List<GraphRagEntity> {
+        if (rawNames.isEmpty()) {
+            return emptyList()
+        }
+
+        val aliasIndex = aliasIndexCache.get(type).toMutableMap()
+        val resolvedEntities = mutableListOf<GraphRagEntity>()
+        var cacheInvalidated = false
+
+        rawNames.forEach { raw ->
+            val normalized = normalizeEntityName(raw)
+            val existing = aliasIndex[normalized]
+            if (existing != null) {
+                resolvedEntities.add(existing)
+                return@forEach
+            }
+
+            val created = persistNewEntity(
+                name = raw.trim(),
+                canonicalName = normalized,
+                type = type,
+                metadata = emptyMap(),
+                aliases = emptyList(),
+                schoolId = null,
+                programId = null,
+                confidenceScore = properties.defaultConfidenceScore,
+                sourceUrls = emptyArray()
+            )
+
+            addEntityToAliasIndex(created, aliasIndex)
+            resolvedEntities.add(created)
+            cacheInvalidated = true
+        }
+
+        if (cacheInvalidated) {
+            refreshCachesForType(type)
+        }
+
+        return resolvedEntities
+    }
+
+    private fun refreshCachesForType(type: EntityType) {
+        entityListCache.invalidate(type)
+        aliasIndexCache.invalidate(type)
+    }
+
+    private fun buildAliasIndex(entities: List<GraphRagEntity>): Map<String, GraphRagEntity> {
+        val index = mutableMapOf<String, GraphRagEntity>()
+        entities.forEach { entity -> addEntityToAliasIndex(entity, index) }
+        return index
+    }
+
+    private fun addEntityToAliasIndex(entity: GraphRagEntity, index: MutableMap<String, GraphRagEntity>) {
+        val canonicalNormalized = normalizeEntityName(entity.canonicalName)
+        index[canonicalNormalized] = entity
+        entity.aliases.forEach { alias ->
+            val normalizedAlias = basicNormalize(alias)
+            if (normalizedAlias.isNotBlank()) {
+                index[normalizedAlias] = entity
+            }
+        }
+        canonicalAliasLookup[canonicalNormalized]?.forEach { dictionaryAlias ->
+            if (dictionaryAlias.isNotBlank()) {
+                index[dictionaryAlias] = entity
+            }
+        }
+    }
+
+    private fun persistNewEntity(
+        name: String,
+        canonicalName: String,
+        type: EntityType,
+        metadata: Map<String, Any>,
+        aliases: List<String>,
+        schoolId: UUID?,
+        programId: UUID?,
+        confidenceScore: Double,
+        sourceUrls: Array<String>
+    ): GraphRagEntity {
+        val clampedScore = confidenceScore.coerceIn(0.0, 1.0)
+        val newEntity = GraphRagEntity(
+            entityType = type,
+            entityName = name,
+            canonicalName = canonicalName,
+            aliases = collectAliasCandidates(canonicalName, aliases),
+            metadata = metadata,
+            schoolId = schoolId,
+            programId = programId,
+            confidenceScore = BigDecimal.valueOf(clampedScore),
+            sourceUrls = sourceUrls
+        )
+
+        return try {
+            entityRepository.save(newEntity)
+        } catch (ex: DataIntegrityViolationException) {
+            logger.warn("Entity already exists during persist: {} / {}", type, canonicalName)
+            entityRepository.findByEntityTypeAndCanonicalName(type, canonicalName)
+                .orElseThrow { ex }
+        }
+    }
+
+    private fun collectAliasCandidates(canonicalNormalized: String, userAliases: List<String>): List<String> {
+        val aliasSet = linkedSetOf<String>()
+        canonicalAliasLookup[canonicalNormalized].orEmpty().forEach { alias ->
+            if (alias.isNotBlank()) aliasSet += alias
+        }
+        userAliases.map { basicNormalize(it) }.filter { alias -> alias.isNotBlank() }
+            .forEach { aliasSet += it }
+        return aliasSet.toList()
+    }
+
+    private fun basicNormalize(name: String): String {
+        return name.trim()
+            .lowercase()
+            .replace(Regex("\\s+"), " ")
+            .replace("&", "and")
+            .replace(Regex("\\bincorporated\\b"), "")
+            .replace(Regex("\\binc\\.?\\b"), "")
+            .replace(Regex("\\bcorporation\\b"), "")
+            .replace(Regex("\\bcorp\\.?\\b"), "")
+            .replace(Regex("\\bllc\\.?\\b"), "")
+            .replace(Regex("\\bltd\\.?\\b"), "")
+            .replace(Regex("[^a-z0-9\\s-]"), "")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+    }
+
+    private fun stripInstitutionSuffixes(name: String): String {
+        val suffixes = listOf(
+            "university", "univ", "college", "institute", "school",
+            "academy", "polytechnic", "tech", "technology"
+        )
+        var result = name
+        for (suffix in suffixes) {
+            result = result.replace(Regex("\\b$suffix\\b"), "").trim()
+        }
+        return result.replace(Regex("\\s+"), " ").trim()
+    }
+
     private fun levenshteinDistance(str1: String, str2: String): Int {
         val dp = Array(str1.length + 1) { IntArray(str2.length + 1) }
-        
+
         for (i in 0..str1.length) {
             dp[i][0] = i
         }
         for (j in 0..str2.length) {
             dp[0][j] = j
         }
-        
+
         for (i in 1..str1.length) {
             for (j in 1..str2.length) {
                 val cost = if (str1[i - 1] == str2[j - 1]) 0 else 1
                 dp[i][j] = minOf(
-                    dp[i - 1][j] + 1,      // deletion
-                    dp[i][j - 1] + 1,      // insertion
-                    dp[i - 1][j - 1] + cost // substitution
+                    dp[i - 1][j] + 1,
+                    dp[i][j - 1] + 1,
+                    dp[i - 1][j - 1] + cost
                 )
             }
         }
-        
+
         return dp[str1.length][str2.length]
-    }
-    
-    /**
-     * Entity 신뢰도 점수 재계산
-     * 
-     * 고려 요소:
-     * - Source URL 개수
-     * - 연결된 Triple 개수
-     * - Extraction method (LLM vs Manual)
-     */
-    fun recalculateConfidenceScore(entity: GraphRagEntity, tripleCount: Int): Double {
-        var score = entity.confidenceScore.toDouble()
-        
-        // Source URL 보너스 (최대 +0.1)
-        val sourceBonus = minOf(entity.sourceUrls.size * 0.02, 0.1)
-        score += sourceBonus
-        
-        // Triple 연결 보너스 (최대 +0.15)
-        val tripleBonus = minOf(tripleCount * 0.03, 0.15)
-        score += tripleBonus
-        
-        return minOf(score, 1.0)
     }
 }
